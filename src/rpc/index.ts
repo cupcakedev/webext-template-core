@@ -29,5 +29,5 @@ export const useApi = ({method, params, response}:ICommand) => {
             })
     })
 
-    return {data, error, isLoading}
+    return [data, error, isLoading]
 }

@@ -1,4 +1,3 @@
-import {IRoute} from "../interfaces";
 import {Router} from './router'
 import {EXTENSION_PREFIX} from "../config";
 
@@ -7,18 +6,6 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         return;
     }
     const {method, params} = request
-
-    route({method, params, sender})
-        .then(response => {
-            if (response !== undefined) {
-                sendResponse(response)
-            }
-        })
-
-    return true;
-});
-
-const route = async ({method, params, sender}: IRoute) => {
 
     const argsObj = parseArgs(params);
 
@@ -29,8 +16,15 @@ const route = async ({method, params, sender}: IRoute) => {
     }
 
     // @ts-ignore
-    return Router[method](sender, argsObj)
-};
+    Router[method](sender, argsObj)
+        .then((response: any) => {
+            if (response !== undefined) {
+                sendResponse(response)
+            }
+        })
+
+    return true;
+});
 
 const parseArgs = (args: any) => {
     if (!args) {

@@ -14,7 +14,13 @@ export interface ICommandGetTabID {
     response? : (data:any) => void
 }
 
-export type ICommand = ICommandGetToken | ICommandGetTabID // | ICommandSomething
+export interface ICommandGetExtensionID {
+    method: 'getExtensionID';
+    params?: any
+    response? : (data:any) => void
+}
+
+export type ICommand = ICommandGetToken | ICommandGetTabID | ICommandGetExtensionID // | ICommandSomething
 
 export interface IRoute {
     method: string;

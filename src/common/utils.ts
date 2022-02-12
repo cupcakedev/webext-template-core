@@ -31,6 +31,10 @@ export async function getCurrentTabId() {
     return execute({method: 'getTabID'})
 }
 
+export async function getExtensionID() {
+    return execute({method: 'getExtensionID'})
+}
+
 export const listenToMessage = (type: string, callback: (sender: MessageSender, sendResponse: () => void) => void) => {
     chrome.runtime.onMessage.addListener(
         function (request, sender, sendResponse) {

@@ -7,5 +7,9 @@ export const Router = {
 
     getTabID: async (sender: any, args?: any) => {
         return sender.tab.id
+    },
+
+    getExtensionID: async (sender: any, args?: any) => {
+        return sender.id
     }
 }
