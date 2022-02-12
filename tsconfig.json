@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "module": "commonjs",
+    "target": "es5",
+    "sourceMap": true,
+    "noEmitOnError": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "baseUrl": ".",
+    "lib": ["dom", "es2018"],
+    "allowJs": true,
+    "jsx": "react",
+    "downlevelIteration": true,
+    "strict": true,
+    "types": ["chrome", "node", "webpack-env"]
+  },
+  "include": ["src/**/*", "custom.d.ts"],
+  "exclude": ["./node_modules", "./dist"]
+}
