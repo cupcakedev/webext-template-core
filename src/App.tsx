@@ -4,6 +4,8 @@ import {execute, useApi} from './rpc'
 import {listenToMessage, findRoute} from "./common/utils";
 import {EXTENSION_PREFIX} from "./config";
 import {routes} from "./content/routes";
+import {useQuery} from "./query/UseBaseQuery";
+import {useMutation} from "./query/useMutation";
 
 interface IExample {
     /** Текст внутри кнопки */
@@ -11,7 +13,7 @@ interface IExample {
     top: string
 }
 
-const App: React.FC<{ tabId: number}> = ({tabId}) => {
+const App = () => {
     const [pathname, setPathname] = useState<string>(window.location.pathname)
     const [search, setSearch] = useState<string>(window.location.search)
     const Route = findRoute(routes, pathname)
@@ -33,7 +35,7 @@ const App: React.FC<{ tabId: number}> = ({tabId}) => {
 
     if(!Route) return null;
     // @ts-ignore
-    return <Route.Component {...Route.props} tabId={tabId}/>
+    return <Route.Component {...Route.props} />
 }
 
 export default App;

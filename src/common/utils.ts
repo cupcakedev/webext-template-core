@@ -7,18 +7,6 @@ import { parse } from 'query-string'
 import MessageSender = chrome.runtime.MessageSender;
 import {RouteInterface} from "../interfaces";
 
-
-
-// @ts-ignore
-export const actionToPlainObject: Middleware =
-    // @ts-ignore
-    (api: MiddlewareAPI<void>) =>
-        // @ts-ignore
-        (next: Dispatch<void>) => <A extends Action>(action: A) => {
-            // @ts-ignore
-            return next(Object.assign({}, action))
-        }
-
 export const openTab = async (url: string) => {
     return new Promise<void>((resolve, reject) => {
         chrome.tabs.create({url}, () => {

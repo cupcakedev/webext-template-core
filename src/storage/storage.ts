@@ -1,5 +1,5 @@
-export const storage = {
-    get: (key: string, defaultValue: string, storageArea: string) => {
+const Storage = {
+    get: (key: string, defaultValue: undefined, storageArea: string) => {
         const keyObj = defaultValue === undefined ? key : {[key]: defaultValue};
         return new Promise((resolve, reject) => {
             // @ts-ignore
@@ -20,3 +20,5 @@ export const storage = {
         });
     },
 };
+
+export default  Storage

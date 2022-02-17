@@ -1,0 +1,60 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "name": "Иван",
+      "login": "Ivan"
+    },
+    {
+      "id": 2,
+      "name": "Петр",
+      "login": "Petr"
+    },
+    {
+      "id": 4,
+      "name": "Макс",
+      "login": "Maks"
+    },
+    {
+      "id": 6,
+      "name": "Игорь",
+      "login": "Igor"
+    },
+    {
+      "name": "Костя",
+      "login": "Kostya",
+      "id": 7
+    },
+    {
+      "name": "Костя",
+      "login": "Kostya",
+      "id": 8
+    },
+    {
+      "name": "Костя",
+      "login": "Kostya",
+      "id": 9
+    },
+    {
+      "name": "Костя",
+      "login": "Kostya",
+      "id": 10
+    },
+    {
+      "name": "Костя",
+      "login": "Kostya",
+      "id": 11
+    },
+    {
+      "name": "Костя",
+      "login": "Kostya",
+      "id": 12
+    }
+  ],
+  "tokens": [
+    {
+      "id": 1,
+      "token": "WFR24t2cdwdsgwrfeEQFewvSBdgn3rf35t"
+    }
+  ]
+}

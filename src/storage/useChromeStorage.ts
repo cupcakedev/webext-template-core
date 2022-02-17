@@ -1,5 +1,5 @@
 import {useCallback, useEffect, useState} from 'react';
-import {storage} from './storage';
+import storage from './storage';
 
 
 /**

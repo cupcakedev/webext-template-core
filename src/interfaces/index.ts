@@ -20,7 +20,25 @@ export interface ICommandGetExtensionID {
     response? : (data:any) => void
 }
 
-export type ICommand = ICommandGetToken | ICommandGetTabID | ICommandGetExtensionID // | ICommandSomething
+export interface ICommandGetUsers {
+    method: 'getUsers';
+    params?: any
+    response? : (data:any) => void
+}
+
+export interface ICommandAddUsers {
+    method: 'addUser';
+    params?: any
+    response? : (data:any) => void
+}
+
+export interface ICommandUpdateUser {
+    method: 'updateUser';
+    params?: any
+    response? : (data:any) => void
+}
+
+export type ICommand = ICommandGetToken | ICommandGetTabID | ICommandGetExtensionID | ICommandGetUsers | ICommandAddUsers | ICommandUpdateUser// | ICommandSomething
 
 export interface IRoute {
     method: string;

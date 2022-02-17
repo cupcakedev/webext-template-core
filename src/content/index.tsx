@@ -1,7 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from "../App";
-import {actionToPlainObject, getCurrentTabId} from "../common/utils";
+import { getCurrentTabId} from "../common/utils";
+import {QueryClientProvider} from "../query/Provider";
+import {QueryClient} from "../query/QueryClient";
 
 let injection = document.getElementById('inject');
 
@@ -19,31 +21,37 @@ export async function injectEntryPoint(){
     //console.log(injection)
     // @ts-ignore
     //const shadow = injection.attachShadow({mode: 'open'});
+    const client = new QueryClient();
 
     ReactDOM.render(
-        // @ts-ignore
-        <App tabId={tabId}/>
+        <QueryClientProvider client={client}>
+            <App />
+        </QueryClientProvider>
         , injection);
 }
 
 injectEntryPoint().then().catch(e => console.log(e))
 
-let timerId: number | null = null;
-const observer = new MutationObserver(()=>{
-    // @ts-ignore
-    timerId = setTimeout(()=>{
-        if(document.getElementById('inject')) {
-            injectEntryPoint().then().catch(e => console.log(e))
-        }
-    }, 50)
-});
-if(injection){
-    observer.observe(document.getElementsByTagName('body')[0], {
-        attributes: true,
-        childList: true,
-        subtree: true
-    })
-}
+
+// TODO Реализовать обсервер
+
+// let timerId: number | null = null;
+// const observer = new MutationObserver(()=>{
+//     // @ts-ignore
+//     timerId = setTimeout(()=>{
+//         if(document.getElementById('inject')) {
+//             injectEntryPoint().then().catch(e => console.log(e))
+//         }
+//     }, 50)
+// });
+// if(injection){
+//     observer.observe(document.getElementsByTagName('body')[0], {
+//         attributes: true,
+//         childList: true,
+//         subtree: true
+//     })
+// }
+
 //
 // return () => {
 //     observer.disconnect();

@@ -5,12 +5,14 @@
   "scripts": {
     "dev": "dotenv -- webpack --mode=development --watch",
     "build": "dotenv -- webpack --mode=production",
-    "lint": "eslint --ext js,ts,tsx ."
+    "lint": "eslint --ext js,ts,tsx .",
+    "test": "jest"
   },
   "private": true,
   "main": "export/index",
   "dependencies": {
     "@types/lodash": "^4.14.178",
+    "axios": "^0.26.0",
     "lodash": "^4.17.21",
     "query-string": "^7.1.1",
     "react": "^17.0.1",

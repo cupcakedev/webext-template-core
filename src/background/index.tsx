@@ -1,4 +1,4 @@
-import {Router} from './router'
+import {Services} from './services'
 import {EXTENSION_PREFIX} from "../config";
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
@@ -9,18 +9,22 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 
     const argsObj = parseArgs(params);
 
-    const map = Object.keys(Router)
+    const map = Object.keys(Services)
 
     if (!map.includes(method)) {
         return Promise.reject()
     }
 
     // @ts-ignore
-    Router[method](sender, argsObj)
+    Services[method](sender, argsObj)
         .then((response: any) => {
+            console.log(response)
             if (response !== undefined) {
                 sendResponse(response)
             }
+        })
+        .catch((e:any) => {
+            sendResponse({error: e.message})
         })
 
     return true;
