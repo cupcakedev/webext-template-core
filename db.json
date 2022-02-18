@@ -1,4 +1,4 @@
-﻿{
+{
   "users": [
     {
       "id": 1,
@@ -7,23 +7,28 @@
     },
     {
       "id": 2,
-      "name": "Петр",
-      "login": "Petr"
+      "name": "342",
+      "login": "342"
+    },
+    {
+      "id": 3,
+      "name": "342",
+      "login": "342"
     },
     {
       "id": 4,
-      "name": "Макс",
-      "login": "Maks"
-    },
-    {
-      "id": 6,
       "name": "Игорь",
       "login": "Igor"
     },
     {
       "name": "Костя",
       "login": "Kostya",
-      "id": 7
+      "id": 5
+    },
+    {
+      "name": "Костя",
+      "login": "Kostya",
+      "id": 6
     }
   ],
   "tokens": [

@@ -1,23 +1,23 @@
 import axiosOriginal from 'axios'
 // @ts-ignore
 import adapter from 'axios/lib/adapters/xhr'
+import {IRpc, IServices} from "../interfaces";
 
 const axios = axiosOriginal.create({adapter})
-import {ITokenArgs} from "../interfaces";
 
-const ID = 1;
 const URL_JSON_SERVER = 'http://localhost:3004'
 
-export const Services = {
-    getToken: async (sender: any, args?: any) => {
-        return axios(`${URL_JSON_SERVER}/tokens/${ID}`);
+export const Services: IServices<IRpc> = {
+    getToken: (_, args) => {
+        return axios(`${URL_JSON_SERVER}/tokens/${args}`);
     },
 
-    getTabID: async (sender: any, args?: any) => {
+    getTabID: (sender) => {
+        console.log(sender)
         return sender.tab.id
     },
 
-    getExtensionID: async (sender: any, args?: any) => {
+    getExtensionID: (sender) => {
         return sender.id
     },
 
@@ -29,7 +29,7 @@ export const Services = {
         }
     },
 
-    addUser: async (sender: any, args?: any) => {
+    addUser: async (_, user) => {
         try {
             return await (
                 await fetch(
@@ -38,7 +38,7 @@ export const Services = {
                         headers: {
                             'Content-Type': 'application/json;charset=utf-8'
                         },
-                        body: JSON.stringify(args)
+                        body: JSON.stringify(user)
                     })
             ).json();
         } catch (e) {
@@ -46,11 +46,11 @@ export const Services = {
         }
     },
 
-    deleteUser: async (sender: any, args?: any) => {
+    deleteUser: async (_, id) => {
         try {
             return await (
                 await fetch(
-                    `${URL_JSON_SERVER}/users/${args.id}`, {
+                    `${URL_JSON_SERVER}/users/${id}`, {
                         method: 'DELETE'
                     })
             ).json();
@@ -59,16 +59,16 @@ export const Services = {
         }
     },
 
-    updateUser: async (sender: any, args?: any) => {
+    updateUser: async (_, user) => {
         try {
             return await (
                 await fetch(
-                    `${URL_JSON_SERVER}/users/${args.id}`, {
+                    `${URL_JSON_SERVER}/users/${user.id}`, {
                         method: 'PUT',
                         headers: {
                             'Content-Type': 'application/json;charset=utf-8'
                         },
-                        body: JSON.stringify(args)
+                        body: JSON.stringify(user)
                     })
             ).json();
         } catch (e) {

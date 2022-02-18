@@ -1,7 +1,8 @@
 import React, {useState} from 'react';
 import ReactDOM from 'react-dom';
 import {useChromeStorageLocal} from 'use-chrome-storage';
-import {getExtensionID} from "../common/utils";
+import {factory} from "../rpc/factory";
+import {IRpc} from "../interfaces";
 
 const App = () => {
 
@@ -12,6 +13,8 @@ const App = () => {
     if (errorMessage) {
         return <p>{`An error has occurred: ${errorMessage}`}</p>
     }
+
+    const getExtensionID = factory<IRpc['getExtensionID']>('getExtensionID')
 
     const getTabIDHandler = async () => {
         const id = await getExtensionID()

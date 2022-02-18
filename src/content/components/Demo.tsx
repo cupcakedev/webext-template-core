@@ -2,47 +2,29 @@ import React, {useState} from "react";
 
 import {Injection} from "./Injection";
 import {EXTENSION_PREFIX} from "../../config";
-import {getCurrentTabId} from "../../common/utils";
-import {execute} from "../../rpc";
-import {useQuery} from "react-query";
+import {QueryFunctionContext, useQuery} from "react-query";
 import {useMutation} from "react-query";
 import {useQueryClient} from "react-query";
+import {IRpc} from "../../interfaces";
+import {factory} from "../../rpc/factory";
 
 const Demo: React.FC<{ variant?: string }> = ({variant}) => {
 
     const [value, setValue] = useState(0)
     const queryClient = useQueryClient()
 
+
     const [tabID, setTabID] = useState('')
 
-    const getUsers = async (_keys: any) => {
-        const [_key, page, status ] = _keys
-        // console.log("Обновление users началось")
-        // try {
-        //     const data = await axios(`http://localhost:3004/users/`, {method: 'GET'});
-        //     console.log(data)
-        //     return data.data
-        // } catch (e) {
-        //     return e;
-        // }
-        return execute({method: 'getUsers', params:{page, status }})
-    }
+    const getTabID = factory<IRpc['getTabID']>('getTabID')
 
-    const addUser = () => {
-        const params = {name:"Костя",login:"Kostya"}
-        return execute({method: 'addUser', params})
-    }
+    const getUsers = factory<IRpc['getUsers']>('getUsers')
+    const getToken = factory<IRpc['getToken']>('getToken')
+    const addUser = factory<IRpc['addUser']>('addUser')
+    const updateUser = factory<IRpc['updateUser']>('updateUser')
+    const deleteUser = factory<IRpc['deleteUser']>('deleteUser')
 
-    const updateUser = () => {
-        const params = {id: 6, name:"Игорь", login:"Igor"}
-        return execute({method: 'updateUser', params})
-    }
-
-    const {data, isLoading, error} = useQuery(['usersList', { page: 1}], getUsers)
-    //
-    // console.log(`isLoading: ${isLoading}`)
-    // console.log(`error: ${error}`)
-    // console.log(`data: ${JSON.stringify(data)}`)
+    const {data, isLoading, error} = useQuery(['usersList', { sort: '1'}], getUsers)
 
     const mutation = useMutation(addUser, {
         onSuccess: (data: any) => {
@@ -53,7 +35,8 @@ const Demo: React.FC<{ variant?: string }> = ({variant}) => {
         },
     })
 
-    const mutationUpdate = useMutation(updateUser, {
+
+    const mutationUpdate = useMutation(updateUser , {
         onSuccess: (data: any) => {
             queryClient.invalidateQueries('usersList')
         },
@@ -65,7 +48,9 @@ const Demo: React.FC<{ variant?: string }> = ({variant}) => {
     const selectTargetEl = () => document.querySelector('#inject');
 
     const getTabIDHandler = async () => {
-        const id = await getCurrentTabId()
+        const id = await getTabID()
+        const token = await getToken()
+        console.log(token)
         // @ts-ignore
         setTabID(id)
     }
@@ -87,8 +72,17 @@ const Demo: React.FC<{ variant?: string }> = ({variant}) => {
                     }
                 </div>
 
-                <button onClick={() => mutation.mutate()}>Add</button>
-                <button onClick={() => mutationUpdate.mutate()}>Update</button>
+                <button onClick={() => mutation.mutate(
+                    {
+                        name: '342',
+                        login: '342'
+                    }
+                )}>Add</button>
+                <button onClick={() => mutationUpdate.mutate({
+                    id:'3',
+                    name: '342',
+                    login: '342'
+                })}>Update</button>
                 <button onClick={getTabIDHandler}>Запросить tabID</button>
                 <button
                     onClick={() => {

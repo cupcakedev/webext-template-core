@@ -5,8 +5,9 @@ import {QueryClient} from "react-query";
 import {createChromeStoragePersistor} from "../storage/createChromeStoragePersistor";
 import {persistQueryClient} from 'react-query/persistQueryClient-experimental'
 
-import {getCurrentTabId} from "../common/utils";
 import App from "../App";
+import {factory} from "../rpc/factory";
+import {IRpc} from "../interfaces";
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -30,7 +31,9 @@ export async function injectEntryPoint() {
     // const _store = new Store();
     // const middleware = [actionToPlainObject]
     // const store = applyMiddleware(_store, ...middleware)
-    const [tabId] = await Promise.all([getCurrentTabId()]);
+
+    const getTabID = factory<IRpc['getTabID']>('getTabID')
+    const [tabId] = await Promise.all([getTabID()]);
 
     // const injection = document.createElement('div');
     // injection.classList.add('extension-injection');
