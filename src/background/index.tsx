@@ -2,6 +2,11 @@ import {Services} from './services'
 import {EXTENSION_PREFIX} from "../config";
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+    console.log("Пытаюсь что-то делать")
+    if(chrome.runtime.lastError) {
+        sendResponse(chrome.runtime.lastError)
+        return true;
+    }
     if (request.type !== 'command') {
         return;
     }
@@ -69,22 +74,29 @@ const parseArgs = (args: any) => {
 //     alert(e)
 // }
 
-chrome.storage.onChanged.addListener(function (changes, namespace) {
-    for (let [key, {oldValue, newValue}] of Object.entries(changes)) {
-        console.log(
-            `Storage key "${key}" in namespace "${namespace}" changed.`,
-            `Old value was "${oldValue}", new value is "${newValue}".`
-        );
-    }
-});
+// chrome.storage.onChanged.addListener(function (changes, namespace) {
+//     for (let [key, {oldValue, newValue}] of Object.entries(changes)) {
+//         console.log(
+//             `Storage key "${key}" in namespace "${namespace}" changed.`,
+//             `Old value was "${oldValue}", new value is "${newValue}".`
+//         );
+//     }
+// });
 
-chrome.tabs.onUpdated.addListener(
-    function(tabId, changeInfo, tab) {
-        if (changeInfo.status === 'complete') {
-            console.log(`${EXTENSION_PREFIX}__change_url`)
-            chrome.tabs.sendMessage( tabId, {
-                type: `${EXTENSION_PREFIX}__change_url`
-            })
-        }
+function urlListener (tabId: any, changeInfo: any, tab: any) {
+    if (changeInfo.status === 'complete') {
+        console.log(`${EXTENSION_PREFIX}__change_url`)
+        if(chrome.runtime.lastError) {return;}
+
+        chrome.tabs.sendMessage( tabId, {
+            type: `${EXTENSION_PREFIX}__change_url`
+        })
     }
-);
+}
+
+chrome.tabs.onUpdated.addListener(urlListener);
+//
+// chrome.runtime.connect().onDisconnect.addListener(function() {
+//     chrome.tabs.onUpdated.removeListener(urlListener)
+//     console.log("disconnected")
+// })

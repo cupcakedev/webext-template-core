@@ -1,21 +1,19 @@
 import React, {useState} from "react";
-import {useChromeStorageLocal} from "../../storage";
+
 import {Injection} from "./Injection";
 import {EXTENSION_PREFIX} from "../../config";
 import {getCurrentTabId} from "../../common/utils";
 import {execute} from "../../rpc";
-import {useQuery} from "../../query/UseBaseQuery";
-import {useMutation} from "../../query/useMutation";
-import {useQueryClient} from "../../query/Provider";
-import axios from "axios";
+import {useQuery} from "react-query";
+import {useMutation} from "react-query";
+import {useQueryClient} from "react-query";
 
 const Demo: React.FC<{ variant?: string }> = ({variant}) => {
 
+    const [value, setValue] = useState(0)
     const queryClient = useQueryClient()
 
     const [tabID, setTabID] = useState('')
-    const key = 'counter';
-    const [value, setValue, isPersistent, errorMessage] = useChromeStorageLocal(key, 0);
 
     const getUsers = async (_keys: any) => {
         const [_key, page, status ] = _keys
@@ -40,7 +38,7 @@ const Demo: React.FC<{ variant?: string }> = ({variant}) => {
         return execute({method: 'updateUser', params})
     }
 
-    const [data, isLoading, error] = useQuery(['usersList', { page: 1}], getUsers, {option: 'paramOption'})
+    const {data, isLoading, error} = useQuery(['usersList', { page: 1}], getUsers)
     //
     // console.log(`isLoading: ${isLoading}`)
     // console.log(`error: ${error}`)
@@ -57,7 +55,7 @@ const Demo: React.FC<{ variant?: string }> = ({variant}) => {
 
     const mutationUpdate = useMutation(updateUser, {
         onSuccess: (data: any) => {
-            queryClient.invalidateQueries('usersList', {})
+            queryClient.invalidateQueries('usersList')
         },
         onError: () => {
             console.log("Мутация провалилась")
@@ -72,6 +70,8 @@ const Demo: React.FC<{ variant?: string }> = ({variant}) => {
         setTabID(id)
     }
 
+    const users = data as []
+
     return (
         <Injection selectTargetElement={selectTargetEl}
                    position="afterbegin"
@@ -79,10 +79,9 @@ const Demo: React.FC<{ variant?: string }> = ({variant}) => {
         >
             <div style={{...styles.box, top: top}}>
                 <p>TabID: {tabID || 'Неизвестно'}</p>
-                <p>Счетчик: {value}</p>
                 <div>
                     {
-                        data && data.map((user: any, key: number) => {
+                        users && users.map((user: any, key: number) => {
                             return <p key={key}>{user.name}</p>
                         })
                     }

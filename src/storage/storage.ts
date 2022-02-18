@@ -1,24 +1,26 @@
-const Storage = {
-    get: (key: string, defaultValue: undefined, storageArea: string) => {
-        const keyObj = defaultValue === undefined ? key : {[key]: defaultValue};
-        return new Promise((resolve, reject) => {
-            // @ts-ignore
-            chrome.storage[storageArea].get(keyObj, items => {
-                const error = chrome.runtime.lastError;
-                if (error) return reject(error);
-                resolve(items[key]);
-            });
-        });
-    },
-    set: (key: string, value: string, storageArea: string) => {
-        return new Promise<void>((resolve, reject) => {
-            // @ts-ignore
-            chrome.storage[storageArea].set({[key]: value}, () => {
-                const error = chrome.runtime.lastError;
-                error ? reject(error) : resolve();
-            });
-        });
-    },
-};
+export const getItem = async (key: string) => {
+    console.log("getItem")
+    return await new Promise<string | null>((resolve) => {
+        chrome.storage.local.get(key, items => {
+            resolve(items[key]);
+        })
+    })
+}
 
-export default  Storage
+export const setItem =  (key: string, value: string, callback?: (result: boolean) => void) => {
+    chrome.storage.local.set({[key]: value}, () => {
+        console.log("Я сохранился")
+        if(typeof callback === 'function') {
+            chrome.runtime.lastError
+                ? callback(false)
+                : callback(true)
+        }
+    });
+}
+
+export const removeItem = (key: string) => {
+    console.log("removeItem")
+    chrome.storage.local.set({[key]: undefined}, () => {
+        console.log("Я сохранился")
+    })
+}

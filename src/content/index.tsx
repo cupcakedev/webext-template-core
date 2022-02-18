@@ -1,13 +1,32 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import {QueryClientProvider} from "react-query";
+import {QueryClient} from "react-query";
+import {createChromeStoragePersistor} from "../storage/createChromeStoragePersistor";
+import {persistQueryClient} from 'react-query/persistQueryClient-experimental'
+
+import {getCurrentTabId} from "../common/utils";
 import App from "../App";
-import { getCurrentTabId} from "../common/utils";
-import {QueryClientProvider} from "../query/Provider";
-import {QueryClient} from "../query/QueryClient";
+
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            cacheTime: 1000 * 60 * 60 * 24, // 24 hours
+        },
+    },
+})
+
+const localStoragePersistor = createChromeStoragePersistor({key: `REACT_QUERY_CHROME_STORAGE_LOCAL`})
+
+persistQueryClient({
+    queryClient,
+    persistor: localStoragePersistor,
+    maxAge: 24 * 60 * 60
+})
 
 let injection = document.getElementById('inject');
 
-export async function injectEntryPoint(){
+export async function injectEntryPoint() {
     // const _store = new Store();
     // const middleware = [actionToPlainObject]
     // const store = applyMiddleware(_store, ...middleware)
@@ -21,11 +40,10 @@ export async function injectEntryPoint(){
     //console.log(injection)
     // @ts-ignore
     //const shadow = injection.attachShadow({mode: 'open'});
-    const client = new QueryClient();
 
     ReactDOM.render(
-        <QueryClientProvider client={client}>
-            <App />
+        <QueryClientProvider client={queryClient}>
+            <App/>
         </QueryClientProvider>
         , injection);
 }
