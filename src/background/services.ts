@@ -1,11 +1,16 @@
 import axiosOriginal from 'axios'
 // @ts-ignore
 import adapter from 'axios/lib/adapters/xhr'
-import {IRpc, IServices} from "../interfaces";
+import {IRpc} from "../interfaces";
 
 const axios = axiosOriginal.create({adapter})
 
 const URL_JSON_SERVER = 'http://localhost:3004'
+
+export type IServices<T> = {
+    [name in keyof IRpc]: <T extends { Params?: any; Response: any; }>
+    (sender: any, args:IRpc[name]['Params']) => Promise<T['Response']>;
+};
 
 export const Services: IServices<IRpc> = {
     getToken: (_, args) => {
@@ -13,7 +18,6 @@ export const Services: IServices<IRpc> = {
     },
 
     getTabID: (sender) => {
-        console.log(sender)
         return sender.tab.id
     },
 

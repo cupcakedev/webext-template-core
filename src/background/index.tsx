@@ -1,5 +1,6 @@
 import {Services} from './services'
-import {EXTENSION_PREFIX} from "../config";
+
+const EXTENSION_NAME_PREFIX = process.env.EXTENSION_NAME_PREFIX
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     if(chrome.runtime.lastError) {
@@ -18,8 +19,6 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     if (!map.includes(method)) {
         return Promise.reject()
     }
-
-    // @ts-ignore
 
     // @ts-ignore
     const result = Services[method](sender, argsObj)
@@ -59,22 +58,23 @@ const parseArgs = (args: any) => {
     }
 }
 
-// chrome.storage.onChanged.addListener(function (changes, namespace) {
-//     for (let [key, {oldValue, newValue}] of Object.entries(changes)) {
-//         console.log(
-//             `Storage key "${key}" in namespace "${namespace}" changed.`,
-//             `Old value was "${oldValue}", new value is "${newValue}".`
-//         );
-//     }
-// });
+chrome.storage.onChanged.addListener(function (changes, namespace) {
+    for (let [key, {oldValue, newValue}] of Object.entries(changes)) {
+        console.log(
+            `Storage key "${key}" in namespace "${namespace}" changed.`,
+            `Old value was "${oldValue}", new value is "${newValue}".`
+        );
+    }
+});
 
 function urlListener (tabId: any, changeInfo: any, tab: any) {
     if (changeInfo.status === 'complete') {
-        console.log(`${EXTENSION_PREFIX}__change_url`)
-        if(chrome.runtime.lastError) {return;}
+        if(chrome.runtime.lastError) {
+            return;
+        }
 
         chrome.tabs.sendMessage( tabId, {
-            type: `${EXTENSION_PREFIX}__change_url`
+            type: `${EXTENSION_NAME_PREFIX}__change_url`
         })
     }
 }

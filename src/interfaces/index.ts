@@ -1,15 +1,10 @@
-export type IServices<T> = {
-    [name in keyof IRpc]: <T extends { Params?: any; Response: any; }>
-    (sender: any, args:IRpc[name]['Params']) => Promise<T['Response']>;
-};
-
 export interface RouteInterface {
     pattern: string | ((pathname: string) => any);
     component: () => React.Component | React.FC<any>
 }
 
 export interface IUser {
-    id: string,
+    id: number,
     name: string,
     login: string
 }
@@ -21,7 +16,7 @@ export interface IRpc {
     },
     getTabID: {
         Params?: undefined
-        Response: string
+        Response: number
     },
     getExtensionID: {
         Params?: undefined

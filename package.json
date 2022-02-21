@@ -1,7 +1,7 @@
 {
-  "name": "My_First_Extension",
+  "name": "CupcakeDevExtensionTemplate",
   "version": "0.0.1",
-  "description": "Coupon autoapply SDK",
+  "description": "CupcakeDev Extension Template",
   "scripts": {
     "dev": "dotenv -- webpack --mode=development --watch",
     "build": "dotenv -- webpack --mode=production",

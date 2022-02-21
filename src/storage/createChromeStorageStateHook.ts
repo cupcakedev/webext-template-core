@@ -1,5 +1,5 @@
 import {useCallback, useEffect} from 'react';
-import useChromeStorage from './useChromeStorage';
+import useChromeStorage from '../hooks/useChromeStorage';
 
 
 export default function createChromeStorageStateHook(key:string, initialValue:any, storageArea: 'local' | 'sync') {

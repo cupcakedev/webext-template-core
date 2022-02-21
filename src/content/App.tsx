@@ -1,14 +1,8 @@
 import React, {useEffect, useState} from 'react'
-import {execute} from './rpc'
-import {listenToMessage, findRoute} from "./common/utils";
-import {EXTENSION_PREFIX} from "./config";
-import {routes} from "./content/routes";
+import {listenToMessage, findRoute} from "../common/utils";
+import {routes} from "./Routes";
 
-interface IExample {
-    /** Текст внутри кнопки */
-    name: string,
-    top: string
-}
+const EXTENSION_NAME_PREFIX = process.env.EXTENSION_NAME_PREFIX
 
 const App = () => {
     const [pathname, setPathname] = useState<string>(window.location.pathname)
@@ -18,7 +12,7 @@ const App = () => {
     useEffect(()=>{
         let prevPathname = window.location.pathname
         let prevSearch = window.location.search;
-        listenToMessage(`${EXTENSION_PREFIX}__change_url`, (sender, sendResponse) => {
+        listenToMessage(`${EXTENSION_NAME_PREFIX}__change_url`, (sender, sendResponse) => {
             if(window.location.pathname !== prevPathname) {
                 setPathname(window.location.pathname)
                 prevPathname = window.location.pathname

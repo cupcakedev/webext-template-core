@@ -48,15 +48,15 @@ module.exports = (env) => ({
         plugins: [new TsconfigPathsPlugin({})],
     },
     plugins: [
-        new EnvironmentPlugin(['isPopup']),
+        new EnvironmentPlugin(['EXTENSION_NAME_PREFIX']),
         new CopyWebpackPlugin({
             patterns: [
                 {
-                    from: './manifest.json',
+                    from: './src/manifest.json',
                     force: true,
                 },
                 {
-                    from: './src/assets/icon.png',
+                    from: './src/assets/start.jpg',
                     force: true,
                 },
                 {

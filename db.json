@@ -1,19 +1,14 @@
 {
   "users": [
     {
-      "id": 1,
-      "name": "Иван",
-      "login": "Ivan"
-    },
-    {
       "id": 2,
-      "name": "342",
-      "login": "342"
+      "login": "Vladimir",
+      "name": "Владимир"
     },
     {
       "id": 3,
-      "name": "342",
-      "login": "342"
+      "login": "Игорь",
+      "name": "Петров"
     },
     {
       "id": 4,
@@ -21,14 +16,19 @@
       "login": "Igor"
     },
     {
-      "name": "Костя",
-      "login": "Kostya",
-      "id": 5
+      "id": 5,
+      "login": "Иван",
+      "name": "Иванов"
     },
     {
-      "name": "Костя",
-      "login": "Kostya",
-      "id": 6
+      "id": 6,
+      "login": "Petr",
+      "name": "Петр"
+    },
+    {
+      "login": "111",
+      "name": "222",
+      "id": 7
     }
   ],
   "tokens": [

@@ -1,5 +1,5 @@
 import {useCallback, useEffect, useState} from 'react';
-import {getItem, setItem} from "./storage";
+import {getItem, setItem} from "../storage/storage";
 
 /**
  * Basic hook for storage
