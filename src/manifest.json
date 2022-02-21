@@ -1,6 +1,6 @@
 {
-  "name": "Getting Started Example",
-  "description": "Build an Extension!",
+  "name": "CupcakeDev Extension Template",
+  "description": "CupcakeDev Extension Template. Manifest version 3",
   "version": "1.0",
   "manifest_version": 3,
   "background": {

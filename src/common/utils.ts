@@ -1,4 +1,3 @@
-import {execute} from "../rpc";
 // @ts-ignore
 import { matchPattern } from 'url-matcher'
 // @ts-ignore
@@ -13,14 +12,6 @@ export const openTab = async (url: string) => {
             resolve()
         });
     })
-}
-
-export async function getCurrentTabId() {
-    return execute({method: 'getTabID'})
-}
-
-export async function getExtensionID() {
-    return execute({method: 'getExtensionID'})
 }
 
 export const listenToMessage = (type: string, callback: (sender: MessageSender, sendResponse: () => void) => void) => {

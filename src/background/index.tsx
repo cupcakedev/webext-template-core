@@ -1,7 +1,12 @@
 import {Services} from './services'
-import {EXTENSION_PREFIX} from "../config";
+
+const EXTENSION_NAME_PREFIX = process.env.EXTENSION_NAME_PREFIX
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+    if(chrome.runtime.lastError) {
+        sendResponse(chrome.runtime.lastError)
+        return true;
+    }
     if (request.type !== 'command') {
         return;
     }
@@ -16,19 +21,29 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     }
 
     // @ts-ignore
-    Services[method](sender, argsObj)
-        .then((response: any) => {
+    const result = Services[method](sender, argsObj)
+
+    if(isPromise(result)) {
+        result.then((response: any) => {
             console.log(response)
             if (response !== undefined) {
                 sendResponse(response)
             }
         })
-        .catch((e:any) => {
-            sendResponse({error: e.message})
-        })
+            .catch((e: any) => {
+                sendResponse({error: e.message})
+            })
+    }
+    else {
+        sendResponse(result)
+    }
 
     return true;
 });
+
+function isPromise(promise: any) {
+    return !!promise && typeof promise.then === 'function'
+}
 
 const parseArgs = (args: any) => {
     if (!args) {
@@ -43,32 +58,6 @@ const parseArgs = (args: any) => {
     }
 }
 
-
-// // // listening for an event / long-lived connections
-// // // coming from devtools
-// //     chrome.runtime.onConnect.addListener(function (port) {
-// //         port.onMessage.addListener(function (message) {
-// //             switch (port.name) {
-// //                 case "color-divs-port":
-// //                     colorDivs();
-// //                     break;
-// //             }
-// //         });
-// //     });
-
-// // send a message to the content script
-//     var colorDivs = function () {
-//         chrome.tabs.query({"active": true, "lastFocusedWindow": true}, function (tabs) {
-//             const tabURL = tabs[0].url;
-//             console.log("URL from get-url.js", tabURL);
-//             chrome.tabs.sendMessage(tabs[0].id as number, {type: "colors-div", color: "#F00"});
-//         });
-//     }
-// }
-// catch (e) {
-//     alert(e)
-// }
-
 chrome.storage.onChanged.addListener(function (changes, namespace) {
     for (let [key, {oldValue, newValue}] of Object.entries(changes)) {
         console.log(
@@ -78,13 +67,21 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
     }
 });
 
-chrome.tabs.onUpdated.addListener(
-    function(tabId, changeInfo, tab) {
-        if (changeInfo.status === 'complete') {
-            console.log(`${EXTENSION_PREFIX}__change_url`)
-            chrome.tabs.sendMessage( tabId, {
-                type: `${EXTENSION_PREFIX}__change_url`
-            })
+function urlListener (tabId: any, changeInfo: any, tab: any) {
+    if (changeInfo.status === 'complete') {
+        if(chrome.runtime.lastError) {
+            return;
         }
+
+        chrome.tabs.sendMessage( tabId, {
+            type: `${EXTENSION_NAME_PREFIX}__change_url`
+        })
     }
-);
+}
+
+chrome.tabs.onUpdated.addListener(urlListener);
+
+// chrome.runtime.connect().onDisconnect.addListener(function() {
+//     chrome.tabs.onUpdated.removeListener(urlListener)
+//     console.log("disconnected")
+// })

@@ -1,114 +1,84 @@
 import React, {useState} from "react";
-import {useChromeStorageLocal} from "../../storage";
+
 import {Injection} from "./Injection";
-import {EXTENSION_PREFIX} from "../../config";
-import {getCurrentTabId} from "../../common/utils";
-import {execute} from "../../rpc";
-import {useQuery} from "../../query/UseBaseQuery";
-import {useMutation} from "../../query/useMutation";
-import {useQueryClient} from "../../query/Provider";
-import axios from "axios";
+import {useQuery} from "react-query";
+import {useQueryClient} from "react-query";
+import {IRpc} from "../../interfaces";
+import {factory} from "../../rpc/";
+import Users from "./Users";
+import useChromeStorage from "../../hooks/useChromeStorage";
 
 const Demo: React.FC<{ variant?: string }> = ({variant}) => {
 
+    const selectTargetEl = () => document.querySelector('#injection > shadow-view');
+    const containerClassName = 'test__container'
+
+    const [value, setValue, _, errorMessage] = useChromeStorage('counter', 0);
     const queryClient = useQueryClient()
 
-    const [tabID, setTabID] = useState('')
-    const key = 'counter';
-    const [value, setValue, isPersistent, errorMessage] = useChromeStorageLocal(key, 0);
+    const [tabID, setTabID] = useState<number>(0)
 
-    const getUsers = async (_keys: any) => {
-        const [_key, page, status ] = _keys
-        // console.log("Обновление users началось")
-        // try {
-        //     const data = await axios(`http://localhost:3004/users/`, {method: 'GET'});
-        //     console.log(data)
-        //     return data.data
-        // } catch (e) {
-        //     return e;
-        // }
-        return execute({method: 'getUsers', params:{page, status }})
-    }
+    const getTabID = factory<IRpc['getTabID']>('getTabID')
 
-    const addUser = () => {
-        const params = {name:"Костя",login:"Kostya"}
-        return execute({method: 'addUser', params})
-    }
+    const getUsers = factory<IRpc['getUsers']>('getUsers')
+    const getToken = factory<IRpc['getToken']>('getToken')
 
-    const updateUser = () => {
-        const params = {id: 6, name:"Игорь", login:"Igor"}
-        return execute({method: 'updateUser', params})
-    }
-
-    const [data, isLoading, error] = useQuery(['usersList', { page: 1}], getUsers, {option: 'paramOption'})
-    //
-    // console.log(`isLoading: ${isLoading}`)
-    // console.log(`error: ${error}`)
-    // console.log(`data: ${JSON.stringify(data)}`)
-
-    const mutation = useMutation(addUser, {
-        onSuccess: (data: any) => {
-            queryClient.invalidateQueries('usersList', {})
-        },
-        onError: () => {
-            console.log("Мутация провалилась")
-        },
-    })
-
-    const mutationUpdate = useMutation(updateUser, {
-        onSuccess: (data: any) => {
-            queryClient.invalidateQueries('usersList', {})
-        },
-        onError: () => {
-            console.log("Мутация провалилась")
-        },
-    })
-
-    const selectTargetEl = () => document.querySelector('#inject');
+    const {data, isLoading, error} = useQuery(['usersList', { sort: '1'}], getUsers)
 
     const getTabIDHandler = async () => {
-        const id = await getCurrentTabId()
-        // @ts-ignore
+        const id = await getTabID()
+        const token = await getToken()
+        setTabID(id)
         setTabID(id)
     }
 
     return (
         <Injection selectTargetElement={selectTargetEl}
                    position="afterbegin"
-                   containerClassName={`${EXTENSION_PREFIX}__container`}
+                   containerClassName={containerClassName}
         >
-            <div style={{...styles.box, top: top}}>
-                <p>TabID: {tabID || 'Неизвестно'}</p>
-                <p>Счетчик: {value}</p>
+            <div style={styles.box}>
                 <div>
-                    {
-                        data && data.map((user: any, key: number) => {
-                            return <p key={key}>{user.name}</p>
-                        })
-                    }
-                </div>
+                    <div style={{
+                        display: 'flex',
+                        gap: '11px',
+                        height: '25px',
+                        alignItems: 'center'
+                    }}>
+                        
+                        <p>TabID: {tabID || 'Неизвестно'}</p>
+                        <button onClick={getTabIDHandler}>Запросить tabID</button>
+                    </div>
+                    <div style={{
+                        display: 'flex',
+                        gap: '11px',
+                        height: '25px',
+                        alignItems: 'center'
+                    }}>
 
-                <button onClick={() => mutation.mutate()}>Add</button>
-                <button onClick={() => mutationUpdate.mutate()}>Update</button>
-                <button onClick={getTabIDHandler}>Запросить tabID</button>
-                <button
-                    onClick={() => {
-                        setValue((prev: number) => (prev + 1));
-                    }}
-                >Инкремент
-                </button>
-                <button
-                    onClick={() => {
-                        setValue((prev: number) => (0));
-                    }}
-                >Очистить
-                </button>
-                <button
-                    onClick={() => {
-                        setValue((prev: number) => (prev - 1));
-                    }}
-                >Декремент
-                </button>
+                        <p>Счетчик: {value}</p>
+                        <button
+                            onClick={() => {
+                                setValue((prev: number) => (prev + 1));
+                            }}
+                        >Increment
+                        </button>
+                        <button
+                            onClick={() => {
+                                setValue((prev: number) => (0));
+                            }}
+                        >Clear
+                        </button>
+                        <button
+                            onClick={() => {
+                                setValue((prev: number) => (prev - 1));
+                            }}
+                        >Decrement
+                        </button>
+
+                    </div>
+                </div>
+                <Users users={data} />
             </div>
         </Injection>
     )
@@ -119,10 +89,12 @@ export default Demo
 const styles: any = {
     box: {
         color: "black",
-        width: "145px",
         border: "1px solid black",
         background: "rgb(221, 221, 221)",
-        fontSize: "22px",
-        padding: "24px"
+        fontSize: "14px",
+        padding: "24px",
+        position: 'absolute',
+        top: '25px',
+        left: '25px',
     }
 }

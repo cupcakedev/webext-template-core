@@ -1,7 +1,7 @@
-import {ICommand} from "../interfaces";
-import React, {useEffect, useState} from 'react';
+import {IRpc} from "../interfaces";
+import {QueryFunctionContext} from "react-query";
 
-export const execute = ({method, params}:ICommand) => {
+export const execute = <T extends { Params: any, Response: any }>(method: keyof IRpc, params: T['Params']) => {
     return new Promise((resolve, reject) => {
         chrome.runtime.sendMessage({
             type: "command",
@@ -11,23 +11,7 @@ export const execute = ({method, params}:ICommand) => {
     })
 }
 
-export const useApi = ({method, params, response}:ICommand) => {
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState('');
-    const [data, setData] = useState();
-
-    useEffect(() => {
-        execute({method, params, response})
-            .then((data) => {
-                setIsLoading(false)
-                setError('')
-                response && response(data)
-            })
-            .catch(e => {
-                setIsLoading(false)
-                setError(e)
-            })
-    })
-
-    return [data, error, isLoading]
+export function factory<T extends  { Params?: any, Response: any} >
+(method: keyof IRpc): (params?: QueryFunctionContext<(string | T['Params'])[], any> | T['Params'] ) => Promise<T['Response']>{
+    return (params?) => execute(method, params)
 }
