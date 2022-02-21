@@ -2,18 +2,18 @@ import React, {useState} from "react";
 
 import {Injection} from "./Injection";
 import {useQuery} from "react-query";
-import {useMutation} from "react-query";
 import {useQueryClient} from "react-query";
 import {IRpc} from "../../interfaces";
 import {factory} from "../../rpc/";
 import Users from "./Users";
+import useChromeStorage from "../../hooks/useChromeStorage";
 
 const Demo: React.FC<{ variant?: string }> = ({variant}) => {
 
     const selectTargetEl = () => document.querySelector('#injection > shadow-view');
     const containerClassName = 'test__container'
 
-    const [value, setValue] = useState(0)
+    const [value, setValue, _, errorMessage] = useChromeStorage('counter', 0);
     const queryClient = useQueryClient()
 
     const [tabID, setTabID] = useState<number>(0)

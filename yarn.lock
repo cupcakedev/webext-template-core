@@ -4909,11 +4909,6 @@ url-matcher@^0.2.2:
   dependencies:
     invariant "^2.0.0"
 
-use-chrome-storage@^1.0.5:
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/use-chrome-storage/-/use-chrome-storage-1.0.5.tgz#14705225d01f092ea8602645bab5d879b20e53fc"
-  integrity sha512-ZRe6JsWh4MvFWnV9p51kRkwLJbBPIX/Nx5qptnvRWM7MM2x9s+h+OB8PN9yXl7Kb0FPYC5tsX1ejCmkG4eNP4g==
-
 useragent@^2.3.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/useragent/-/useragent-2.3.0.tgz#217f943ad540cb2128658ab23fc960f6a88c9972"
