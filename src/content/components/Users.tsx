@@ -1,69 +1,69 @@
-import React, {useState} from "react";
-import {factory} from "../../rpc";
-import {IRpc, IUser} from "../../interfaces";
-import {useMutation, useQueryClient} from "react-query";
+import React, { useState } from 'react';
+import { factory } from '../../rpc';
+import { IRpc, IUser } from '../../interfaces';
+import { useMutation, useQueryClient } from 'react-query';
 
 const Users: React.FC<{ users: Array<IUser> | undefined }> = (users) => {
-    const [isEdit, setIsEdit] = useState(false)
-    const [login, setLogin] = useState<string>('')
-    const [name, setName] = useState<string>('')
-    const [newLogin, setNewLogin] = useState<string>('')
-    const [newName, setNewName] = useState<string>('')
-    const [row, setRow] = useState<number>()
+    const [isEdit, setIsEdit] = useState(false);
+    const [login, setLogin] = useState<string>('');
+    const [name, setName] = useState<string>('');
+    const [newLogin, setNewLogin] = useState<string>('');
+    const [newName, setNewName] = useState<string>('');
+    const [row, setRow] = useState<number>();
 
-    const queryClient = useQueryClient()
+    const queryClient = useQueryClient();
 
-    const addUser = factory<IRpc['addUser']>('addUser')
-    const updateUser = factory<IRpc['updateUser']>('updateUser')
-    const deleteUser = factory<IRpc['deleteUser']>('deleteUser')
+    const addUser = factory<IRpc['addUser']>('addUser');
+    const updateUser = factory<IRpc['updateUser']>('updateUser');
+    const deleteUser = factory<IRpc['deleteUser']>('deleteUser');
 
     const mutationDelete = useMutation(deleteUser, {
         onSuccess: (data: any) => {
-            queryClient.invalidateQueries('usersList')
+            queryClient.invalidateQueries('usersList');
         },
         onError: () => {
-            alert("Удалить не получилось")
+            alert('Удалить не получилось');
         },
-    })
+    });
 
     const mutationUpdate = useMutation(updateUser, {
         onSuccess: (data: any) => {
-            queryClient.invalidateQueries('usersList')
+            queryClient.invalidateQueries('usersList');
         },
         onError: () => {
-            alert("Обновить не получилось")
+            alert('Обновить не получилось');
         },
-    })
+    });
 
     const mutationAdd = useMutation(addUser, {
         onSuccess: (data: any) => {
-            queryClient.invalidateQueries('usersList', {})
+            queryClient.invalidateQueries('usersList', {});
         },
         onError: () => {
-            console.log("Мутация провалилась")
+            console.log('Мутация провалилась');
         },
-    })
+    });
 
     const changeHandler = (user: IUser, index: number) => {
-        setLogin(user.login)
-        setName(user.name)
-        setIsEdit(!isEdit)
-        setRow(index)
-    }
+        setLogin(user.login);
+        setName(user.name);
+        setIsEdit(!isEdit);
+        setRow(index);
+    };
 
     return (
         <table>
             <tbody>
-            <tr>
-                <th>ID</th>
-                <th>Login</th>
-                <th>Name</th>
-                <th>Update</th>
-                <th>Delete</th>
-            </tr>
-            {
-                users && users.users && users.users.map((user: IUser, i: number) => {
-                        return (
+                <tr>
+                    <th>ID</th>
+                    <th>Login</th>
+                    <th>Name</th>
+                    <th>Update</th>
+                    <th>Delete</th>
+                </tr>
+                {users &&
+                    users.users &&
+                    users.users.map((user: IUser, i: number) => (
                             <tr>
                                 {
                                     isEdit && row === i
@@ -111,37 +111,50 @@ const Users: React.FC<{ users: Array<IUser> | undefined }> = (users) => {
                             </tr>
 
                         )
-                    }
-                )
-            }
-            <tr>
-                <td>#</td>
-                <td>
-                    <input value={newLogin} placeholder='login'
-                           onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                               setNewLogin(e.target.value);
-                           }}/>
-                </td>
-                <td>
-                    <input value={newName} placeholder="name"
-                           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewName(e.target.value)}/>
-                </td>
-                <td></td>
-                <td>
-                    <button style={{width: '100%'}} onClick={() => {
-                        mutationAdd.mutate({
-                            login: newLogin,
-                            name: newName
-                        })
-                        setNewLogin('')
-                        setNewName('')
-                    }}
-                    >Add</button>
-                </td>
-            </tr>
+                        );
+                    })}
+                <tr>
+                    <td>#</td>
+                    <td>
+                        <input
+                            value={newLogin}
+                            placeholder="login"
+                            onChange={(
+                                e: React.ChangeEvent<HTMLInputElement>
+                            ) => {
+                                setNewLogin(e.target.value);
+                            }}
+                        />
+                    </td>
+                    <td>
+                        <input
+                            value={newName}
+                            placeholder="name"
+                            onChange={(
+                                e: React.ChangeEvent<HTMLInputElement>
+                            ) => setNewName(e.target.value)}
+                        />
+                    </td>
+                    <td />
+                    <td>
+                        <button
+                            style={{ width: '100%' }}
+                            onClick={() => {
+                                mutationAdd.mutate({
+                                    login: newLogin,
+                                    name: newName,
+                                });
+                                setNewLogin('');
+                                setNewName('');
+                            }}
+                        >
+                            Add
+                        </button>
+                    </td>
+                </tr>
             </tbody>
         </table>
-    )
-}
+    );
+};
 
-export default Users
+export default Users;

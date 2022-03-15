@@ -1,33 +1,31 @@
-import axiosOriginal from 'axios'
+import axiosOriginal from 'axios';
 // @ts-ignore
-import adapter from 'axios/lib/adapters/xhr'
-import {IRpc} from "../interfaces";
+import adapter from 'axios/lib/adapters/xhr';
+import { IRpc } from '../interfaces';
 
-const axios = axiosOriginal.create({adapter})
+const axios = axiosOriginal.create({ adapter });
 
-const URL_JSON_SERVER = 'http://localhost:3004'
+const URL_JSON_SERVER = 'http://localhost:3004';
 
 export type IServices<T> = {
-    [name in keyof IRpc]: <T extends { Params?: any; Response: any; }>
-    (sender: any, args:IRpc[name]['Params']) => Promise<T['Response']>;
+    [name in keyof IRpc]: <T extends { Params?: any; Response: any }>(
+        sender: any,
+        args: IRpc[name]['Params']
+    ) => Promise<T['Response']>;
 };
 
 export const Services: IServices<IRpc> = {
-    getToken: (_, args) => {
-        return axios(`${URL_JSON_SERVER}/tokens/${args}`);
-    },
+    getToken: (_, args) => axios(`${URL_JSON_SERVER}/tokens/${args}`),
 
-    getTabID: (sender) => {
-        return sender.tab.id
-    },
+    getTabID: (sender) => sender.tab.id,
 
-    getExtensionID: (sender) => {
-        return sender.id
-    },
+    getExtensionID: (sender) => sender.id,
 
     getUsers: async () => {
         try {
-            return await (await fetch(`${URL_JSON_SERVER}/users/`, {method: 'GET'})).json();
+            return await (
+                await fetch(`${URL_JSON_SERVER}/users/`, { method: 'GET' })
+            ).json();
         } catch (e) {
             return e;
         }
@@ -36,14 +34,13 @@ export const Services: IServices<IRpc> = {
     addUser: async (_, user) => {
         try {
             return await (
-                await fetch(
-                    `${URL_JSON_SERVER}/users/`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json;charset=utf-8'
-                        },
-                        body: JSON.stringify(user)
-                    })
+                await fetch(`${URL_JSON_SERVER}/users/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json;charset=utf-8',
+                    },
+                    body: JSON.stringify(user),
+                })
             ).json();
         } catch (e) {
             return e;
@@ -53,10 +50,9 @@ export const Services: IServices<IRpc> = {
     deleteUser: async (_, id) => {
         try {
             return await (
-                await fetch(
-                    `${URL_JSON_SERVER}/users/${id}`, {
-                        method: 'DELETE'
-                    })
+                await fetch(`${URL_JSON_SERVER}/users/${id}`, {
+                    method: 'DELETE',
+                })
             ).json();
         } catch (e) {
             return e;
@@ -66,18 +62,16 @@ export const Services: IServices<IRpc> = {
     updateUser: async (_, user) => {
         try {
             return await (
-                await fetch(
-                    `${URL_JSON_SERVER}/users/${user.id}`, {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json;charset=utf-8'
-                        },
-                        body: JSON.stringify(user)
-                    })
+                await fetch(`${URL_JSON_SERVER}/users/${user.id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json;charset=utf-8',
+                    },
+                    body: JSON.stringify(user),
+                })
             ).json();
         } catch (e) {
             return e;
         }
-    }
-}
-
+    },
+};

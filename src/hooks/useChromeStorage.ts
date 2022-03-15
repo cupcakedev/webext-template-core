@@ -1,5 +1,5 @@
-import {useCallback, useEffect, useState} from 'react';
-import {getItem, setItem} from "../storage/storage";
+import { useCallback, useEffect, useState } from 'react';
+import { getItem, setItem } from '../storage/storage';
 
 /**
  * Basic hook for storage
@@ -10,15 +10,19 @@ import {getItem, setItem} from "../storage/storage";
  */
 
 interface IChromeStorage {
-    key: string,
-    initialValue: {},
-    storageArea: 'local' | 'sync'
+    key: string;
+    initialValue: {};
+    storageArea: 'local' | 'sync';
 }
 
-const useChromeStorage = (key: string, initialValue: {}, storageArea: 'local' | 'sync' = 'local') => {
-    const [INITIAL_VALUE] = useState(() => {
-        return typeof initialValue === 'function' ? initialValue() : initialValue;
-    });
+const useChromeStorage = (
+    key: string,
+    initialValue: {},
+    storageArea: 'local' | 'sync' = 'local'
+) => {
+    const [INITIAL_VALUE] = useState(() =>
+        typeof initialValue === 'function' ? initialValue() : initialValue
+    );
     const [STORAGE_AREA] = useState(storageArea);
     const [state, setState] = useState(INITIAL_VALUE);
     const [isPersistent, setIsPersistent] = useState(true);
@@ -26,30 +30,34 @@ const useChromeStorage = (key: string, initialValue: {}, storageArea: 'local' | 
 
     useEffect(() => {
         getItem(key)
-            .then((res:any) => {
+            .then((res: any) => {
                 setState(res);
                 setIsPersistent(true);
                 setError('');
             })
-            .catch(error => {
+            .catch((error) => {
                 setIsPersistent(false);
                 setError(error);
             });
     }, [key, INITIAL_VALUE]);
 
-    const updateValue = useCallback((newValue) => {
-        const toStore = typeof newValue === 'function' ? newValue(state) : newValue;
-        setState(toStore);
-        setItem(key, toStore, (result) => {
-            if(result) {
-                setIsPersistent(true);
-                setError('');
-            } else {
-                setIsPersistent(false);
-                setError(error);
-            }
-        })
-    }, [STORAGE_AREA, key, state]);
+    const updateValue = useCallback(
+        (newValue) => {
+            const toStore =
+                typeof newValue === 'function' ? newValue(state) : newValue;
+            setState(toStore);
+            setItem(key, toStore, (result) => {
+                if (result) {
+                    setIsPersistent(true);
+                    setError('');
+                } else {
+                    setIsPersistent(false);
+                    setError(error);
+                }
+            });
+        },
+        [STORAGE_AREA, key, state]
+    );
 
     useEffect(() => {
         const onChange = (changes: any, areaName: string) => {
@@ -66,6 +74,6 @@ const useChromeStorage = (key: string, initialValue: {}, storageArea: 'local' | 
     }, [key, STORAGE_AREA]);
 
     return [state, updateValue, isPersistent, error];
-}
+};
 
 export default useChromeStorage;

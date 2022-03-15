@@ -1,4 +1,4 @@
 export interface IShadowRootOptions {
-  delegatesFocus?: boolean;
-  mode?: ShadowRootMode;
+    delegatesFocus?: boolean;
+    mode?: ShadowRootMode;
 }
