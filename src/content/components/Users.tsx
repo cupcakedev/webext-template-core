@@ -64,55 +64,87 @@ const Users: React.FC<{ users: Array<IUser> | undefined }> = (users) => {
                 {users &&
                     users.users &&
                     users.users.map((user: IUser, i: number) => (
-                            <tr>
-                                {
-                                    isEdit && row === i
-                                        ? <>
-                                            <td>{user.id}</td>
-                                            <td>
-                                                <input value={login} placeholder='login'
-                                                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                                                           setLogin(e.target.value);
-                                                       }}/>
-                                            </td>
-                                            <td>
-                                                <input value={name} placeholder="name"
-                                                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)}/>
-                                            </td>
-                                            <td>
-                                                <button onClick={() => setIsEdit(!isEdit)}>Cancel</button>
-                                                <button onClick={() => {
-                                                    setIsEdit(!isEdit)
-                                                    mutationUpdate.mutate({
-                                                        id: user.id,
-                                                        login,
-                                                        name: name
-                                                    })
-                                                }}>Save
-                                                </button>
-                                            </td>
-                                            <td>
-                                                <button onClick={() => mutationDelete.mutate(user.id)}>Delete</button>
-                                            </td>
-                                        </>
-                                        : <>
-                                            <td>{user.id}</td>
-                                            <td>{user.login}</td>
-                                            <td>{user.name}</td>
-                                            <td>
-                                                <button onClick={() => changeHandler(user, i)}>Change</button>
-                                            </td>
-                                            <td>
-                                                <button onClick={() => mutationDelete.mutate(user.id)}>Delete</button>
-                                            </td>
-                                        </>
-
-                                }
-                            </tr>
-
-                        )
-                        );
-                    })}
+                        <tr>
+                            {isEdit && row === i ? (
+                                <>
+                                    <td>{user.id}</td>
+                                    <td>
+                                        <input
+                                            value={login}
+                                            placeholder="login"
+                                            onChange={(
+                                                e: React.ChangeEvent<HTMLInputElement>
+                                            ) => {
+                                                setLogin(e.target.value);
+                                            }}
+                                        />
+                                    </td>
+                                    <td>
+                                        <input
+                                            value={name}
+                                            placeholder="name"
+                                            onChange={(
+                                                e: React.ChangeEvent<HTMLInputElement>
+                                            ) => setName(e.target.value)}
+                                        />
+                                    </td>
+                                    <td>
+                                        <button
+                                            onClick={() => setIsEdit(!isEdit)}
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                setIsEdit(!isEdit);
+                                                mutationUpdate.mutate({
+                                                    id: user.id,
+                                                    login,
+                                                    name: name,
+                                                });
+                                            }}
+                                        >
+                                            Save
+                                        </button>
+                                    </td>
+                                    <td>
+                                        <button
+                                            onClick={() =>
+                                                mutationDelete.mutate(user.id)
+                                            }
+                                        >
+                                            Delete
+                                        </button>
+                                    </td>
+                                </>
+                            ) : (
+                                <>
+                                    <td>{user.id}</td>
+                                    <td>{user.login}</td>
+                                    <td>{user.name}</td>
+                                    <td>
+                                        <button
+                                            onClick={() =>
+                                                changeHandler(user, i)
+                                            }
+                                        >
+                                            Change
+                                        </button>
+                                    </td>
+                                    <td>
+                                        <button
+                                            onClick={() =>
+                                                mutationDelete.mutate(user.id)
+                                            }
+                                        >
+                                            Delete
+                                        </button>
+                                    </td>
+                                </>
+                            )}
+                        </tr>
+                    ))}
+                ;
                 <tr>
                     <td>#</td>
                     <td>
