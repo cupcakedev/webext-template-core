@@ -1,45 +1,49 @@
+import { Request } from 'src/rpc';
 import { Services } from './services';
 
 const { EXTENSION_NAME_PREFIX } = process.env;
 
-chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-    if (chrome.runtime.lastError) {
-        sendResponse(chrome.runtime.lastError);
+chrome.runtime.onMessage.addListener(
+    (request: Request, sender, sendResponse) => {
+        if (chrome.runtime.lastError) {
+            sendResponse(chrome.runtime.lastError);
+            return true;
+        }
+        if (request.type !== 'command') {
+            return true;
+        }
+        console.log('request', request.method, ' => send');
+        const { method, params } = request;
+
+        const argsObj = parseArgs(params);
+
+        const map = Object.keys(Services);
+
+        if (!map.includes(method)) {
+            return Promise.reject();
+        }
+
+        // @ts-ignore
+        const result = Services[method](sender, argsObj);
+
+        if (isPromise(result)) {
+            result
+                .then((response: any) => {
+                    console.log(response);
+                    sendResponse(response);
+                })
+                .catch((e: any) => {
+                    console.log({ error: e.message });
+                    sendResponse({ error: e.message });
+                });
+        } else {
+            console.log(result);
+            sendResponse(result);
+        }
+
         return true;
     }
-    if (request.type !== 'command') {
-        return;
-    }
-    const { method, params } = request;
-
-    const argsObj = parseArgs(params);
-
-    const map = Object.keys(Services);
-
-    if (!map.includes(method)) {
-        return Promise.reject();
-    }
-
-    // @ts-ignore
-    const result = Services[method](sender, argsObj);
-
-    if (isPromise(result)) {
-        result
-            .then((response: any) => {
-                console.log(response);
-                if (response !== undefined) {
-                    sendResponse(response);
-                }
-            })
-            .catch((e: any) => {
-                sendResponse({ error: e.message });
-            });
-    } else {
-        sendResponse(result);
-    }
-
-    return true;
-});
+);
 
 function isPromise(promise: any) {
     return !!promise && typeof promise.then === 'function';
@@ -67,7 +71,11 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
     }
 });
 
-function urlListener(tabId: any, changeInfo: any, tab: any) {
+function urlListener(
+    tabId: number,
+    changeInfo: chrome.tabs.TabChangeInfo,
+    tab: chrome.tabs.Tab
+) {
     if (changeInfo.status === 'complete') {
         if (chrome.runtime.lastError) {
             return;
@@ -77,6 +85,7 @@ function urlListener(tabId: any, changeInfo: any, tab: any) {
             type: `${EXTENSION_NAME_PREFIX}__change_url`,
         });
     }
+    console.log(tab.url);
 }
 
 chrome.tabs.onUpdated.addListener(urlListener);

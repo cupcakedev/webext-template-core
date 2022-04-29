@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { factory } from '../../rpc';
-import { IRpc, IUser } from '../../interfaces';
+import { IUser } from '../../interfaces';
 import { useMutation, useQueryClient } from 'react-query';
 
-const Users: React.FC<{ users: Array<IUser> | undefined }> = (users) => {
+const Users: React.FC<{ users: Array<IUser> | undefined }> = (props) => {
     const [isEdit, setIsEdit] = useState(false);
     const [login, setLogin] = useState<string>('');
     const [name, setName] = useState<string>('');
@@ -13,9 +13,9 @@ const Users: React.FC<{ users: Array<IUser> | undefined }> = (users) => {
 
     const queryClient = useQueryClient();
 
-    const addUser = factory<IRpc['addUser']>('addUser');
-    const updateUser = factory<IRpc['updateUser']>('updateUser');
-    const deleteUser = factory<IRpc['deleteUser']>('deleteUser');
+    const addUser = factory('addUser');
+    const updateUser = factory('updateUser');
+    const deleteUser = factory('deleteUser');
 
     const mutationDelete = useMutation(deleteUser, {
         onSuccess: (data: any) => {
@@ -61,10 +61,9 @@ const Users: React.FC<{ users: Array<IUser> | undefined }> = (users) => {
                     <th>Update</th>
                     <th>Delete</th>
                 </tr>
-                {users &&
-                    users.users &&
-                    users.users.map((user: IUser, i: number) => (
-                        <tr>
+                {props.users &&
+                    props.users.map((user: IUser, i: number) => (
+                        <tr key={user.id}>
                             {isEdit && row === i ? (
                                 <>
                                     <td>{user.id}</td>
@@ -100,7 +99,7 @@ const Users: React.FC<{ users: Array<IUser> | undefined }> = (users) => {
                                                 mutationUpdate.mutate({
                                                     id: user.id,
                                                     login,
-                                                    name: name,
+                                                    name,
                                                 });
                                             }}
                                         >
@@ -144,7 +143,6 @@ const Users: React.FC<{ users: Array<IUser> | undefined }> = (users) => {
                             )}
                         </tr>
                     ))}
-                ;
                 <tr>
                     <td>#</td>
                     <td>

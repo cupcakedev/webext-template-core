@@ -7,15 +7,22 @@ const axios = axiosOriginal.create({ adapter });
 
 const URL_JSON_SERVER = 'http://localhost:3004';
 
-export type IServices<T> = {
-    [name in keyof IRpc]: <T extends { Params?: any; Response: any }>(
+export type IServices = {
+    [name in keyof IRpc]: (
         sender: any,
         args: IRpc[name]['Params']
-    ) => Promise<T['Response']>;
+    ) => Promise<IRpc[name]['Response']>;
 };
 
-export const Services: IServices<IRpc> = {
-    getToken: (_, args) => axios(`${URL_JSON_SERVER}/tokens/${args}`),
+export const Services: IServices = {
+    getToken: async (_, args) => {
+        try {
+            const res = await axios(`${URL_JSON_SERVER}/tokens/${args}`);
+            return res.data;
+        } catch (e) {
+            return undefined;
+        }
+    },
 
     getTabID: (sender) => sender.tab.id,
 
@@ -27,7 +34,7 @@ export const Services: IServices<IRpc> = {
                 await fetch(`${URL_JSON_SERVER}/users/`, { method: 'GET' })
             ).json();
         } catch (e) {
-            return e;
+            return undefined;
         }
     },
 
@@ -43,7 +50,7 @@ export const Services: IServices<IRpc> = {
                 })
             ).json();
         } catch (e) {
-            return e;
+            return undefined;
         }
     },
 
@@ -55,7 +62,7 @@ export const Services: IServices<IRpc> = {
                 })
             ).json();
         } catch (e) {
-            return e;
+            return undefined;
         }
     },
 
@@ -71,7 +78,7 @@ export const Services: IServices<IRpc> = {
                 })
             ).json();
         } catch (e) {
-            return e;
+            return undefined;
         }
     },
 };

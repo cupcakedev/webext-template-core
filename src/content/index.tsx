@@ -9,7 +9,6 @@ import { ShadowView } from './../shadow';
 
 import App from './App';
 import { factory } from '../rpc';
-import { IRpc } from '../interfaces';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -35,7 +34,7 @@ injection.id = 'injection';
 document.body.appendChild(injection);
 
 export async function injectEntryPoint() {
-    const getTabID = factory<IRpc['getTabID']>('getTabID');
+    const getTabID = factory('getTabID');
     const tabId = await getTabID();
 
     ReactDOM.render(

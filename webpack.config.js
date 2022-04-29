@@ -66,7 +66,6 @@ module.exports = (env) => ({
                 },
             ],
         }),
-        new ExtReloader(),
     ],
     optimization: {
         minimizer: [

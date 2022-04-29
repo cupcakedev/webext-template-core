@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { Injection } from './Injection';
 import { useQuery } from 'react-query';
 import { useQueryClient } from 'react-query';
-import { IRpc } from '../../interfaces';
 import { factory } from '../../rpc/';
 import Users from './Users';
 import useChromeStorage from '../../hooks/useChromeStorage';
@@ -18,10 +17,9 @@ const Demo: React.FC<{ variant?: string }> = ({ variant }) => {
 
     const [tabID, setTabID] = useState<number>(0);
 
-    const getTabID = factory<IRpc['getTabID']>('getTabID');
-
-    const getUsers = factory<IRpc['getUsers']>('getUsers');
-    const getToken = factory<IRpc['getToken']>('getToken');
+    const getTabID = factory('getTabID');
+    const getUsers = factory('getUsers');
+    const getToken = factory('getToken');
 
     const { data, isLoading, error } = useQuery(
         ['usersList', { sort: '1' }],
