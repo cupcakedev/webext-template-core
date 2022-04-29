@@ -57,7 +57,9 @@ module.exports = (env) => ({
                     force: true,
                 },
                 {
-                    from: './src/assets/start.jpg',
+                    context: './src/assets/icon',
+                    from: '*.png',
+                    to: 'icon',
                     force: true,
                 },
                 {
