@@ -104,5 +104,6 @@ const styles: any = {
         position: 'absolute',
         top: '25px',
         left: '25px',
+        zIndex: '2147483647',
     },
 };
