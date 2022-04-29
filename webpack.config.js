@@ -18,6 +18,7 @@ module.exports = (env) => ({
         filename: '[name].js',
         clean: true,
     },
+    devtool: 'cheap-module-source-map',
     module: {
         rules: [
             {
