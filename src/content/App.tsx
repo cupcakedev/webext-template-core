@@ -5,19 +5,19 @@ import { routes } from './Routes';
 const { EXTENSION_NAME_PREFIX } = process.env;
 
 const App = () => {
-    const [pathname, setPathname] = useState<string>(window.location.pathname);
+    const [url, setUrl] = useState<string>(window.location.href);
     const [search, setSearch] = useState<string>(window.location.search);
-    const Route = findRoute(routes, pathname);
+    const Route = findRoute(routes, url);
 
     useEffect(() => {
-        let prevPathname = window.location.pathname;
+        let prevUrl = window.location.href;
         let prevSearch = window.location.search;
         listenToMessage(
             `${EXTENSION_NAME_PREFIX}__change_url`,
             (sender, sendResponse) => {
-                if (window.location.pathname !== prevPathname) {
-                    setPathname(window.location.pathname);
-                    prevPathname = window.location.pathname;
+                if (window.location.href !== prevUrl) {
+                    setUrl(window.location.href);
+                    prevUrl = window.location.href;
                 }
                 if (window.location.search !== prevSearch) {
                     setSearch(window.location.search);
