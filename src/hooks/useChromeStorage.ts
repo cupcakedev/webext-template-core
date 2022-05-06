@@ -9,15 +9,9 @@ import { getItem, setItem } from '../storage/storage';
  * @returns {[*, function(*= any): void, boolean, string]}
  */
 
-interface IChromeStorage {
-    key: string;
-    initialValue: {};
-    storageArea: 'local' | 'sync';
-}
-
 const useChromeStorage = (
     key: string,
-    initialValue: {},
+    initialValue?: {},
     storageArea: 'local' | 'sync' = 'local'
 ) => {
     const [INITIAL_VALUE] = useState(() =>
@@ -46,7 +40,7 @@ const useChromeStorage = (
             const toStore =
                 typeof newValue === 'function' ? newValue(state) : newValue;
             setState(toStore);
-            setItem(key, toStore, (result) => {
+            setItem(key, toStore).then((result) => {
                 if (result) {
                     setIsPersistent(true);
                     setError('');
@@ -56,7 +50,7 @@ const useChromeStorage = (
                 }
             });
         },
-        [STORAGE_AREA, key, state]
+        [key, state, error]
     );
 
     useEffect(() => {
