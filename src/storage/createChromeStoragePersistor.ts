@@ -2,6 +2,7 @@ import {
     PersistedClient,
     Persistor,
 } from 'react-query/persistQueryClient-experimental';
+import { REACT_QUERY_STORAGE_KEY } from 'src/common/queryClient';
 import { getItem, removeItem, setItem } from './storage';
 
 interface CreateChromeStoragePersistorOptions {
@@ -22,12 +23,8 @@ interface CreateChromeStoragePersistorOptions {
     deserialize?: (cachedString: string) => PersistedClient;
 }
 
-export function noop(): undefined {
-    return undefined;
-}
-
 export function createChromeStoragePersistor({
-    key = `REACT_QUERY_CHROME_STORAGE_LOCAL`,
+    key = REACT_QUERY_STORAGE_KEY,
     throttleTime = 1000,
     serialize = JSON.stringify,
     deserialize = JSON.parse,
@@ -79,7 +76,7 @@ export function createChromeStoragePersistor({
             const cacheString = await getItem(key);
 
             if (!cacheString) {
-                return;
+                return undefined;
             }
 
             return deserialize(cacheString) as PersistedClient;
@@ -87,12 +84,6 @@ export function createChromeStoragePersistor({
         removeClient: () => {
             removeItem(key);
         },
-    };
-
-    return {
-        persistClient: noop,
-        restoreClient: noop,
-        removeClient: noop,
     };
 }
 
@@ -102,7 +93,7 @@ function throttle<TArgs extends any[]>(
 ) {
     let timer: number | null = null;
     let params: TArgs;
-    return function (...args: TArgs) {
+    return (...args: TArgs) => {
         params = args;
         if (timer === null) {
             // @ts-ignore
