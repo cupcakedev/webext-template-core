@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { IRpc } from '../interfaces';
 import { QueryFunctionContext } from 'react-query';
 
@@ -27,3 +28,6 @@ export function factory<T extends keyof IRpc>(
 ) => Promise<IRpc[T]['Response']> {
     return (params?) => execute(method, params);
 }
+
+export const useFactory = <T extends keyof IRpc>(method: T) =>
+    useMemo(() => factory(method), [method]);

@@ -1,4 +1,4 @@
-import Demo from './components/Demo';
+import Demo from './components/DemoInjection';
 import { RouteInterface } from '../interfaces';
 
 export const routes: RouteInterface[] = [

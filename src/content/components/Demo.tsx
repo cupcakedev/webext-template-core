@@ -1,30 +1,22 @@
 import React, { useState } from 'react';
 
-import { Injection } from './Injection';
 import { useQuery } from 'react-query';
 import { useQueryClient } from 'react-query';
 import { factory } from '../../rpc/';
 import Users from './Users';
 import useChromeStorage from '../../hooks/useChromeStorage';
 
-const Demo: React.FC<{ variant?: string }> = ({ variant }) => {
-    const selectTargetEl = () =>
-        document.querySelector('#injection > shadow-view');
-    const containerClassName = 'test__container';
+const getTabID = factory('getTabID');
+const getUsers = factory('getUsers');
+const getToken = factory('getToken');
 
+const Demo: React.FC<{ variant?: string }> = ({ variant }) => {
     const [value, setValue, _, errorMessage] = useChromeStorage('counter', 0);
     const queryClient = useQueryClient();
 
     const [tabID, setTabID] = useState<number>(0);
 
-    const getTabID = factory('getTabID');
-    const getUsers = factory('getUsers');
-    const getToken = factory('getToken');
-
-    const { data, isLoading, error } = useQuery(
-        ['usersList', { sort: '1' }],
-        getUsers
-    );
+    const { data, isLoading, error } = useQuery('usersList', getUsers);
 
     const getTabIDHandler = async () => {
         const id = await getTabID();
@@ -34,61 +26,53 @@ const Demo: React.FC<{ variant?: string }> = ({ variant }) => {
     };
 
     return (
-        <Injection
-            selectTargetElement={selectTargetEl}
-            position="afterbegin"
-            containerClassName={containerClassName}
-        >
-            <div style={styles.box}>
-                <div>
-                    <div
-                        style={{
-                            display: 'flex',
-                            gap: '11px',
-                            height: '25px',
-                            alignItems: 'center',
-                        }}
-                    >
-                        <p>TabID: {tabID || 'Неизвестно'}</p>
-                        <button onClick={getTabIDHandler}>
-                            Запросить tabID
-                        </button>
-                    </div>
-                    <div
-                        style={{
-                            display: 'flex',
-                            gap: '11px',
-                            height: '25px',
-                            alignItems: 'center',
-                        }}
-                    >
-                        <p>Счетчик: {value}</p>
-                        <button
-                            onClick={() => {
-                                setValue((prev: number) => prev + 1);
-                            }}
-                        >
-                            Increment
-                        </button>
-                        <button
-                            onClick={() => {
-                                setValue((prev: number) => 0);
-                            }}
-                        >
-                            Clear
-                        </button>
-                        <button
-                            onClick={() => {
-                                setValue((prev: number) => prev - 1);
-                            }}
-                        >
-                            Decrement
-                        </button>
-                    </div>
+        <div style={styles.box}>
+            <div>
+                <div
+                    style={{
+                        display: 'flex',
+                        gap: '11px',
+                        height: '25px',
+                        alignItems: 'center',
+                    }}
+                >
+                    <p>TabID: {tabID || 'Неизвестно'}</p>
+                    <button onClick={getTabIDHandler}>Запросить tabID</button>
                 </div>
-                <Users users={data} />
+                <div
+                    style={{
+                        display: 'flex',
+                        gap: '11px',
+                        height: '25px',
+                        alignItems: 'center',
+                    }}
+                >
+                    <p>Счетчик: {value}</p>
+                    <button
+                        onClick={() => {
+                            setValue((prev: number) => prev + 1);
+                        }}
+                    >
+                        Increment
+                    </button>
+                    <button
+                        onClick={() => {
+                            setValue((prev: number) => 0);
+                        }}
+                    >
+                        Clear
+                    </button>
+                    <button
+                        onClick={() => {
+                            setValue((prev: number) => prev - 1);
+                        }}
+                    >
+                        Decrement
+                    </button>
+                </div>
             </div>
-        </Injection>
+            <Users users={data} />
+        </div>
     );
 };
 
@@ -101,9 +85,5 @@ const styles: any = {
         background: 'rgb(221, 221, 221)',
         fontSize: '14px',
         padding: '24px',
-        position: 'absolute',
-        top: '25px',
-        left: '25px',
-        zIndex: '2147483647',
     },
 };

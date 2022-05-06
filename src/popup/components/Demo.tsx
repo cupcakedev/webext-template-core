@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { factory } from '../../rpc/';
+import { useFactory } from '../../rpc/';
 import useChromeStorage from '../../hooks/useChromeStorage';
 
 const Demo = () => {
@@ -7,11 +7,11 @@ const Demo = () => {
 
     const [value, setValue, _, errorMessage] = useChromeStorage('counter', 0);
 
+    const getExtensionID = useFactory('getExtensionID');
+
     if (errorMessage) {
         return <p>{`An error has occurred: ${errorMessage}`}</p>;
     }
-
-    const getExtensionID = factory('getExtensionID');
 
     const getTabIDHandler = async () => {
         const id = await getExtensionID();
