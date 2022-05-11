@@ -4,7 +4,7 @@ import { QueryClientProvider } from 'react-query';
 
 import { ShadowView } from './../shadow';
 
-import queryClient from '../common/queryClient';
+import queryClient from '../common/react-query/queryClient';
 import App from './App';
 
 const injection = document.createElement('div');

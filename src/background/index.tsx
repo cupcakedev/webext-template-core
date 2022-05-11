@@ -1,7 +1,7 @@
-import { Request } from 'src/rpc';
 import { Services } from './services';
 import { deepDiff } from './diff';
-import { REACT_QUERY_STORAGE_KEY } from 'src/common/queryClient';
+import { Request } from '../rpc';
+import { REACT_QUERY_STORAGE_KEY } from '../common/react-query/queryClient';
 
 const { EXTENSION_NAME_PREFIX } = process.env;
 

@@ -1,8 +1,8 @@
 /* eslint-disable react/button-has-type */
 import React, { useState } from 'react';
-import { factory } from '../../rpc';
-import { IUser } from '../../interfaces';
 import { useMutation, useQueryClient } from 'react-query';
+import { IUser } from '../../interfaces';
+import { factory } from '../../common/react-query/factory';
 
 const addUser = factory('addUser');
 const updateUser = factory('updateUser');

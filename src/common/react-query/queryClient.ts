@@ -1,5 +1,5 @@
 import { QueryClient } from 'react-query';
-import { createChromeStoragePersistor } from '../storage/createChromeStoragePersistor';
+import { createChromeStoragePersistor } from './createChromeStoragePersistor';
 import { persistQueryClient } from 'react-query/persistQueryClient-experimental';
 
 export const REACT_QUERY_STORAGE_KEY = `REACT_QUERY_CHROME_STORAGE_LOCAL`;

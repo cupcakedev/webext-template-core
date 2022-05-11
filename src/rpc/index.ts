@@ -1,6 +1,38 @@
-import { useMemo } from 'react';
-import { IRpc } from '../interfaces';
-import { QueryFunctionContext } from 'react-query';
+import { IUser } from 'src/interfaces';
+
+export interface IRpc {
+    getToken: {
+        Params: number;
+        Response: string;
+    };
+    getTabID: {
+        Params?: undefined;
+        Response: number;
+    };
+    getExtensionID: {
+        Params?: undefined;
+        Response: string;
+    };
+    getUsers: {
+        Params: { sort: string };
+        Response: Array<IUser>;
+    };
+    addUser: {
+        Params: {
+            name: IUser['name'];
+            login: IUser['login'];
+        };
+        Response: IUser;
+    };
+    updateUser: {
+        Params: IUser;
+        Response: IUser;
+    };
+    deleteUser: {
+        Params: number;
+        Response: any;
+    };
+}
 
 export type Request = {
     type: 'command';
@@ -10,9 +42,9 @@ export type Request = {
 
 export const execute = <T extends keyof IRpc>(
     method: T,
-    params?: IRpc[T]['Params'] | QueryFunctionContext
+    params?: IRpc[T]['Params']
 ) =>
-    new Promise((resolve) => {
+    new Promise<IRpc[T]['Response']>((resolve) => {
         const request: Request = {
             type: 'command',
             method,
@@ -20,14 +52,3 @@ export const execute = <T extends keyof IRpc>(
         };
         chrome.runtime.sendMessage(request, (response) => resolve(response));
     });
-
-export function factory<T extends keyof IRpc>(
-    method: T
-): (
-    params?: IRpc[T]['Params'] | QueryFunctionContext
-) => Promise<IRpc[T]['Response']> {
-    return (params?) => execute(method, params);
-}
-
-export const useFactory = <T extends keyof IRpc>(method: T) =>
-    useMemo(() => factory(method), [method]);

@@ -1,7 +1,7 @@
 import axiosOriginal from 'axios';
 // @ts-ignore
 import adapter from 'axios/lib/adapters/xhr';
-import { IRpc } from '../interfaces';
+import { IRpc } from '../rpc';
 
 const axios = axiosOriginal.create({ adapter });
 

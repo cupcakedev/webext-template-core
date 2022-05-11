@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 
 import { useQuery } from 'react-query';
 import { useQueryClient } from 'react-query';
-import { factory } from '../../rpc/';
 import Users from './Users';
 import useChromeStorage from '../../hooks/useChromeStorage';
+import { factory } from '../../common/react-query/factory';
 
 const getTabID = factory('getTabID');
 const getUsers = factory('getUsers');

@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import { useFactory } from '../../rpc/';
+import { factory } from 'src/common/react-query/factory';
 import useChromeStorage from '../../hooks/useChromeStorage';
+
+const getExtensionID = factory('getExtensionID');
 
 const Demo = () => {
     const [extID, setExtID] = useState('');
 
     const [value, setValue, _, errorMessage] = useChromeStorage('counter', 0);
-
-    const getExtensionID = useFactory('getExtensionID');
 
     if (errorMessage) {
         return <p>{`An error has occurred: ${errorMessage}`}</p>;
@@ -19,7 +19,7 @@ const Demo = () => {
     };
 
     return (
-        <div style={{ ...styles.box, top }}>
+        <div style={{ ...styles.box }}>
             <p>Extension ID: {extID || 'Undefined'}</p>
             <p>Counter: {value}</p>
             <button onClick={getTabIDHandler}>Запросить ExtID</button>

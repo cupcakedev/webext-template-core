@@ -2,8 +2,8 @@ import {
     PersistedClient,
     Persistor,
 } from 'react-query/persistQueryClient-experimental';
-import { REACT_QUERY_STORAGE_KEY } from 'src/common/queryClient';
-import { getItem, removeItem, setItem } from './storage';
+import { REACT_QUERY_STORAGE_KEY } from 'src/common/react-query/queryClient';
+import { getItem, removeItem, setItem } from '../../storage/storage';
 
 interface CreateChromeStoragePersistorOptions {
     /** The key to use when storing the cache */
