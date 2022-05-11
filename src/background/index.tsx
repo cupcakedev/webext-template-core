@@ -1,7 +1,5 @@
 import { Services } from './services';
-import { deepDiff } from './diff';
 import { RequestMessage } from '../rpc';
-import { REACT_QUERY_STORAGE_KEY } from '../common/react-query/queryClient';
 
 const { EXTENSION_NAME_PREFIX } = process.env;
 
@@ -66,16 +64,10 @@ const parseArgs = (args: any) => {
 
 chrome.storage.onChanged.addListener(function (changes, namespace) {
     for (const [key, { oldValue, newValue }] of Object.entries(changes)) {
-        if (key === REACT_QUERY_STORAGE_KEY) {
-            const old = oldValue && JSON.parse(oldValue);
-            const neww = newValue && JSON.parse(newValue);
-            console.log('React Query storage updated', deepDiff(old, neww));
-        } else {
-            console.log(
-                `Storage key "${key}" in namespace "${namespace}" changed.`,
-                `Old value was "${oldValue}", new value is "${newValue}".`
-            );
-        }
+        console.log(
+            `Storage key "${key}" in namespace "${namespace}" changed.`,
+            `Old value was "${oldValue}", new value is "${newValue}".`
+        );
     }
 });
 

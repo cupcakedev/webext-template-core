@@ -1,8 +1,7 @@
 /* eslint-disable react/button-has-type */
 import React, { useState } from 'react';
-import { useMutation, useQueryClient } from 'react-query';
+import { factory } from '../../rpc';
 import { IUser } from '../../interfaces';
-import { factory } from '../../common/react-query/factory';
 
 const addUser = factory('addUser');
 const updateUser = factory('updateUser');
@@ -93,35 +92,6 @@ const Users: React.FC<{ users: Array<IUser> | undefined }> = (props) => {
     const [newName, setNewName] = useState<string>('');
     const [row, setRow] = useState<number>();
 
-    const queryClient = useQueryClient();
-
-    const mutationDelete = useMutation(deleteUser, {
-        onSuccess: () => {
-            queryClient.invalidateQueries('usersList');
-        },
-        onError: () => {
-            alert('Удалить не получилось');
-        },
-    });
-
-    const mutationUpdate = useMutation(updateUser, {
-        onSuccess: () => {
-            queryClient.invalidateQueries('usersList');
-        },
-        onError: () => {
-            alert('Обновить не получилось');
-        },
-    });
-
-    const mutationAdd = useMutation(addUser, {
-        onSuccess: () => {
-            queryClient.invalidateQueries('usersList', {});
-        },
-        onError: () => {
-            console.log('Мутация провалилась');
-        },
-    });
-
     const changeHandler = (user: IUser, index: number) => {
         setIsEdit(!isEdit);
         setRow(index);
@@ -144,14 +114,18 @@ const Users: React.FC<{ users: Array<IUser> | undefined }> = (props) => {
                             edit={isEdit && row === i}
                             user={user}
                             changeHandler={() => changeHandler(user, i)}
-                            deleteHandler={() =>
-                                mutationDelete.mutate({ id: user.id })
-                            }
+                            deleteHandler={() => {
+                                deleteUser({ id: user.id });
+                            }}
                             saveHandler={(login, name) => {
                                 console.log('handle save', login, name);
                                 setIsEdit(!isEdit);
-                                mutationUpdate.mutate({
-                                    user: { id: user.id, login, name },
+                                updateUser({
+                                    user: {
+                                        id: user.id,
+                                        login,
+                                        name,
+                                    },
                                 });
                             }}
                             cancelHandler={() => setIsEdit(!isEdit)}
@@ -184,10 +158,7 @@ const Users: React.FC<{ users: Array<IUser> | undefined }> = (props) => {
                         <button
                             style={{ width: '100%' }}
                             onClick={() => {
-                                mutationAdd.mutate({
-                                    login: newLogin,
-                                    name: newName,
-                                });
+                                addUser({ name: newName, login: newLogin });
                                 setNewLogin('');
                                 setNewName('');
                             }}

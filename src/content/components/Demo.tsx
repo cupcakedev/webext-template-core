@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
-import { useQuery, useQueryClient } from 'react-query';
 import Users from './Users';
 import useChromeStorage from '../../hooks/useChromeStorage';
-import { factory } from '../../common/react-query/factory';
+import { factory } from '../../rpc';
+import { IUser } from '../../interfaces';
 
 const getTabID = factory('getTabID');
 const getUsers = factory('getUsers');
@@ -11,12 +11,14 @@ const getToken = factory('getToken');
 
 const Demo: React.FC<{ variant?: string }> = ({ variant }) => {
     const [value, setValue, _, errorMessage] = useChromeStorage('counter', 0);
-    const queryClient = useQueryClient();
 
     const [tabID, setTabID] = useState<number>(0);
-    const { data, isLoading, error } = useQuery('usersList', () =>
-        getUsers({ sort: 'ASC' })
-    );
+
+    const [users, setUsers] = useState<IUser[] | undefined>(undefined);
+
+    useEffect(() => {
+        getUsers({ sort: 'ASC' }).then((users) => setUsers(users));
+    }, []);
 
     const getTabIDHandler = async () => {
         const id = await getTabID();
@@ -71,7 +73,7 @@ const Demo: React.FC<{ variant?: string }> = ({ variant }) => {
                     </button>
                 </div>
             </div>
-            <Users users={data} />
+            <Users users={users} />
         </div>
     );
 };
