@@ -7,17 +7,11 @@ export const getItem = async (key: string) => {
     });
 };
 
-export const setItem = (
-    key: string,
-    value: string,
-    callback?: (result: boolean) => void
-) =>
+export const setItem = (key: string, value: string) =>
     new Promise((resolve) =>
         chrome.storage.local.set({ [key]: value }, () => {
             console.log('Я сохранился');
-            if (typeof callback === 'function') {
-                chrome.runtime.lastError ? resolve(false) : resolve(true);
-            }
+            chrome.runtime.lastError ? resolve(false) : resolve(true);
         })
     );
 
