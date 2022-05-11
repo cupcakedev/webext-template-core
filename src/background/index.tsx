@@ -1,12 +1,12 @@
 import { Services } from './services';
 import { deepDiff } from './diff';
-import { Request } from '../rpc';
+import { RequestMessage } from '../rpc';
 import { REACT_QUERY_STORAGE_KEY } from '../common/react-query/queryClient';
 
 const { EXTENSION_NAME_PREFIX } = process.env;
 
 chrome.runtime.onMessage.addListener(
-    (request: Request, sender, sendResponse) => {
+    (request: RequestMessage, sender, sendResponse) => {
         if (chrome.runtime.lastError) {
             sendResponse(chrome.runtime.lastError);
             return true;

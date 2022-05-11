@@ -144,14 +144,14 @@ const Users: React.FC<{ users: Array<IUser> | undefined }> = (props) => {
                             edit={isEdit && row === i}
                             user={user}
                             changeHandler={() => changeHandler(user, i)}
-                            deleteHandler={() => mutationDelete.mutate(user.id)}
+                            deleteHandler={() =>
+                                mutationDelete.mutate({ id: user.id })
+                            }
                             saveHandler={(login, name) => {
                                 console.log('handle save', login, name);
                                 setIsEdit(!isEdit);
                                 mutationUpdate.mutate({
-                                    id: user.id,
-                                    login,
-                                    name,
+                                    user: { id: user.id, login, name },
                                 });
                             }}
                             cancelHandler={() => setIsEdit(!isEdit)}

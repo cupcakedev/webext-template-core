@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { factory } from 'src/common/react-query/factory';
+import { factory } from '../../rpc';
 import useChromeStorage from '../../hooks/useChromeStorage';
 
 const getExtensionID = factory('getExtensionID');

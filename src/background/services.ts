@@ -28,7 +28,7 @@ export const Services: IServices = {
 
     getExtensionID: (sender) => sender.id,
 
-    getUsers: async () => {
+    getUsers: async (_, { sort }) => {
         try {
             return await (
                 await fetch(`${URL_JSON_SERVER}/users/`, { method: 'GET' })
@@ -54,7 +54,7 @@ export const Services: IServices = {
         }
     },
 
-    deleteUser: async (_, id) => {
+    deleteUser: async (_, { id }) => {
         try {
             return await (
                 await fetch(`${URL_JSON_SERVER}/users/${id}`, {
@@ -66,7 +66,7 @@ export const Services: IServices = {
         }
     },
 
-    updateUser: async (_, user) => {
+    updateUser: async (_, { user }) => {
         try {
             return await (
                 await fetch(`${URL_JSON_SERVER}/users/${user.id}`, {

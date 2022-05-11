@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 
-import { useQuery } from 'react-query';
-import { useQueryClient } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 import Users from './Users';
 import useChromeStorage from '../../hooks/useChromeStorage';
 import { factory } from '../../common/react-query/factory';
@@ -15,8 +14,9 @@ const Demo: React.FC<{ variant?: string }> = ({ variant }) => {
     const queryClient = useQueryClient();
 
     const [tabID, setTabID] = useState<number>(0);
-
-    const { data, isLoading, error } = useQuery('usersList', getUsers);
+    const { data, isLoading, error } = useQuery('usersList', () =>
+        getUsers({ sort: 'ASC' })
+    );
 
     const getTabIDHandler = async () => {
         const id = await getTabID();
