@@ -6,7 +6,8 @@
     "dev": "dotenv -- webpack --mode=development --watch",
     "build": "dotenv -- webpack --mode=production",
     "lint": "eslint --ext js,ts,tsx .",
-    "test": "jest"
+    "test": "jest",
+    "start-json-server": "json-server --watch db.json --port 3004"
   },
   "private": true,
   "main": "export/index",
