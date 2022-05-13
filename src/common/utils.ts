@@ -3,8 +3,9 @@ import { matchPattern } from 'url-matcher';
 // @ts-ignore
 import * as _ from 'lodash';
 import { parse } from 'query-string';
-import MessageSender = chrome.runtime.MessageSender;
 import { RouteInterface } from '../interfaces';
+
+type MessageSender = chrome.runtime.MessageSender;
 
 export const openTab = async (url: string) =>
     new Promise<void>((resolve, reject) => {
