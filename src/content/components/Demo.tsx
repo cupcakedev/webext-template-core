@@ -14,6 +14,11 @@ const Demo: React.FC<{ variant?: string }> = ({ variant }) => {
         initialValue: 0,
     });
 
+    const [token, setToken, _, errorMessage] = useChromeStorage('JWSToken', {
+        storageArea: 'sync',
+        emptyValue: null,
+    });
+
     const [tabID, setTabID] = useState<number | undefined>();
 
     const [users, setUsers] = useState<IUser[] | undefined>(undefined);

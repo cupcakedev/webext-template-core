@@ -1,18 +1,27 @@
 import { useCallback, useEffect, useState } from 'react';
-import storage, { EmptyStorageValue, Storage } from '../storage/storage';
+import storage, {
+    EmptyStorageValue,
+    LocalStorage,
+    StorageValue,
+    SyncStorage,
+} from '../storage/storage';
 
-type UseChromeStorage = <Key extends keyof Storage, E = EmptyStorageValue>(
+type UseChromeStorage = <
+    Key extends NS extends 'local' ? keyof LocalStorage : keyof SyncStorage,
+    NS extends 'local' | 'sync' = 'local',
+    E = EmptyStorageValue
+>(
     key: Key,
     options: {
-        storageArea?: 'local' | 'sync';
-        initialValue?: Storage<E>[Key] | (() => Storage<E>[Key]);
+        storageArea?: NS;
+        initialValue?: StorageValue<Key, E> | (() => StorageValue<Key, E>);
         emptyValue?: E;
     }
 ) => [
     typeof options.initialValue extends undefined
-        ? Storage<E>[Key] | undefined
-        : Storage<E>[Key],
-    (arg0: Storage<E>[Key]) => void,
+        ? StorageValue<Key, E> | undefined
+        : StorageValue<Key, E>,
+    (arg0: StorageValue<Key, E>) => void,
     boolean,
     string
 ];

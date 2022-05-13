@@ -31,29 +31,26 @@ const stateStorageKeys = {
     tokensUpdating: 'tokensUpdating',
 } as const;
 
-const storageKeys = {
+export const localStorageKeys = {
     ...stateStorageKeys,
     ...utilityStorageKeys,
-    ...authStorageKeys,
     ...dataStorageKeys,
 } as const;
 
-type StorageKey = keyof typeof storageKeys;
+export const syncStorageKeys = authStorageKeys;
 
-type Template<T = unknown> = {
-    [key in StorageKey]: T;
+type LocalStorageKey = keyof typeof localStorageKeys;
+
+type LocalStorageDataTemplate<T = unknown> = {
+    [key in LocalStorageKey]: T;
 };
 
-type StorageData = Template &
+type LocalStorageData = LocalStorageDataTemplate &
     Subtype<
-        Template,
+        LocalStorageDataTemplate,
         {
             users: IUser[];
             counter: number;
-
-            user: IUser;
-            JWSToken: string;
-            refreshJWSToken: string;
 
             storageVersion: string;
 
@@ -61,56 +58,103 @@ type StorageData = Template &
         }
     >;
 
-export type EmptyStorageValue = '' | null | undefined;
+type SyncStorageKey = keyof typeof syncStorageKeys;
 
-export type Storage<E = EmptyStorageValue> = {
-    [key in StorageKey]: StorageData[key] | E;
+type SyncStorageDataTemplate<T = unknown> = {
+    [key in SyncStorageKey]: T;
 };
 
+type SyncStorageData = SyncStorageDataTemplate &
+    Subtype<
+        SyncStorageDataTemplate,
+        {
+            JWSToken: string;
+            refreshJWSToken: string;
+            user: IUser;
+        }
+    >;
+
+export type EmptyStorageValue = '' | null | undefined;
+
+export type LocalStorage<E = EmptyStorageValue> = {
+    [key in LocalStorageKey]: LocalStorageData[key] | E;
+};
+
+export type SyncStorage<E = EmptyStorageValue> = {
+    [key in SyncStorageKey]: SyncStorageData[key] | E;
+};
+
+export type Storage<E = EmptyStorageValue> = LocalStorage<E> & SyncStorage<E>;
+
+export type StorageKey = keyof Storage;
+
+export type StorageValue<
+    Key extends LocalStorageKey | SyncStorageKey,
+    E = EmptyStorageValue
+> =
+    // @ts-ignore
+    Key extends LocalStorageKey ? LocalStorage<E>[Key] : SyncStorage<E>[Key];
+
+const getNamespace = (key: StorageKey) =>
+    Object.values(syncStorageKeys).includes(key as any) ? 'sync' : 'local';
+
 // Safari skips writes with 'undefined' and 'null', write '' instead
-const normalizeStorageValue = (value: Storage[StorageKey]) =>
+const normalizeStorageValue = (value: any) =>
     value !== undefined && value !== null ? value : '';
 
-const normalizeStorageData = (items: Partial<Storage>) =>
+const normalizeStorageData = (items: any) =>
     Object.entries(items).reduce((acc, [key, value]) => {
         Object.assign(acc, { [key]: normalizeStorageValue(value) });
         return acc;
     }, items);
 
-const getItem = async <T extends StorageKey, E = EmptyStorageValue>(
+const getItem = async <
+    T extends LocalStorageKey | SyncStorageKey,
+    E = EmptyStorageValue
+>(
     key: T,
     emptyResultValue?: E
 ) =>
-    new Promise<Storage<E>[T]>((resolve) => {
-        chrome.storage.local.get(key, (data) =>
+    new Promise((resolve) => {
+        chrome.storage[getNamespace(key)].get(key, (data) =>
             resolve(
                 emptyResultValue !== undefined
                     ? data[key] || emptyResultValue
                     : data[key]
             )
         );
-    });
+    }) as Promise<Storage<E>[T]>;
 
-const getItems = async <T extends StorageKey[], E = EmptyStorageValue>(
-    keys: T,
-    emptyResultValue?: E
-) =>
-    new Promise<Pick<Storage<E>, T[number]>>((resolve) => {
-        chrome.storage.local.get(keys, (data) => {
-            if (emptyResultValue !== undefined) {
-                keys.forEach((key) => {
-                    if (!data[key]) {
-                        data[key] = emptyResultValue;
-                    }
-                });
-            }
-            resolve(data as Pick<Storage<E>, T[number]>);
+type GetItems = <NS extends 'local' | 'sync'>(
+    namespace: NS
+) => NS extends 'local'
+    ? <T extends LocalStorageKey[], E = EmptyStorageValue>(
+          keys: T,
+          emptyResultValue?: E
+      ) => Promise<Pick<LocalStorage<E>, T[number]>>
+    : <T extends SyncStorageKey[], E = EmptyStorageValue>(
+          keys: T,
+          emptyResultValue?: E
+      ) => Promise<Pick<SyncStorage<E>, T[number]>>;
+
+const getItems: GetItems =
+    (namespace) => async (keys: string[], emptyResultValue: any) =>
+        new Promise<any>((resolve) => {
+            chrome.storage[namespace].get(keys, (data) => {
+                if (emptyResultValue !== undefined) {
+                    keys.forEach((key) => {
+                        if (!data[key]) {
+                            data[key] = emptyResultValue;
+                        }
+                    });
+                }
+                resolve(data);
+            });
         });
-    });
 
 const setItem = <T extends StorageKey>(key: T, value: Storage[T]) =>
     new Promise((resolve) =>
-        chrome.storage.local.set(
+        chrome.storage[getNamespace(key)].set(
             { [key]: normalizeStorageValue(value) },
             () => {
                 chrome.runtime.lastError ? resolve(false) : resolve(true);
@@ -135,7 +179,7 @@ const remove = (items: StorageKey[] | StorageKey) =>
 const clear = () => chrome.storage.local.clear();
 
 const init = async () => {
-    const lastStorageVersion = await getItem(storageKeys.storageVersion);
+    const lastStorageVersion = await getItem(localStorageKeys.storageVersion);
     if (process.env.NODE_ENV === 'development') {
         console.log('storage version:', STORAGE_VERSION);
         console.log('last storage version:', lastStorageVersion);
@@ -144,7 +188,7 @@ const init = async () => {
         if (process.env.NODE_ENV === 'development')
             console.log('storage version changed, clear storage');
         await clear();
-        await setItem(storageKeys.storageVersion, STORAGE_VERSION);
+        await setItem(localStorageKeys.storageVersion, STORAGE_VERSION);
     }
 };
 
@@ -155,6 +199,5 @@ export default {
     setItems,
     remove,
     clear,
-    keys: storageKeys,
     init,
 };
