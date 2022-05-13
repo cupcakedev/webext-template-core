@@ -5,30 +5,12 @@ import * as _ from 'lodash';
 import { parse } from 'query-string';
 import { RouteInterface } from '../interfaces';
 
-type MessageSender = chrome.runtime.MessageSender;
-
 export const openTab = async (url: string) =>
     new Promise<void>((resolve, reject) => {
         chrome.tabs.create({ url }, () => {
             resolve();
         });
     });
-
-export const listenToMessage = (
-    type: string,
-    callback: (sender: MessageSender, sendResponse: () => void) => void
-) => {
-    chrome.runtime.onMessage.addListener(function (
-        request,
-        sender,
-        sendResponse
-    ) {
-        if (request.type === type) {
-            callback(sender, sendResponse);
-        }
-        return true;
-    });
-};
 
 export const findRoute = (routes: RouteInterface[], pathname: string) => {
     for (const route of routes) {

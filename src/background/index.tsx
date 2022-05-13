@@ -1,7 +1,6 @@
 import { Services } from './services';
 import { IBgRequest } from '../rpc';
-
-const { EXTENSION_NAME_PREFIX } = process.env;
+import { callTab } from 'src/rpc/tabs';
 
 chrome.runtime.onMessage.addListener(
     async (request: IBgRequest, sender, sendResponse) => {
@@ -51,11 +50,14 @@ function urlListener(
             return;
         }
 
-        chrome.tabs.sendMessage(tabId, {
-            type: `${EXTENSION_NAME_PREFIX}__change_url`,
-        });
+        console.log(tab.url);
+
+        callTab(tabId, 'updateUrl').then((ok) =>
+            ok
+                ? console.log('updated URL for tab', tabId)
+                : console.log('no URL update needed for tab', tabId)
+        );
     }
-    console.log(tab.url);
 }
 
 chrome.tabs.onUpdated.addListener(urlListener);
