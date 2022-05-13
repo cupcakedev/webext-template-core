@@ -1192,10 +1192,10 @@
     "@svgr/plugin-svgo" "^5.5.0"
     loader-utils "^2.0.0"
 
-"@types/chrome@^0.0.145":
-  version "0.0.145"
-  resolved "https://registry.yarnpkg.com/@types/chrome/-/chrome-0.0.145.tgz#6c53ae0af5f25350b07bfd24cf459b5fe65cd9b8"
-  integrity sha512-vLvTMmfc8mvwOZzkmn2UwlWSNu0t0txBkyuIv8NgihRkvFCe6XJX65YZAgAP/RdBit3enhU2GTxCr+prn4uZmA==
+"@types/chrome@^0.0.185":
+  version "0.0.185"
+  resolved "https://registry.yarnpkg.com/@types/chrome/-/chrome-0.0.185.tgz#5aee082a4eccf8d151750bae0af377b7f5ab7fd1"
+  integrity sha512-HU0q31jtBHSfqtqW5TqqgU+BnSiUJdB98qFWT1SD2gXZxk8NVuogNmv7T+WUL+q2/GEer/4est19A1h8FdehYQ==
   dependencies:
     "@types/filesystem" "*"
     "@types/har-format" "*"

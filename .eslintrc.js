@@ -15,5 +15,6 @@ module.exports = {
         'no-unneeded-ternary': 0,
         'comma-dangle': 0,
         'no-constant-condition': 0,
+        'no-unused-expressions': 0,
     },
 };

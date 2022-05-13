@@ -1,21 +1,30 @@
 import { useCallback, useEffect, useState } from 'react';
-import { getItem, setItem } from '../storage/storage';
+import storage, { EmptyStorageValue, Storage } from '../storage/storage';
 
-/**
- * Basic hook for storage
- * @param {string} key
- * @param {*} initialValue
- * @param {'local'|'sync'} storageArea
- * @returns {[*, function(*= any): void, boolean, string]}
- */
+type UseChromeStorage = <Key extends keyof Storage, E = EmptyStorageValue>(
+    key: Key,
+    options: {
+        storageArea?: 'local' | 'sync';
+        initialValue?: Storage<E>[Key] | (() => Storage<E>[Key]);
+        emptyValue?: E;
+    }
+) => [
+    typeof options.initialValue extends undefined
+        ? Storage<E>[Key] | undefined
+        : Storage<E>[Key],
+    (arg0: Storage<E>[Key]) => void,
+    boolean,
+    string
+];
 
-const useChromeStorage = (
-    key: string,
-    initialValue?: {},
-    storageArea: 'local' | 'sync' = 'local'
+const useChromeStorage: UseChromeStorage = (
+    key,
+    { storageArea = 'local', initialValue, emptyValue }
 ) => {
     const [INITIAL_VALUE] = useState(() =>
-        typeof initialValue === 'function' ? initialValue() : initialValue
+        typeof initialValue === 'function'
+            ? initialValue()
+            : initialValue ?? emptyValue
     );
     const [STORAGE_AREA] = useState(storageArea);
     const [state, setState] = useState(INITIAL_VALUE);
@@ -23,8 +32,9 @@ const useChromeStorage = (
     const [error, setError] = useState('');
 
     useEffect(() => {
-        getItem(key)
-            .then((res: any) => {
+        storage
+            .getItem(key)
+            .then((res) => {
                 setState(res);
                 setIsPersistent(true);
                 setError('');
@@ -40,7 +50,7 @@ const useChromeStorage = (
             const toStore =
                 typeof newValue === 'function' ? newValue(state) : newValue;
             setState(toStore);
-            setItem(key, toStore).then((result) => {
+            storage.setItem(key, toStore).then((result) => {
                 if (result) {
                     setIsPersistent(true);
                     setError('');

@@ -10,7 +10,9 @@ const getUsers = getBgCaller('getUsers');
 const getToken = getBgCaller('getToken');
 
 const Demo: React.FC<{ variant?: string }> = ({ variant }) => {
-    const [value, setValue, _, errorMessage] = useChromeStorage('counter', 0);
+    const [value, setValue, _, errorMessage] = useChromeStorage('counter', {
+        initialValue: 0,
+    });
 
     const [tabID, setTabID] = useState<number | undefined>();
 
