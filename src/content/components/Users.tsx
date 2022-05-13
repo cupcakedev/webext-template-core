@@ -1,11 +1,11 @@
 /* eslint-disable react/button-has-type */
 import React, { useState } from 'react';
-import { factory } from '../../rpc';
+import { getBgCaller } from '../../rpc';
 import { IUser } from '../../interfaces';
 
-const addUser = factory('addUser');
-const updateUser = factory('updateUser');
-const deleteUser = factory('deleteUser');
+const addUser = getBgCaller('addUser');
+const updateUser = getBgCaller('updateUser');
+const deleteUser = getBgCaller('deleteUser');
 
 const User: React.FC<{
     user: IUser;

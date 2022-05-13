@@ -2,17 +2,17 @@ import React, { useEffect, useState } from 'react';
 
 import Users from './Users';
 import useChromeStorage from '../../hooks/useChromeStorage';
-import { factory } from '../../rpc';
+import { getBgCaller } from '../../rpc';
 import { IUser } from '../../interfaces';
 
-const getTabID = factory('getTabID');
-const getUsers = factory('getUsers');
-const getToken = factory('getToken');
+const getTabID = getBgCaller('getTabID');
+const getUsers = getBgCaller('getUsers');
+const getToken = getBgCaller('getToken');
 
 const Demo: React.FC<{ variant?: string }> = ({ variant }) => {
     const [value, setValue, _, errorMessage] = useChromeStorage('counter', 0);
 
-    const [tabID, setTabID] = useState<number>(0);
+    const [tabID, setTabID] = useState<number | undefined>();
 
     const [users, setUsers] = useState<IUser[] | undefined>(undefined);
 
@@ -38,7 +38,7 @@ const Demo: React.FC<{ variant?: string }> = ({ variant }) => {
                         alignItems: 'center',
                     }}
                 >
-                    <p>TabID: {tabID || 'Неизвестно'}</p>
+                    <p>TabID: {tabID}</p>
                     <button onClick={getTabIDHandler}>Запросить tabID</button>
                 </div>
                 <div

@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { factory } from '../../rpc';
+import { getBgCaller } from '../../rpc';
 import useChromeStorage from '../../hooks/useChromeStorage';
 
-const getExtensionID = factory('getExtensionID');
+const getExtensionID = getBgCaller('getExtensionID');
 
 const Demo = () => {
-    const [extID, setExtID] = useState('');
+    const [extID, setExtID] = useState<string | undefined>();
 
     const [value, setValue, _, errorMessage] = useChromeStorage('counter', 0);
 

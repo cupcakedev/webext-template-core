@@ -1,10 +1,10 @@
 import { Services } from './services';
-import { RequestMessage } from '../rpc';
+import { IBgRequest } from '../rpc';
 
 const { EXTENSION_NAME_PREFIX } = process.env;
 
 chrome.runtime.onMessage.addListener(
-    (request: RequestMessage, sender, sendResponse) => {
+    async (request: IBgRequest, sender, sendResponse) => {
         if (chrome.runtime.lastError) {
             sendResponse(chrome.runtime.lastError);
             return true;
@@ -15,52 +15,22 @@ chrome.runtime.onMessage.addListener(
         console.log('request', request.method, ' => send');
         const { method, params } = request;
 
-        const argsObj = parseArgs(params);
-
-        const map = Object.keys(Services);
-
-        if (!map.includes(method)) {
+        if (!Object.keys(Services).includes(method)) {
             return Promise.reject();
         }
 
-        // @ts-ignore
-        const result = Services[method](sender, argsObj);
-
-        if (isPromise(result)) {
-            result
-                .then((response: any) => {
-                    console.log(response);
-                    sendResponse(response);
-                })
-                .catch((e: any) => {
-                    console.log({ error: e.message });
-                    sendResponse({ error: e.message });
-                });
-        } else {
+        try {
+            const result = await Services[method](sender, params as never);
             console.log(result);
             sendResponse(result);
+        } catch (e: any) {
+            console.log({ error: e.message });
+            sendResponse({ error: e.message });
         }
 
         return true;
     }
 );
-
-function isPromise(promise: any) {
-    return !!promise && typeof promise.then === 'function';
-}
-
-const parseArgs = (args: any) => {
-    if (!args) {
-        return undefined;
-    }
-
-    try {
-        return JSON.parse(args);
-    } catch (e) {
-        console.log(`Can't parse args`);
-        return undefined;
-    }
-};
 
 chrome.storage.onChanged.addListener(function (changes, namespace) {
     for (const [key, { oldValue, newValue }] of Object.entries(changes)) {

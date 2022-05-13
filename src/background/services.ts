@@ -1,20 +1,13 @@
 import axiosOriginal from 'axios';
 // @ts-ignore
 import adapter from 'axios/lib/adapters/xhr';
-import { IRpc } from '../rpc';
+import { IBgServices } from '../rpc';
 
 const axios = axiosOriginal.create({ adapter });
 
 const URL_JSON_SERVER = 'http://localhost:3004';
 
-export type IServices = {
-    [name in keyof IRpc]: (
-        sender: any,
-        args: IRpc[name]['Params']
-    ) => Promise<IRpc[name]['Response']>;
-};
-
-export const Services: IServices = {
+export const Services: IBgServices = {
     getToken: async (_, args) => {
         try {
             const res = await axios(`${URL_JSON_SERVER}/tokens/${args}`);
@@ -24,11 +17,11 @@ export const Services: IServices = {
         }
     },
 
-    getTabID: (sender) => sender.tab.id,
+    getTabID: (sender) => sender.tab?.id,
 
     getExtensionID: (sender) => sender.id,
 
-    getUsers: async (_, { sort }) => {
+    getUsers: async (_, args) => {
         try {
             return await (
                 await fetch(`${URL_JSON_SERVER}/users/`, { method: 'GET' })

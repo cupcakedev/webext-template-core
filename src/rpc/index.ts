@@ -1,17 +1,18 @@
+import { Promisable } from 'src/interfaces/utils';
 import { IUser } from '../interfaces';
 
-export interface IRpc {
+export interface IBgModel {
     getToken: {
         Params: undefined;
         Response: string;
     };
     getTabID: {
         Params: undefined;
-        Response: number;
+        Response: number | undefined;
     };
     getExtensionID: {
         Params: { id?: string };
-        Response: string;
+        Response: string | undefined;
     };
     getUsers: {
         Params: { sort?: string };
@@ -30,41 +31,55 @@ export interface IRpc {
     };
     deleteUser: {
         Params: { id: number };
-        Response: any;
+        Response: undefined;
     };
 }
 
-export type RequestMessage = {
-    type: 'command';
-    method: string;
-    params: string;
+export type IBgServices = {
+    [Key in keyof IBgModel]: Partial<
+        IBgModel[Key]['Params']
+    > extends IBgModel[Key]['Params']
+        ? (
+              sender: chrome.runtime.MessageSender,
+              args?: IBgModel[Key]['Params']
+          ) => Promisable<IBgModel[Key]['Response']>
+        : (
+              sender: chrome.runtime.MessageSender,
+              args: IBgModel[Key]['Params']
+          ) => Promisable<IBgModel[Key]['Response']>;
 };
 
-type Request = <T extends keyof IRpc>(
-    ...args: Partial<IRpc[T]['Params']> extends IRpc[T]['Params']
-        ? [method: T, params?: IRpc[T]['Params']]
-        : [method: T, params: IRpc[T]['Params']]
-) => Promise<IRpc[T]['Response']>;
+export interface IBgRequest<Key extends keyof IBgModel = keyof IBgModel> {
+    type: 'command';
+    method: Key;
+    params: IBgModel[Key]['Params'];
+}
 
-export const execute: Request = (...args) =>
-    new Promise<IRpc[typeof args[0]]['Response']>((resolve) => {
-        const request: RequestMessage = {
+type BgCaller = <T extends keyof IBgModel>(
+    ...args: Partial<IBgModel[T]['Params']> extends IBgModel[T]['Params']
+        ? [method: T, params?: IBgModel[T]['Params']]
+        : [method: T, params: IBgModel[T]['Params']]
+) => Promise<IBgModel[T]['Response']>;
+
+export const callBg: BgCaller = (...args) =>
+    new Promise((resolve) => {
+        const request: IBgRequest = {
             type: 'command',
             method: args[0],
-            params: JSON.stringify(args[1]),
+            params: args[1],
         };
         chrome.runtime.sendMessage(request, (response) => resolve(response));
     });
 
-type Factory = <T extends keyof IRpc>(
+type BgFactory = <T extends keyof IBgModel>(
     method: T
 ) => (
-    ...args: Partial<IRpc[T]['Params']> extends IRpc[T]['Params']
-        ? [params?: IRpc[T]['Params']]
-        : [params: IRpc[T]['Params']]
-) => Promise<IRpc[T]['Response']>;
+    ...args: Partial<IBgModel[T]['Params']> extends IBgModel[T]['Params']
+        ? [params?: IBgModel[T]['Params']]
+        : [params: IBgModel[T]['Params']]
+) => Promise<IBgModel[T]['Response']>;
 
-export const factory: Factory =
+export const getBgCaller: BgFactory =
     (method) =>
     (...args) =>
-        execute(method, args[0]);
+        callBg(method, args[0]);
