@@ -25,6 +25,7 @@ export const listenToMessage = (
         if (request.type === type) {
             callback(sender, sendResponse);
         }
+        return true;
     });
 };
 

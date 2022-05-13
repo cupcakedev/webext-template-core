@@ -23,6 +23,7 @@ const App = () => {
                     setSearch(window.location.search);
                     prevSearch = window.location.search;
                 }
+                sendResponse();
             }
         );
     }, []);
