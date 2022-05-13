@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 
 import Users from './Users';
 import useChromeStorage from '../../hooks/useChromeStorage';
-import { getBgCaller } from '../../rpc';
+import { getBgCaller } from '../../rpc/bg';
 import { IUser } from '../../interfaces';
 
 const getTabID = getBgCaller('getTabID');

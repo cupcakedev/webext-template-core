@@ -1,7 +1,7 @@
 import axiosOriginal from 'axios';
 // @ts-ignore
 import adapter from 'axios/lib/adapters/xhr';
-import { IBgServices } from '../rpc';
+import { IBgServices } from '../rpc/bg';
 
 const axios = axiosOriginal.create({ adapter });
 

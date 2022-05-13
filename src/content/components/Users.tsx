@@ -1,6 +1,6 @@
 /* eslint-disable react/button-has-type */
 import React, { useState } from 'react';
-import { getBgCaller } from '../../rpc';
+import { getBgCaller } from '../../rpc/bg';
 import { IUser } from '../../interfaces';
 
 const addUser = getBgCaller('addUser');

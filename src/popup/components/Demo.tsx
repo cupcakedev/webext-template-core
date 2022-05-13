@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { getBgCaller } from '../../rpc';
+import { getBgCaller } from '../../rpc/bg';
 import useChromeStorage from '../../hooks/useChromeStorage';
 
 const getExtensionID = getBgCaller('getExtensionID');

@@ -1,5 +1,5 @@
 import { Services } from './services';
-import { IBgRequest } from '../rpc';
+import { IBgRequest } from '../rpc/bg';
 import { callTab } from 'src/rpc/tabs';
 
 chrome.runtime.onMessage.addListener(
