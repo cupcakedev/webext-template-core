@@ -1,50 +1,39 @@
 import { useCallback, useEffect, useState } from 'react';
 import storage, {
-    EmptyStorageValue,
-    LocalStorage,
-    StorageValue,
-    SyncStorage,
+    StorageData,
+    StorageKey,
+    syncStorageKeys,
 } from '../storage/storage';
 
-type UseChromeStorage = <
-    Key extends NS extends 'local' ? keyof LocalStorage : keyof SyncStorage,
-    NS extends 'local' | 'sync' = 'local',
-    E = EmptyStorageValue
->(
-    key: Key,
-    options: {
-        storageArea?: NS;
-        initialValue?: StorageValue<Key, E> | (() => StorageValue<Key, E>);
-        emptyValue?: E;
-    }
-) => [
-    typeof options.initialValue extends undefined
-        ? StorageValue<Key, E> | undefined
-        : StorageValue<Key, E>,
-    (arg0: StorageValue<Key, E>) => void,
-    boolean,
-    string
-];
+type StorageDispatch<T> = (data: T | ((prevState: T) => T)) => void;
+type StorageTuple<T> = [T, StorageDispatch<T>, boolean, string];
 
-const useChromeStorage: UseChromeStorage = (
-    key,
-    { storageArea = 'local', initialValue, emptyValue }
-) => {
-    const [INITIAL_VALUE] = useState(() =>
-        typeof initialValue === 'function'
-            ? initialValue()
-            : initialValue ?? emptyValue
+export type StorageHookReturn<
+    Key extends StorageKey,
+    Data extends StorageData<Key>
+> = Data extends undefined
+    ? StorageTuple<StorageData<Key>>
+    : StorageTuple<NonNullable<StorageData<Key>>>;
+
+function useChromeStorage<
+    Key extends StorageKey,
+    Data extends StorageData<Key>
+>(key: Key, defaultValue?: Data | (() => Data)) {
+    const [DEFAULT_VALUE] = useState(() =>
+        typeof defaultValue === 'function' ? defaultValue() : defaultValue
     );
-    const [STORAGE_AREA] = useState(storageArea);
-    const [state, setState] = useState(INITIAL_VALUE);
+    const [STORAGE_AREA] = useState<'sync' | 'local'>(() =>
+        Object.keys(syncStorageKeys).includes(key) ? 'sync' : 'local'
+    );
+    const [state, setState] = useState(DEFAULT_VALUE);
     const [isPersistent, setIsPersistent] = useState(true);
     const [error, setError] = useState('');
 
     useEffect(() => {
         storage
-            .getItem(key)
+            .get(key as any)
             .then((res) => {
-                setState(res);
+                setState(res || DEFAULT_VALUE);
                 setIsPersistent(true);
                 setError('');
             })
@@ -52,14 +41,14 @@ const useChromeStorage: UseChromeStorage = (
                 setIsPersistent(false);
                 setError(error);
             });
-    }, [key, INITIAL_VALUE]);
+    }, [key, DEFAULT_VALUE]);
 
     const updateValue = useCallback(
         (newValue) => {
             const toStore =
                 typeof newValue === 'function' ? newValue(state) : newValue;
             setState(toStore);
-            storage.setItem(key, toStore).then((result) => {
+            storage.set(key as any, toStore).then((result) => {
                 if (result) {
                     setIsPersistent(true);
                     setError('');
@@ -86,7 +75,10 @@ const useChromeStorage: UseChromeStorage = (
         };
     }, [key, STORAGE_AREA]);
 
-    return [state, updateValue, isPersistent, error];
-};
+    return [state, updateValue, isPersistent, error] as StorageHookReturn<
+        Key,
+        Data
+    >;
+}
 
 export default useChromeStorage;

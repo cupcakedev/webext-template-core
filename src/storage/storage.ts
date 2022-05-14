@@ -18,7 +18,7 @@ const dataStorageKeys = {
 } as const;
 
 const authStorageKeys = {
-    user: 'memberInfo',
+    user: 'user',
     JWSToken: 'JWSToken',
     refreshJWSToken: 'refreshJWSToken',
 } as const;
@@ -31,13 +31,17 @@ const stateStorageKeys = {
     tokensUpdating: 'tokensUpdating',
 } as const;
 
-export const localStorageKeys = {
+const sameKeyValue = <T extends string>(t: {
+    [v in T]: v;
+}) => t;
+
+export const localStorageKeys = sameKeyValue({
     ...stateStorageKeys,
     ...utilityStorageKeys,
     ...dataStorageKeys,
-} as const;
+} as const);
 
-export const syncStorageKeys = authStorageKeys;
+export const syncStorageKeys = sameKeyValue(authStorageKeys);
 
 type LocalStorageKey = keyof typeof localStorageKeys;
 
@@ -74,112 +78,132 @@ type SyncStorageData = SyncStorageDataTemplate &
         }
     >;
 
-export type EmptyStorageValue = '' | null | undefined;
-
-export type LocalStorage<E = EmptyStorageValue> = {
-    [key in LocalStorageKey]: LocalStorageData[key] | E;
+export type LocalStorage = {
+    [key in LocalStorageKey]: LocalStorageData[key] | undefined;
 };
 
-export type SyncStorage<E = EmptyStorageValue> = {
-    [key in SyncStorageKey]: SyncStorageData[key] | E;
+export type SyncStorage = {
+    [key in SyncStorageKey]: SyncStorageData[key] | undefined;
 };
 
-export type Storage<E = EmptyStorageValue> = LocalStorage<E> & SyncStorage<E>;
+export type Storage = LocalStorage & SyncStorage;
 
 export type StorageKey = keyof Storage;
 
-export type StorageValue<
-    Key extends LocalStorageKey | SyncStorageKey,
-    E = EmptyStorageValue
-> =
-    // @ts-ignore
-    Key extends LocalStorageKey ? LocalStorage<E>[Key] : SyncStorage<E>[Key];
+export type StorageData<Key extends StorageKey = StorageKey> = Storage[Key];
 
-const getNamespace = (key: StorageKey) =>
+const getArea = (key: StorageKey) =>
     Object.values(syncStorageKeys).includes(key as any) ? 'sync' : 'local';
 
 // Safari skips writes with 'undefined' and 'null', write '' instead
-const normalizeStorageValue = (value: any) =>
-    value !== undefined && value !== null ? value : '';
+const EMPTY_VALUE = '' as const;
 
-const normalizeStorageData = (items: any) =>
+type StorageRaw = Record<
+    typeof localStorageKeys[keyof typeof localStorageKeys],
+    StorageData | typeof EMPTY_VALUE
+> &
+    Record<
+        typeof syncStorageKeys[keyof typeof syncStorageKeys],
+        StorageData | typeof EMPTY_VALUE
+    >;
+
+const shouldNormalize = (value: StorageData) =>
+    value !== undefined && value !== null;
+
+const normalizeStorageValue = (value: StorageData) =>
+    shouldNormalize(value) ? value : EMPTY_VALUE;
+
+const normalizeStorage = (items: Partial<Storage>): Partial<StorageRaw> =>
     Object.entries(items).reduce((acc, [key, value]) => {
-        Object.assign(acc, { [key]: normalizeStorageValue(value) });
+        if (shouldNormalize(value)) {
+            Object.assign(acc, { [key]: EMPTY_VALUE });
+        }
         return acc;
     }, items);
 
-const getItem = async <
-    T extends LocalStorageKey | SyncStorageKey,
-    E = EmptyStorageValue
->(
-    key: T,
-    emptyResultValue?: E
-) =>
-    new Promise((resolve) => {
-        chrome.storage[getNamespace(key)].get(key, (data) =>
-            resolve(
-                emptyResultValue !== undefined
-                    ? data[key] || emptyResultValue
-                    : data[key]
-            )
+const restoreNormalizedValue = (value: StorageData) =>
+    value === EMPTY_VALUE ? undefined : value;
+
+const restoreNormalizedStorage = (
+    data: Partial<StorageRaw>
+): Partial<Storage> =>
+    Object.entries(data).reduce((acc, [key, value]) => {
+        if (value === EMPTY_VALUE) {
+            Object.assign(acc, { [key]: undefined });
+        }
+        return acc;
+    }, data as Partial<Storage>);
+
+async function getItems<Key extends LocalStorageKey>(keys: Key): Promise<LocalStorage[Key]>; // prettier-ignore
+async function getItems<Key extends SyncStorageKey>(keys: Key): Promise<SyncStorage[Key]>; // prettier-ignore
+async function getItems<Keys extends LocalStorageKey[]>(keys: Keys): Promise<Pick<LocalStorage, Keys[number]>>; // prettier-ignore
+async function getItems<Keys extends SyncStorageKey[]>(keys: Keys): Promise<Pick<SyncStorage, Keys[number]>>; // prettier-ignore
+
+async function getItems(keys: StorageKey | StorageKey[]) {
+    if (Array.isArray(keys)) {
+        return new Promise<Partial<Storage>>((resolve) => {
+            const area = getArea(Object.values(keys)[0]);
+            chrome.storage[area].get(keys, (data) =>
+                resolve(restoreNormalizedStorage(data))
+            );
+        });
+    }
+    return new Promise<StorageData<typeof keys>>((resolve) => {
+        const area = getArea(keys);
+        chrome.storage[area].get(keys, (data) =>
+            resolve(restoreNormalizedValue(data[keys]))
         );
-    }) as Promise<Storage<E>[T]>;
+    });
+}
 
-type GetItems = <NS extends 'local' | 'sync'>(
-    namespace: NS
-) => NS extends 'local'
-    ? <T extends LocalStorageKey[], E = EmptyStorageValue>(
-          keys: T,
-          emptyResultValue?: E
-      ) => Promise<Pick<LocalStorage<E>, T[number]>>
-    : <T extends SyncStorageKey[], E = EmptyStorageValue>(
-          keys: T,
-          emptyResultValue?: E
-      ) => Promise<Pick<SyncStorage<E>, T[number]>>;
+async function setItems(items: Partial<LocalStorage>): Promise<boolean>;
+async function setItems(items: Partial<SyncStorage>): Promise<boolean>;
+async function setItems<Key extends LocalStorageKey>(key: Key, value: LocalStorage[Key] | undefined): Promise<boolean>; // prettier-ignore
+async function setItems<Key extends SyncStorageKey>(key: Key, value: SyncStorage[Key] | undefined): Promise<boolean>; // prettier-ignore
 
-const getItems: GetItems =
-    (namespace) => async (keys: string[], emptyResultValue: any) =>
-        new Promise<any>((resolve) => {
-            chrome.storage[namespace].get(keys, (data) => {
-                if (emptyResultValue !== undefined) {
-                    keys.forEach((key) => {
-                        if (!data[key]) {
-                            data[key] = emptyResultValue;
-                        }
-                    });
-                }
-                resolve(data);
+async function setItems(
+    keyOrItems: Partial<Storage> | StorageKey,
+    value?: StorageData
+) {
+    if (typeof keyOrItems === 'object') {
+        return new Promise<boolean>((resolve) => {
+            const area = getArea((Object.keys(keyOrItems) as StorageKey[])[0]);
+            chrome.storage[area].set(normalizeStorage(keyOrItems), () => {
+                chrome.runtime.lastError ? resolve(false) : resolve(true);
             });
         });
-
-const setItem = <T extends StorageKey>(key: T, value: Storage[T]) =>
-    new Promise((resolve) =>
-        chrome.storage[getNamespace(key)].set(
-            { [key]: normalizeStorageValue(value) },
+    }
+    return new Promise<boolean>((resolve) => {
+        chrome.storage[getArea(keyOrItems)].set(
+            { [keyOrItems]: normalizeStorageValue(value) },
             () => {
                 chrome.runtime.lastError ? resolve(false) : resolve(true);
             }
-        )
-    );
+        );
+    });
+}
 
-const setItems = (items: Partial<Storage>) =>
-    new Promise((resolve) =>
-        chrome.storage.local.set(normalizeStorageData(items), () => {
+async function removeItems(keys: StorageKey | StorageKey[]) {
+    if (Array.isArray(keys)) {
+        return new Promise<boolean>((resolve) => {
+            const area = getArea(Object.values(keys)[0]);
+            chrome.storage[area].remove(keys, () => {
+                chrome.runtime.lastError ? resolve(false) : resolve(true);
+            });
+        });
+    }
+    return new Promise<boolean>((resolve) => {
+        const area = getArea(keys);
+        chrome.storage[area].remove(keys, () => {
             chrome.runtime.lastError ? resolve(false) : resolve(true);
-        })
-    );
-
-const remove = (items: StorageKey[] | StorageKey) =>
-    new Promise((resolve) =>
-        chrome.storage.local.remove(items, () => {
-            chrome.runtime.lastError ? resolve(false) : resolve(true);
-        })
-    );
+        });
+    });
+}
 
 const clear = () => chrome.storage.local.clear();
 
 const init = async () => {
-    const lastStorageVersion = await getItem(localStorageKeys.storageVersion);
+    const lastStorageVersion = await getItems(localStorageKeys.storageVersion);
     if (process.env.NODE_ENV === 'development') {
         console.log('storage version:', STORAGE_VERSION);
         console.log('last storage version:', lastStorageVersion);
@@ -188,16 +212,14 @@ const init = async () => {
         if (process.env.NODE_ENV === 'development')
             console.log('storage version changed, clear storage');
         await clear();
-        await setItem(localStorageKeys.storageVersion, STORAGE_VERSION);
+        await setItems(localStorageKeys.storageVersion, STORAGE_VERSION);
     }
 };
 
 export default {
-    getItem,
-    getItems,
-    setItem,
-    setItems,
-    remove,
+    get: getItems,
+    set: setItems,
+    remove: removeItems,
     clear,
     init,
 };

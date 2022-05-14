@@ -7,9 +7,7 @@ const getExtensionID = getBgCaller('getExtensionID');
 const Demo = () => {
     const [extID, setExtID] = useState<string | undefined>();
 
-    const [value, setValue, _, errorMessage] = useChromeStorage('counter', {
-        initialValue: 0,
-    });
+    const [value, setValue, _, errorMessage] = useChromeStorage('counter', 0);
 
     if (errorMessage) {
         return <p>{`An error has occurred: ${errorMessage}`}</p>;
@@ -27,21 +25,21 @@ const Demo = () => {
             <button onClick={getTabIDHandler}>Запросить ExtID</button>
             <button
                 onClick={() => {
-                    setValue((prev: number) => prev + 1);
+                    setValue((prev) => prev + 1);
                 }}
             >
                 Increment
             </button>
             <button
                 onClick={() => {
-                    setValue((prev: number) => 0);
+                    setValue((prev) => 0);
                 }}
             >
                 Clear
             </button>
             <button
                 onClick={() => {
-                    setValue((prev: number) => prev - 1);
+                    setValue((prev) => prev - 1);
                 }}
             >
                 Decrement

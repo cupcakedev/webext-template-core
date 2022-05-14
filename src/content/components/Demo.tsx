@@ -4,20 +4,20 @@ import Users from './Users';
 import useChromeStorage from '../../hooks/useChromeStorage';
 import { getBgCaller } from '../../rpc/bg';
 import { IUser } from '../../interfaces';
+import createChromeStorageStateHook from 'src/storage/createChromeStorageStateHook';
 
 const getTabID = getBgCaller('getTabID');
 const getUsers = getBgCaller('getUsers');
 const getToken = getBgCaller('getToken');
 
-const Demo: React.FC<{ variant?: string }> = ({ variant }) => {
-    const [value, setValue, _, errorMessage] = useChromeStorage('counter', {
-        initialValue: 0,
-    });
+const useTokensUpdating = createChromeStorageStateHook('tokensUpdating', true);
 
-    const [token, setToken, _, errorMessage] = useChromeStorage('JWSToken', {
-        storageArea: 'sync',
-        emptyValue: null,
-    });
+const Demo: React.FC<{ variant?: string }> = ({ variant }) => {
+    const [counter, setCounter] = useChromeStorage('counter', 0);
+
+    const [JWSToken, setJWSToken, _, error] = useChromeStorage('JWSToken');
+
+    const [tokensUpdating, setTokensUpdating] = useTokensUpdating();
 
     const [tabID, setTabID] = useState<number | undefined>();
 
@@ -56,24 +56,24 @@ const Demo: React.FC<{ variant?: string }> = ({ variant }) => {
                         alignItems: 'center',
                     }}
                 >
-                    <p>Счетчик: {value}</p>
+                    <p>Счетчик: {counter}</p>
                     <button
                         onClick={() => {
-                            setValue((prev: number) => prev + 1);
+                            setCounter((prev) => prev + 1);
                         }}
                     >
                         Increment
                     </button>
                     <button
                         onClick={() => {
-                            setValue((prev: number) => 0);
+                            setCounter((prev) => 0);
                         }}
                     >
                         Clear
                     </button>
                     <button
                         onClick={() => {
-                            setValue((prev: number) => prev - 1);
+                            setCounter((prev) => prev - 1);
                         }}
                     >
                         Decrement
