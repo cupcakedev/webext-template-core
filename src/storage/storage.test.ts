@@ -1,5 +1,5 @@
 import { IUser } from 'src/interfaces';
-import storage from './storage';
+import storage, { Storage } from './storage';
 
 const user: IUser = {
     id: 129321312,
@@ -12,10 +12,12 @@ storage.local.get(['tokensUpdating']).then((res) => res.tokensUpdating);
 storage.sync.get(['JWSToken']).then((res) => res.JWSToken);
 
 // test 'storage.any' linting
-storage.any.get('tokensUpdating').then((bool) => bool); // 'local' key
+storage.any.get('counter').then((bool) => bool); // 'local' key
 storage.any.get('user').then((user) => user?.id); // 'sync' key
-// storage.any.get(['user', 'JWSToken']).then(res => res.user); // multiple 'sync' keys
-// storage.any.get(['JWSToken', 'refreshJWSToken', 'tokensUpdating']).then(res => res.user); // 'sync' and 'local' keys
+storage.any.get(['user', 'JWSToken']).then((res) => res.user); // multiple 'sync' keys
+storage.any
+    .get(['JWSToken', 'refreshJWSToken', 'tokensUpdating'])
+    .then((res) => res); // 'sync' and 'local' keys
 
 // test 'storage.sync' roundabout
 storage.sync.get('user').then((initial) => {
@@ -39,20 +41,58 @@ storage.sync.get('user').then((initial) => {
 });
 
 // test 'storage.any' roundabout
-storage.any.get('tokensUpdating').then((initial) =>
+storage.any.get('counter').then((initial) =>
     storage.any
-        .set('tokensUpdating', !initial)
-        .then((success) => storage.any.get('tokensUpdating'))
+        .set('counter', (initial || 0) + 100500)
+        .then((success) => storage.any.get('counter'))
         .then((updated) => {
             console.log(
                 'storage test 3 ' + (updated !== initial ? 'success' : 'fail')
             );
-            return storage.any.set('tokensUpdating', !updated);
+            return storage.any.set('counter', (updated || 0) - 100500);
         })
-        .then((success) => storage.any.get('tokensUpdating'))
+        .then((success) => storage.any.get('counter'))
         .then((final) =>
             console.log(
                 'storage test 4 ' + (final === initial ? 'success' : 'fail')
             )
         )
+);
+
+const testStorage: Partial<Storage> = {
+    JWSToken: 'token',
+    refreshJWSToken: 'refresh',
+    tokensUpdating: true,
+};
+
+const getAny = () =>
+    storage.any.get(['JWSToken', 'refreshJWSToken', 'tokensUpdating']);
+
+// test 'storage.any' roundabout
+getAny().then((initial) =>
+    storage.any
+        .set(testStorage)
+        .then((success) => getAny())
+        .then((updated) => {
+            console.log(
+                'storage test 5 ' +
+                    (updated.JWSToken === testStorage.JWSToken &&
+                    updated.refreshJWSToken === testStorage.refreshJWSToken &&
+                    updated.tokensUpdating === testStorage.tokensUpdating
+                        ? 'success'
+                        : 'fail')
+            );
+            return storage.any.set(initial);
+        })
+        .then((success) => getAny())
+        .then((final) => {
+            console.log(
+                'storage test 6 ' +
+                    (final.JWSToken === initial.JWSToken &&
+                    final.refreshJWSToken === initial.refreshJWSToken &&
+                    final.tokensUpdating === initial.tokensUpdating
+                        ? 'success'
+                        : 'fail')
+            );
+        })
 );

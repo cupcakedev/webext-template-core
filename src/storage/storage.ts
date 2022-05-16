@@ -1,6 +1,9 @@
+import { partition } from 'lodash';
 import type { Subtype } from '../interfaces/utils';
 import type { ILocalStorage, ISyncStorage } from './config';
 import { localStorageKeys, syncStorageKeys, STORAGE_VERSION } from './config';
+
+const SYNC_KEYS = Object.keys(syncStorageKeys);
 
 interface ISystemLocalStorage {
     storageVersion: string;
@@ -48,7 +51,27 @@ export type StorageKey = keyof Storage;
 export type StorageData<Key extends StorageKey = StorageKey> = Storage[Key];
 
 const getArea = (key: StorageKey) =>
-    Object.values(syncStorageKeys).includes(key as any) ? 'sync' : 'local';
+    SYNC_KEYS.includes(key) ? 'sync' : 'local';
+
+const splitStorageKeys = (keys: StorageKey[]) =>
+    partition(keys, (key) => SYNC_KEYS.includes(key)) as [
+        SyncStorageKey[],
+        LocalStorageKey[]
+    ];
+
+const splitStorage = (storage: Partial<Storage>) =>
+    Object.entries(storage).reduce(
+        (arr, [key, value]) => {
+            if (SYNC_KEYS.includes(key)) {
+                Object.assign(arr[0], { [key]: value });
+                return arr;
+            } else {
+                Object.assign(arr[1], { [key]: value });
+                return arr;
+            }
+        },
+        [{}, {}] as [Partial<SyncStorage>, Partial<LocalStorage>]
+    );
 
 // Safari skips writes with 'undefined' and 'null', write '' instead
 const EMPTY_VALUE = '' as const;
@@ -182,18 +205,44 @@ async function removeSyncItems(keys: SyncStorageKey | SyncStorageKey[]) {
     return removeItems(keys, 'sync');
 }
 
-const getAnyItem = <Key extends StorageKey>(
-    key: Key
-): Promise<StorageData<Key>> =>
-    // @ts-ignore
-    getItems(key, getArea(key));
+async function getAnyItems<Keys extends StorageKey[]>(keys: Keys): Promise<Pick<Storage, Keys[number]>>; // prettier-ignore
+async function getAnyItems<Key extends StorageKey>(key: Key): Promise<Storage[Key]>; // prettier-ignore
 
-const setAnyItem = <Key extends StorageKey>(
-    key: Key,
-    value: StorageData<Key>
-): Promise<boolean> =>
+async function getAnyItems(keys: StorageKey | StorageKey[]) {
+    if (Array.isArray(keys)) {
+        const [syncKeys, localKeys] = splitStorageKeys(keys);
+
+        const [localStorage, syncStorage] = await Promise.all([
+            // @ts-ignore
+            getItems(localKeys, 'local'),
+            // @ts-ignore
+            getItems(syncKeys, 'sync'),
+        ]);
+        return { ...localStorage, ...syncStorage };
+    }
     // @ts-ignore
-    setItems(key, value, getArea(key));
+    return getItems(keys, getArea(keys));
+}
+
+async function setAnyItems<Key extends StorageKey>(key: Key, value: StorageData<Key>): Promise<boolean> // prettier-ignore
+async function setAnyItems(items: Partial<Storage>): Promise<boolean> // prettier-ignore
+
+async function setAnyItems(
+    keyOrItems: Partial<Storage> | StorageKey,
+    value?: StorageData
+) {
+    if (typeof keyOrItems === 'object') {
+        const [sync, local] = splitStorage(keyOrItems);
+        return Promise.all([
+            // @ts-ignore
+            setItems(local, value, 'local'),
+            // @ts-ignore
+            setItems(sync, value, 'sync'),
+        ]).then(([localSuccess, syncSuccess]) => localSuccess && syncSuccess);
+    }
+    // @ts-ignore
+    return setItems(keyOrItems, value, getArea(keyOrItems));
+}
 
 export const initStorage = async () => {
     const lastStorageVersion = await getItems('storageVersion');
@@ -223,8 +272,8 @@ export default {
         clear: () => chrome.storage.sync.clear(),
     },
     any: {
-        get: getAnyItem,
-        set: setAnyItem,
+        get: getAnyItems,
+        set: setAnyItems,
         clear: clearStorage,
     },
 };
