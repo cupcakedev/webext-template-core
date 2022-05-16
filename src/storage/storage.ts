@@ -89,47 +89,44 @@ const restoreNormalizedStorage = (
         return acc;
     }, data as Partial<Storage>);
 
-async function getItems<Key extends LocalStorageKey>(keys: Key): Promise<LocalStorage[Key]>; // prettier-ignore
-async function getItems<Key extends SyncStorageKey>(keys: Key): Promise<SyncStorage[Key]>; // prettier-ignore
 async function getItems<Keys extends LocalStorageKey[]>(keys: Keys): Promise<Pick<LocalStorage, Keys[number]>>; // prettier-ignore
-async function getItems<Keys extends SyncStorageKey[]>(keys: Keys): Promise<Pick<SyncStorage, Keys[number]>>; // prettier-ignore
+async function getItems<Key extends LocalStorageKey>(key: Key): Promise<LocalStorage[Key]>; // prettier-ignore
 
-async function getItems(keys: StorageKey | StorageKey[]) {
+async function getItems(
+    keys: StorageKey | StorageKey[],
+    area: 'local' | 'sync' = 'local'
+) {
     if (Array.isArray(keys)) {
         return new Promise<Partial<Storage>>((resolve) => {
-            const area = getArea(Object.values(keys)[0]);
             chrome.storage[area].get(keys, (data) =>
                 resolve(restoreNormalizedStorage(data))
             );
         });
     }
     return new Promise<StorageData<typeof keys>>((resolve) => {
-        const area = getArea(keys);
         chrome.storage[area].get(keys, (data) =>
             resolve(restoreNormalizedValue(data[keys]))
         );
     });
 }
 
-async function setItems(items: Partial<LocalStorage>): Promise<boolean>;
-async function setItems(items: Partial<SyncStorage>): Promise<boolean>;
+async function setItems(items: Partial<LocalStorage>): Promise<boolean>; // prettier-ignore
 async function setItems<Key extends LocalStorageKey>(key: Key, value: LocalStorage[Key] | undefined): Promise<boolean>; // prettier-ignore
-async function setItems<Key extends SyncStorageKey>(key: Key, value: SyncStorage[Key] | undefined): Promise<boolean>; // prettier-ignore
 
 async function setItems(
     keyOrItems: Partial<Storage> | StorageKey,
-    value?: StorageData
+    value?: StorageData,
+    area: 'local' | 'sync' = 'local'
 ) {
     if (typeof keyOrItems === 'object') {
         return new Promise<boolean>((resolve) => {
-            const area = getArea((Object.keys(keyOrItems) as StorageKey[])[0]);
             chrome.storage[area].set(normalizeStorage(keyOrItems), () => {
                 chrome.runtime.lastError ? resolve(false) : resolve(true);
             });
         });
     }
     return new Promise<boolean>((resolve) => {
-        chrome.storage[getArea(keyOrItems)].set(
+        chrome.storage[area].set(
             { [keyOrItems]: normalizeStorageValue(value) },
             () => {
                 chrome.runtime.lastError ? resolve(false) : resolve(true);
@@ -138,26 +135,67 @@ async function setItems(
     });
 }
 
-async function removeItems(keys: StorageKey | StorageKey[]) {
+async function removeItems(keys: LocalStorageKey | LocalStorageKey[]): Promise<boolean>; // prettier-ignore
+
+async function removeItems(
+    keys: StorageKey | StorageKey[],
+    area: 'local' | 'sync' = 'local'
+) {
     if (Array.isArray(keys)) {
         return new Promise<boolean>((resolve) => {
-            const area = getArea(Object.values(keys)[0]);
             chrome.storage[area].remove(keys, () => {
                 chrome.runtime.lastError ? resolve(false) : resolve(true);
             });
         });
     }
     return new Promise<boolean>((resolve) => {
-        const area = getArea(keys);
         chrome.storage[area].remove(keys, () => {
             chrome.runtime.lastError ? resolve(false) : resolve(true);
         });
     });
 }
 
-const clear = () => chrome.storage.local.clear();
+const clearStorage = () =>
+    Promise.all([chrome.storage.local.clear(), chrome.storage.sync.clear()]);
 
-const init = async () => {
+async function setSyncItems(items: Partial<SyncStorage>): Promise<boolean>; // prettier-ignore
+async function setSyncItems<Key extends SyncStorageKey>(key: Key, value: SyncStorage[Key] | undefined): Promise<boolean>; // prettier-ignore
+
+async function setSyncItems(
+    keyOrItems: Partial<Storage> | StorageKey,
+    value?: StorageData
+) {
+    // @ts-ignore
+    return setItems(keyOrItems, value, 'sync');
+}
+
+async function getSyncItems<Keys extends SyncStorageKey[]>(keys: Keys): Promise<Pick<SyncStorage, Keys[number]>>; // prettier-ignore
+async function getSyncItems<Key extends SyncStorageKey>(key: Key): Promise<SyncStorage[Key]>; // prettier-ignore
+
+async function getSyncItems(keys: StorageKey | StorageKey[]) {
+    // @ts-ignore
+    return getItems(keys, 'sync');
+}
+
+async function removeSyncItems(keys: SyncStorageKey | SyncStorageKey[]) {
+    // @ts-ignore
+    return removeItems(keys, 'sync');
+}
+
+const getAnyItem = <Key extends StorageKey>(
+    key: Key
+): Promise<StorageData<Key>> =>
+    // @ts-ignore
+    getItems(key, getArea(key));
+
+const setAnyItem = <Key extends StorageKey>(
+    key: Key,
+    value: StorageData<Key>
+): Promise<boolean> =>
+    // @ts-ignore
+    setItems(key, value, getArea(key));
+
+export const initStorage = async () => {
     const lastStorageVersion = await getItems('storageVersion');
     if (process.env.NODE_ENV === 'development') {
         console.log('storage version:', STORAGE_VERSION);
@@ -166,15 +204,27 @@ const init = async () => {
     if (STORAGE_VERSION !== lastStorageVersion) {
         if (process.env.NODE_ENV === 'development')
             console.log('storage version changed, clear storage');
-        await clear();
+        await clearStorage();
         await setItems('storageVersion', STORAGE_VERSION);
     }
 };
 
 export default {
-    get: getItems,
-    set: setItems,
-    remove: removeItems,
-    clear,
-    init,
+    local: {
+        get: getItems,
+        set: setItems,
+        remove: removeItems,
+        clear: () => chrome.storage.local.clear(),
+    },
+    sync: {
+        get: getSyncItems,
+        set: setSyncItems,
+        remove: removeSyncItems,
+        clear: () => chrome.storage.sync.clear(),
+    },
+    any: {
+        get: getAnyItem,
+        set: setAnyItem,
+        clear: clearStorage,
+    },
 };

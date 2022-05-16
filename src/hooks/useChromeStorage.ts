@@ -16,7 +16,7 @@ function useChromeStorage<
     Key extends StorageKey,
     Data extends StorageData<Key>
 >(key: Key, defaultValue?: Data | (() => Data)) {
-    const [DEFAULT_VALUE] = useState(() =>
+    const [DEFAULT_VALUE] = useState<StorageData<Key>>(() =>
         typeof defaultValue === 'function' ? defaultValue() : defaultValue
     );
     const [STORAGE_AREA] = useState<'sync' | 'local'>(() =>
@@ -27,8 +27,8 @@ function useChromeStorage<
     const [error, setError] = useState('');
 
     useEffect(() => {
-        storage
-            .get(key as any)
+        storage.any
+            .get(key)
             .then((res) => {
                 setState(res || DEFAULT_VALUE);
                 setIsPersistent(true);
@@ -45,7 +45,7 @@ function useChromeStorage<
             const toStore =
                 typeof newValue === 'function' ? newValue(state) : newValue;
             setState(toStore);
-            storage.set(key as any, toStore).then((result) => {
+            storage.any.set(key, toStore).then((result) => {
                 if (result) {
                     setIsPersistent(true);
                     setError('');
@@ -72,10 +72,7 @@ function useChromeStorage<
         };
     }, [key, STORAGE_AREA]);
 
-    return [state, updateValue, isPersistent, error] as StorageHookReturn<
-        Key,
-        Data
-    >;
+    return [state, updateValue, isPersistent, error] as StorageHookReturn<Key, Data>; // prettier-ignore
 }
 
 export default useChromeStorage;
