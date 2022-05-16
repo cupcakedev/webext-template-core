@@ -5,6 +5,7 @@ import useChromeStorage from '../../hooks/useChromeStorage';
 import { getBgCaller } from '../../rpc/bg';
 import { IUser } from '../../interfaces';
 import createChromeStorageStateHook from 'src/storage/createChromeStorageStateHook';
+import 'src/storage/storage.test';
 
 const getTabID = getBgCaller('getTabID');
 const getUsers = getBgCaller('getUsers');
@@ -26,6 +27,10 @@ const Demo: React.FC<{ variant?: string }> = ({ variant }) => {
     useEffect(() => {
         getUsers({ sort: 'ASC' }).then((users) => setUsers(users));
     }, []);
+
+    useEffect(() => {
+        console.log('React effect: tokensUpdating', tokensUpdating);
+    }, [tokensUpdating]);
 
     const getTabIDHandler = async () => {
         const id = await getTabID();
