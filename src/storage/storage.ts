@@ -1,66 +1,28 @@
-/* When editing this file, follow the STORAGE_VERSION instructions: */
+import type { Subtype } from '../interfaces/utils';
+import type { ILocalStorage, ISyncStorage } from './config';
+import { localStorageKeys, syncStorageKeys, STORAGE_VERSION } from './config';
 
-import { Subtype } from '../interfaces/utils';
-import { IUser } from '../interfaces';
-
-/**
- * Storage version must be set equal to extension version when in this version:
- *
- * 1. Storage key got deleted/renamed
- * 2. Any storage data type had changed (like if TypeScript type would change)
- *
- */
-const STORAGE_VERSION = '1.0.0';
-
-const dataStorageKeys = {
-    users: 'users',
-    counter: 'counter',
-} as const;
-
-const authStorageKeys = {
-    user: 'user',
-    JWSToken: 'JWSToken',
-    refreshJWSToken: 'refreshJWSToken',
-} as const;
-
-const utilityStorageKeys = {
-    storageVersion: 'storageVersion',
-} as const;
-
-const stateStorageKeys = {
-    tokensUpdating: 'tokensUpdating',
-} as const;
+interface ISystemLocalStorage {
+    storageVersion: string;
+}
 
 const sameKeyValue = <T extends string>(t: {
     [v in T]: v;
 }) => t;
 
-export const localStorageKeys = sameKeyValue({
-    ...stateStorageKeys,
-    ...utilityStorageKeys,
-    ...dataStorageKeys,
-} as const);
+sameKeyValue(localStorageKeys);
+sameKeyValue(syncStorageKeys);
 
-export const syncStorageKeys = sameKeyValue(authStorageKeys);
-
-type LocalStorageKey = keyof typeof localStorageKeys;
+type LocalStorageKey =
+    | keyof typeof localStorageKeys
+    | keyof ISystemLocalStorage;
 
 type LocalStorageDataTemplate<T = unknown> = {
     [key in LocalStorageKey]: T;
 };
 
 type LocalStorageData = LocalStorageDataTemplate &
-    Subtype<
-        LocalStorageDataTemplate,
-        {
-            users: IUser[];
-            counter: number;
-
-            storageVersion: string;
-
-            tokensUpdating: boolean;
-        }
-    >;
+    Subtype<LocalStorageDataTemplate, ILocalStorage & ISystemLocalStorage>;
 
 type SyncStorageKey = keyof typeof syncStorageKeys;
 
@@ -69,14 +31,7 @@ type SyncStorageDataTemplate<T = unknown> = {
 };
 
 type SyncStorageData = SyncStorageDataTemplate &
-    Subtype<
-        SyncStorageDataTemplate,
-        {
-            JWSToken: string;
-            refreshJWSToken: string;
-            user: IUser;
-        }
-    >;
+    Subtype<SyncStorageDataTemplate, ISyncStorage>;
 
 export type LocalStorage = {
     [key in LocalStorageKey]: LocalStorageData[key] | undefined;
@@ -203,7 +158,7 @@ async function removeItems(keys: StorageKey | StorageKey[]) {
 const clear = () => chrome.storage.local.clear();
 
 const init = async () => {
-    const lastStorageVersion = await getItems(localStorageKeys.storageVersion);
+    const lastStorageVersion = await getItems('storageVersion');
     if (process.env.NODE_ENV === 'development') {
         console.log('storage version:', STORAGE_VERSION);
         console.log('last storage version:', lastStorageVersion);
@@ -212,7 +167,7 @@ const init = async () => {
         if (process.env.NODE_ENV === 'development')
             console.log('storage version changed, clear storage');
         await clear();
-        await setItems(localStorageKeys.storageVersion, STORAGE_VERSION);
+        await setItems('storageVersion', STORAGE_VERSION);
     }
 };
 

@@ -1,9 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
-import storage, {
-    StorageData,
-    StorageKey,
-    syncStorageKeys,
-} from '../storage/storage';
+import { syncStorageKeys } from 'src/storage/config';
+import storage, { StorageData, StorageKey } from '../storage/storage';
 
 type StorageDispatch<T> = (data: T | ((prevState: T) => T)) => void;
 type StorageTuple<T> = [T, StorageDispatch<T>, boolean, string];
