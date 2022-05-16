@@ -63,10 +63,10 @@ type StorageRaw = Record<
     >;
 
 const shouldNormalize = (value: StorageData) =>
-    value !== undefined && value !== null;
+    value === undefined || value === null;
 
 const normalizeStorageValue = (value: StorageData) =>
-    shouldNormalize(value) ? value : EMPTY_VALUE;
+    shouldNormalize(value) ? EMPTY_VALUE : value;
 
 const normalizeStorage = (items: Partial<Storage>): Partial<StorageRaw> =>
     Object.entries(items).reduce((acc, [key, value]) => {
