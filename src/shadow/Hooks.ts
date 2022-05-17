@@ -7,7 +7,7 @@ export function getRootNode(node: Node) {
 const { removeChild } = Node.prototype;
 // @ts-ignore
 Node.prototype.removeChild = function (child) {
-    if (!removeChild) return;
+    if (!removeChild) return child;
     try {
         return removeChild.call(this, child);
     } catch (err) {

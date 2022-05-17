@@ -16,5 +16,19 @@ module.exports = {
         'comma-dangle': 0,
         'no-constant-condition': 0,
         'no-unused-expressions': 0,
+        '@typescript-eslint/no-unused-vars': ['warn'],
+        'react/button-has-type': 0,
+        'react/sort-comp': [
+            1,
+            {
+                order: [
+                    'type-annotations',
+                    'static-methods',
+                    'lifecycle',
+                    'everything-else',
+                    'render',
+                ],
+            },
+        ],
     },
 };

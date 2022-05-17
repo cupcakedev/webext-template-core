@@ -26,16 +26,16 @@ storage.sync.get('user').then((initial) => {
         .then((success) => storage.sync.get('user'))
         .then((updated) => {
             console.log(
-                'storage test 1 ' +
-                    (updated?.id === user.id ? 'success' : 'fail')
+                `storage test 1 ${updated?.id === user.id ? 'success' : 'fail'}`
             );
             return storage.sync.set('user', initial);
         })
         .then((success) => storage.any.get('user'))
         .then((final) => {
             console.log(
-                'storage test 2 ' +
-                    (final?.id === initial?.id ? 'success' : 'fail')
+                `storage test 2 ${
+                    final?.id === initial?.id ? 'success' : 'fail'
+                }`
             );
         });
 });
@@ -47,14 +47,14 @@ storage.any.get('counter').then((initial) =>
         .then((success) => storage.any.get('counter'))
         .then((updated) => {
             console.log(
-                'storage test 3 ' + (updated !== initial ? 'success' : 'fail')
+                `storage test 3 ${updated !== initial ? 'success' : 'fail'}`
             );
             return storage.any.set('counter', (updated || 0) - 100500);
         })
         .then((success) => storage.any.get('counter'))
         .then((final) =>
             console.log(
-                'storage test 4 ' + (final === initial ? 'success' : 'fail')
+                `storage test 4 ${final === initial ? 'success' : 'fail'}`
             )
         )
 );
@@ -75,24 +75,26 @@ getAny().then((initial) =>
         .then((success) => getAny())
         .then((updated) => {
             console.log(
-                'storage test 5 ' +
-                    (updated.JWSToken === testStorage.JWSToken &&
+                `storage test 5 ${
+                    updated.JWSToken === testStorage.JWSToken &&
                     updated.refreshJWSToken === testStorage.refreshJWSToken &&
                     updated.tokensUpdating === testStorage.tokensUpdating
                         ? 'success'
-                        : 'fail')
+                        : 'fail'
+                }`
             );
             return storage.any.set(initial);
         })
         .then((success) => getAny())
         .then((final) => {
             console.log(
-                'storage test 6 ' +
-                    (final.JWSToken === initial.JWSToken &&
+                `storage test 6 ${
+                    final.JWSToken === initial.JWSToken &&
                     final.refreshJWSToken === initial.refreshJWSToken &&
                     final.tokensUpdating === initial.tokensUpdating
                         ? 'success'
-                        : 'fail')
+                        : 'fail'
+                }`
             );
         })
 );

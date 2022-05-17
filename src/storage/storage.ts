@@ -65,10 +65,9 @@ const splitStorage = (storage: Partial<Storage>) =>
             if (SYNC_KEYS.includes(key)) {
                 Object.assign(arr[0], { [key]: value });
                 return arr;
-            } else {
-                Object.assign(arr[1], { [key]: value });
-                return arr;
             }
+            Object.assign(arr[1], { [key]: value });
+            return arr;
         },
         [{}, {}] as [Partial<SyncStorage>, Partial<LocalStorage>]
     );

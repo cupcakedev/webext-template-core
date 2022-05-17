@@ -22,18 +22,11 @@ export class ShadowView extends React.Component<IShadowViewProps> {
     private originVisibility: string | undefined;
 
     /**
-     * 渲染组件内容
+     * 在组件挂载时
      */
-    public render() {
-        const {
-            tagName = 'shadow-view',
-            children,
-            className,
-            style,
-        } = this.props;
-        const props = { className, style, ref: this.onRef };
-        const styleElement = this.renderStyle();
-        return React.createElement(tagName, props, children, styleElement);
+    componentDidMount() {
+        const { showDelay = 16 } = this.props;
+        setTimeout(this.checkRootVisibility, showDelay);
     }
 
     /**
@@ -62,14 +55,6 @@ export class ShadowView extends React.Component<IShadowViewProps> {
             { key: 'style' },
             styleBuffer.join(';')
         );
-    }
-
-    /**
-     * 在组件挂载时
-     */
-    componentDidMount() {
-        const { showDelay = 16 } = this.props;
-        setTimeout(this.checkRootVisibility, showDelay);
     }
 
     /**
@@ -127,4 +112,19 @@ export class ShadowView extends React.Component<IShadowViewProps> {
             ? setTimeout(this.checkRootVisibility, 16)
             : this.showRoot();
     };
+
+    /**
+     * 渲染组件内容
+     */
+    public render() {
+        const {
+            tagName = 'shadow-view',
+            children,
+            className,
+            style,
+        } = this.props;
+        const props = { className, style, ref: this.onRef };
+        const styleElement = this.renderStyle();
+        return React.createElement(tagName, props, children, styleElement);
+    }
 }

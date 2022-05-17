@@ -17,9 +17,9 @@ export const findRoute = (routes: RouteInterface[], pathname: string) => {
         if (typeof route.pattern === 'string') {
             const match = matchPattern(route.pattern, pathname);
             if (match) {
-                const Component = route.component();
+                const Component = route.component;
                 const params = _.zipObject(match.paramNames, match.paramValues);
-                const searchParams = parse(location.search);
+                const searchParams = parse(window.location.search);
                 // omit ref because react throw error
                 const props = _.omit({ ...params, ...searchParams }, 'ref');
                 return { Component, props };
@@ -28,9 +28,9 @@ export const findRoute = (routes: RouteInterface[], pathname: string) => {
         if (typeof route.pattern === 'function') {
             const match = route.pattern(pathname);
             if (match) {
-                const Component = route.component();
+                const Component = route.component;
                 const params = match;
-                const searchParams = parse(location.search);
+                const searchParams = parse(window.location.search);
                 // omit ref because react throw error
                 const props = _.omit({ ...params, ...searchParams }, 'ref');
                 return { Component, props };
