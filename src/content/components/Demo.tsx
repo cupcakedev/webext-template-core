@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import styled from 'styled-components';
 
 import Users from './Users';
 import useChromeStorage from '../../hooks/useChromeStorage';
@@ -40,7 +41,7 @@ const Demo: React.FC<{ variant?: string }> = ({ variant }) => {
     };
 
     return (
-        <div style={styles.box}>
+        <Root>
             <div>
                 <div
                     style={{
@@ -86,18 +87,17 @@ const Demo: React.FC<{ variant?: string }> = ({ variant }) => {
                 </div>
             </div>
             <Users users={users} />
-        </div>
+        </Root>
     );
 };
 
-export default Demo;
+const Root = styled.div`
+    color: black;
+    border: 1px solid black;
+    background: rgb(221, 221, 221);
+    font-size: 14px;
+    font-family: 'sans-serif';
+    padding: 24px;
+`;
 
-const styles: any = {
-    box: {
-        color: 'black',
-        border: '1px solid black',
-        background: 'rgb(221, 221, 221)',
-        fontSize: '14px',
-        padding: '24px',
-    },
-};
+export default Demo;
