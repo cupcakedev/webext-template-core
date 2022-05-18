@@ -42,18 +42,12 @@ const Demo: React.FC<{ variant?: string }> = ({ variant }) => {
     };
 
     const [showModal, setShowModal] = useState(false);
+    const [showSecondModal, setShowSecondModal] = useState(false);
+    const [showThirdModal, setShowThirdModal] = useState(false);
 
     useEffect(() => {
         console.log('show modal', showModal);
     }, [showModal]);
-
-    const onAccept = () => {
-        setShowModal(false);
-    };
-
-    const onClose = () => {
-        setShowModal(false);
-    };
 
     return (
         <Root>
@@ -70,7 +64,28 @@ const Demo: React.FC<{ variant?: string }> = ({ variant }) => {
                         Открыть модальное окно
                     </button>
                     {showModal && (
-                        <Modal onClose={onClose} onAccept={onAccept} />
+                        <Modal
+                            onClose={() => setShowModal(false)}
+                            onAccept={() => setShowSecondModal(true)}
+                        />
+                    )}
+                    {showSecondModal && (
+                        <Modal
+                            padding="20px 20px 0 0"
+                            onClose={() => setShowSecondModal(false)}
+                            onAccept={() => setShowThirdModal(true)}
+                        />
+                    )}
+                    {showThirdModal && (
+                        <Modal
+                            padding="40px 40px 0 0"
+                            onClose={() => setShowThirdModal(false)}
+                            onAccept={() => {
+                                setShowModal(false);
+                                setShowSecondModal(false);
+                                setShowThirdModal(false);
+                            }}
+                        />
                     )}
                 </div>
                 <div

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import root from 'react-shadow/styled-components';
 import { Injection } from './Injection';
 
@@ -11,10 +11,11 @@ const Modal = (props: any) => {
     return (
         <Injection
             selectTargetElement={selectTargetElement}
+            position="beforeend"
             containerClassName="modal_test__container"
         >
             <root.div>
-                <Root>
+                <Root padding={props.padding}>
                     <Content>
                         <Title>Hello, world of modals!</Title>
                         <Text>React is cool</Text>
@@ -31,13 +32,18 @@ const Modal = (props: any) => {
     );
 };
 
-const Root = styled.div`
+const Root = styled.div<{ padding: string }>`
     z-index: 2147483647;
     position: fixed;
     top: 0;
     bottom: 0;
     height: 100%;
     width: 100%;
+    ${(props) =>
+        props.padding &&
+        css`
+            padding: ${props.padding};
+        `};
     background: rgba(0, 0, 0, 0.5);
 `;
 
