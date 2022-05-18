@@ -41,7 +41,7 @@ function useChromeStorage<
     }, [key, DEFAULT_VALUE]);
 
     const updateValue = useCallback(
-        (newValue) => {
+        (newValue: any) => {
             const toStore =
                 typeof newValue === 'function' ? newValue(state) : newValue;
             setState(toStore);

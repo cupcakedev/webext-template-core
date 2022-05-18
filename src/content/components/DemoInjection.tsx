@@ -14,7 +14,6 @@ export default () => (
         position="afterbegin"
         containerClassName={containerClassName}
     >
-        {/** @ts-ignore */}
         <root.div>
             <Container>
                 <Demo />

@@ -52,7 +52,6 @@ export const Serp: React.FC<SerpProps> = ({ serpLinksSelector }) => {
                     position="beforebegin"
                     containerClassName={CONTAINER_CLASSNAME}
                 >
-                    {/* @ts-ignore */}
                     <root.div>
                         <SerpItem text={container.text} />
                     </root.div>
