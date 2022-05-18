@@ -28,6 +28,7 @@ const App = () => {
 
     if (!Route) return null;
 
+    // @ts-ignore
     // eslint-disable-next-line react/jsx-props-no-spreading
     return <Route.Component {...Route.props} />;
 };
