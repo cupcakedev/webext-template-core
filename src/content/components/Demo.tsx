@@ -7,6 +7,7 @@ import { getBgCaller } from '../../rpc/bg';
 import { IUser } from '../../interfaces';
 import createChromeStorageStateHook from 'src/storage/createChromeStorageStateHook';
 import 'src/storage/storage.test';
+import Modal from './Modal';
 
 const getTabID = getBgCaller('getTabID');
 const getUsers = getBgCaller('getUsers');
@@ -40,9 +41,38 @@ const Demo: React.FC<{ variant?: string }> = ({ variant }) => {
         setTabID(id);
     };
 
+    const [showModal, setShowModal] = useState(false);
+
+    useEffect(() => {
+        console.log('show modal', showModal);
+    }, [showModal]);
+
+    const onAccept = () => {
+        setShowModal(false);
+    };
+
+    const onClose = () => {
+        setShowModal(false);
+    };
+
     return (
         <Root>
             <div>
+                <div
+                    style={{
+                        display: 'flex',
+                        gap: '11px',
+                        height: '25px',
+                        alignItems: 'center',
+                    }}
+                >
+                    <button onClick={() => setShowModal((prev) => !prev)}>
+                        Открыть модальное окно
+                    </button>
+                    {showModal && (
+                        <Modal onClose={onClose} onAccept={onAccept} />
+                    )}
+                </div>
                 <div
                     style={{
                         display: 'flex',
