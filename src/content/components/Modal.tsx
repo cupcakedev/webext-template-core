@@ -1,36 +1,30 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styled, { css } from 'styled-components';
 import root from 'react-shadow/styled-components';
 import { Injection } from './Injection';
 
 const selectTargetElement = () => document.querySelector('#injection');
 
-const Modal = (props: any) => {
-    console.log('render modal');
-
-    return (
-        <Injection
-            selectTargetElement={selectTargetElement}
-            position="beforeend"
-            containerClassName="modal_test__container"
-        >
-            <root.div>
-                <Root padding={props.padding}>
-                    <Content>
-                        <Title>Hello, world of modals!</Title>
-                        <Text>React is cool</Text>
-                        <ButtonsContainer>
-                            <OkButton onClick={props.onAccept}>OK</OkButton>
-                            <CloseButton onClick={props.onClose}>
-                                Close
-                            </CloseButton>
-                        </ButtonsContainer>
-                    </Content>
-                </Root>
-            </root.div>
-        </Injection>
-    );
-};
+const Modal = (props: any) => (
+    <Injection
+        selectTargetElement={selectTargetElement}
+        position="beforeend"
+        containerClassName="modal_test__container"
+    >
+        <root.div>
+            <Root padding={props.padding}>
+                <Content>
+                    <Title>Hello, world of modals!</Title>
+                    <Text>React is cool</Text>
+                    <ButtonsContainer>
+                        <OkButton onClick={props.onAccept}>OK</OkButton>
+                        <CloseButton onClick={props.onClose}>Close</CloseButton>
+                    </ButtonsContainer>
+                </Content>
+            </Root>
+        </root.div>
+    </Injection>
+);
 
 const Root = styled.div<{ padding: string }>`
     z-index: 2147483647;
