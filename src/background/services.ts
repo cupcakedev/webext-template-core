@@ -1,6 +1,7 @@
 import axiosOriginal from 'axios';
 // @ts-ignore
 import adapter from 'axios/lib/adapters/xhr';
+import { getCurrentTab } from '../common/utils';
 import { IBgServices } from '../rpc/bg';
 
 const axios = axiosOriginal.create({ adapter });
@@ -17,7 +18,7 @@ export const Services: IBgServices = {
         }
     },
 
-    getTabID: (sender) => sender.tab?.id,
+    getTabID: async (sender) => sender.tab?.id ?? (await getCurrentTab())?.id,
 
     getExtensionID: (sender) => sender.id,
 
