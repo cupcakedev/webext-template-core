@@ -8,7 +8,7 @@ const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 module.exports = (env) => ({
     mode: env.mode ?? 'production',
     entry: {
-        background: `${__dirname}/src/background/index.tsx`,
+        background: `${__dirname}/src/background/index.ts`,
         content: `${__dirname}/src/content/index.tsx`,
         popup: `${__dirname}/src/popup/index.tsx`,
     },
