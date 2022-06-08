@@ -1,6 +1,6 @@
 export interface RouteInterface {
     pattern: string | ((pathname: string) => any);
-    component: React.ComponentType<any>;
+    component: (props: any) => JSX.Element;
 }
 
 export interface IUser {

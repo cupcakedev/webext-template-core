@@ -1,4 +1,4 @@
-import Demo from './components/DemoInjection';
+import DemoInjection from './components/DemoInjection';
 import { RouteInterface } from '../interfaces';
 import { isSearchPage } from './searchPage/utils';
 import { SearchPage } from './searchPage/SearchPage';
@@ -12,6 +12,6 @@ export const routes: RouteInterface[] = [
     },
     {
         pattern: isDemoPage,
-        component: Demo,
+        component: DemoInjection,
     },
 ];

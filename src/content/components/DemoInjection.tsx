@@ -12,7 +12,7 @@ const style: any = {
     zIndex: '2147483647',
 };
 
-export default () => (
+const DemoInjection = () => (
     <Injection
         selectTargetElement={selectTargetEl}
         position="afterbegin"
@@ -23,3 +23,5 @@ export default () => (
         </div>
     </Injection>
 );
+
+export default DemoInjection;
