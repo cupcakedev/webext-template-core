@@ -2,8 +2,10 @@ import { Services } from './services';
 import { IBgRequest } from '../rpc/bg';
 import { callTab } from '../rpc/tabs';
 
+const isPromise = (value: any) => !!value && typeof value.then === 'function';
+
 chrome.runtime.onMessage.addListener(
-    async (request: IBgRequest, sender, sendResponse) => {
+    (request: IBgRequest, sender, sendResponse) => {
         if (chrome.runtime.lastError) {
             sendResponse(chrome.runtime.lastError);
             return true;
@@ -18,13 +20,21 @@ chrome.runtime.onMessage.addListener(
             return Promise.reject();
         }
 
-        try {
-            const result = await Services[method](sender, params as never);
+        const result = Services[method](sender, params as never);
+
+        if (isPromise(result)) {
+            (result as Promise<any>)
+                .then((promisedResult) => {
+                    console.log(promisedResult);
+                    sendResponse(promisedResult);
+                })
+                .catch((e: any) => {
+                    console.log({ error: e.message });
+                    sendResponse({ error: e.message });
+                });
+        } else {
             console.log(result);
             sendResponse(result);
-        } catch (e: any) {
-            console.log({ error: e.message });
-            sendResponse({ error: e.message });
         }
 
         return true;
