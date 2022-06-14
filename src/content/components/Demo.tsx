@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import styled from 'styled-components';
 
 import Users from './Users';
 import useChromeStorage from '../../hooks/useChromeStorage';
@@ -6,6 +7,7 @@ import { getBgCaller } from '../../rpc/bg';
 import { IUser } from '../../interfaces';
 import createChromeStorageStateHook from 'src/storage/createChromeStorageStateHook';
 import 'src/storage/storage.test';
+import Modal from './Modal';
 
 const getTabID = getBgCaller('getTabID');
 const getUsers = getBgCaller('getUsers');
@@ -39,9 +41,53 @@ const Demo: React.FC<{ variant?: string }> = ({ variant }) => {
         setTabID(id);
     };
 
+    const [showModal, setShowModal] = useState(false);
+    const [showSecondModal, setShowSecondModal] = useState(false);
+    const [showThirdModal, setShowThirdModal] = useState(false);
+
+    useEffect(() => {
+        console.log('show modal', showModal);
+    }, [showModal]);
+
     return (
-        <div style={styles.box}>
+        <Root>
             <div>
+                <div
+                    style={{
+                        display: 'flex',
+                        gap: '11px',
+                        height: '25px',
+                        alignItems: 'center',
+                    }}
+                >
+                    <button onClick={() => setShowModal((prev) => !prev)}>
+                        Открыть модальное окно
+                    </button>
+                    {showModal && (
+                        <Modal
+                            onClose={() => setShowModal(false)}
+                            onAccept={() => setShowSecondModal(true)}
+                        />
+                    )}
+                    {showSecondModal && (
+                        <Modal
+                            padding="20px 20px 0 0"
+                            onClose={() => setShowSecondModal(false)}
+                            onAccept={() => setShowThirdModal(true)}
+                        />
+                    )}
+                    {showThirdModal && (
+                        <Modal
+                            padding="40px 40px 0 0"
+                            onClose={() => setShowThirdModal(false)}
+                            onAccept={() => {
+                                setShowModal(false);
+                                setShowSecondModal(false);
+                                setShowThirdModal(false);
+                            }}
+                        />
+                    )}
+                </div>
                 <div
                     style={{
                         display: 'flex',
@@ -86,18 +132,17 @@ const Demo: React.FC<{ variant?: string }> = ({ variant }) => {
                 </div>
             </div>
             <Users users={users} />
-        </div>
+        </Root>
     );
 };
 
-export default Demo;
+const Root = styled.div`
+    color: black;
+    border: 1px solid black;
+    background: rgb(221, 221, 221);
+    font-size: 14px;
+    font-family: 'sans-serif';
+    padding: 24px;
+`;
 
-const styles: any = {
-    box: {
-        color: 'black',
-        border: '1px solid black',
-        background: 'rgb(221, 221, 221)',
-        fontSize: '14px',
-        padding: '24px',
-    },
-};
+export default Demo;

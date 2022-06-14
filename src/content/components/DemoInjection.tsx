@@ -1,16 +1,12 @@
 import React from 'react';
+import styled from 'styled-components';
+import root from 'react-shadow/styled-components';
+
 import Demo from './Demo';
 import { Injection } from './Injection';
 
-const selectTargetEl = () => document.querySelector('#injection > shadow-view');
+const selectTargetEl = () => document.querySelector('#injection');
 const containerClassName = 'test__container';
-
-const style: any = {
-    position: 'absolute',
-    top: '25px',
-    left: '25px',
-    zIndex: '2147483647',
-};
 
 const DemoInjection = () => (
     <Injection
@@ -18,10 +14,19 @@ const DemoInjection = () => (
         position="afterbegin"
         containerClassName={containerClassName}
     >
-        <div style={style}>
-            <Demo />
-        </div>
+        <root.div>
+            <Container>
+                <Demo />
+            </Container>
+        </root.div>
     </Injection>
 );
+
+const Container = styled.div`
+    position: absolute;
+    top: 25px;
+    left: 25px;
+    z-index: 2147483647;
+`;
 
 export default DemoInjection;

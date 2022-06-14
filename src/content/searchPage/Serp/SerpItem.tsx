@@ -1,23 +1,24 @@
 import React from 'react';
+import styled from 'styled-components';
 
 import logo from '../../../assets/icon/32.png';
 
-const styles: any = {
-    serpItem: {
-        display: 'flex',
-        alignItems: 'center',
-        fontSize: '16px',
-    },
-    img: {
-        marginRight: '2px',
-    },
-};
-
 const SerpItem = ({ text }: { text: string }) => (
-    <div style={styles.serpItem}>
-        <img style={styles.img} alt="serp-logo" src={logo} />
+    <Root>
+        <img alt="serp-logo" src={logo} />
         <span>{text}</span>
-    </div>
+    </Root>
 );
+
+const Root = styled.div`
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    color: #777;
+
+    img {
+        margin-right: 2px;
+    }
+`;
 
 export default SerpItem;

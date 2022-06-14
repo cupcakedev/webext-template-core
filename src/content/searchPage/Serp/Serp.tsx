@@ -1,6 +1,6 @@
 import React, { useLayoutEffect, useState } from 'react';
+import root from 'react-shadow/styled-components';
 import { Injection } from 'src/content/components/Injection';
-import ShadowView from 'src/shadow';
 import SerpItem from './SerpItem';
 
 const CONTAINER_CLASSNAME = 'template-serp';
@@ -52,9 +52,9 @@ export const Serp: React.FC<SerpProps> = ({ serpLinksSelector }) => {
                     position="beforebegin"
                     containerClassName={CONTAINER_CLASSNAME}
                 >
-                    <ShadowView>
+                    <root.div>
                         <SerpItem text={container.text} />
-                    </ShadowView>
+                    </root.div>
                 </Injection>
             ))}
         </>
