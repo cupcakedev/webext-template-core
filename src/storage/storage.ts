@@ -48,8 +48,6 @@ export type Storage = LocalStorage & SyncStorage;
 
 export type StorageKey = keyof Storage;
 
-export type StorageData<Key extends StorageKey = StorageKey> = Storage[Key];
-
 const getArea = (key: StorageKey) =>
     SYNC_KEYS.includes(key) ? 'sync' : 'local';
 
@@ -77,17 +75,17 @@ const EMPTY_VALUE = '' as const;
 
 type StorageRaw = Record<
     typeof localStorageKeys[keyof typeof localStorageKeys],
-    StorageData | typeof EMPTY_VALUE
+    Storage[StorageKey] | typeof EMPTY_VALUE
 > &
     Record<
         typeof syncStorageKeys[keyof typeof syncStorageKeys],
-        StorageData | typeof EMPTY_VALUE
+        Storage[StorageKey] | typeof EMPTY_VALUE
     >;
 
-const shouldNormalize = (value: StorageData) =>
+const shouldNormalize = (value: Storage[StorageKey]) =>
     value === undefined || value === null;
 
-const normalizeStorageValue = (value: StorageData) =>
+const normalizeStorageValue = (value: Storage[StorageKey]) =>
     shouldNormalize(value) ? EMPTY_VALUE : value;
 
 const normalizeStorage = (items: Partial<Storage>): Partial<StorageRaw> =>
@@ -98,7 +96,7 @@ const normalizeStorage = (items: Partial<Storage>): Partial<StorageRaw> =>
         return acc;
     }, items);
 
-const restoreNormalizedValue = (value: StorageData) =>
+const restoreNormalizedValue = (value: Storage[StorageKey]) =>
     value === EMPTY_VALUE ? undefined : value;
 
 const restoreNormalizedStorage = (
@@ -125,7 +123,7 @@ async function getItems(
             );
         });
     }
-    return new Promise<StorageData<typeof keys>>((resolve) => {
+    return new Promise<Storage[StorageKey]>((resolve) => {
         chrome.storage[area].get(keys, (data) =>
             resolve(restoreNormalizedValue(data[keys]))
         );
@@ -137,7 +135,7 @@ async function setItems<Key extends LocalStorageKey>(key: Key, value: LocalStora
 
 async function setItems(
     keyOrItems: Partial<Storage> | StorageKey,
-    value?: StorageData,
+    value?: Storage[StorageKey],
     area: 'local' | 'sync' = 'local'
 ) {
     if (typeof keyOrItems === 'object') {
@@ -185,7 +183,7 @@ async function setSyncItems<Key extends SyncStorageKey>(key: Key, value: SyncSto
 
 async function setSyncItems(
     keyOrItems: Partial<Storage> | StorageKey,
-    value?: StorageData
+    value?: Storage[StorageKey]
 ) {
     // @ts-ignore
     return setItems(keyOrItems, value, 'sync');
@@ -223,12 +221,12 @@ async function getAnyItems(keys: StorageKey | StorageKey[]) {
     return getItems(keys, getArea(keys));
 }
 
-async function setAnyItems<Key extends StorageKey>(key: Key, value: StorageData<Key>): Promise<boolean> // prettier-ignore
+async function setAnyItems<Key extends StorageKey>(key: Key, value: Storage[Key]): Promise<boolean> // prettier-ignore
 async function setAnyItems(items: Partial<Storage>): Promise<boolean> // prettier-ignore
 
 async function setAnyItems(
     keyOrItems: Partial<Storage> | StorageKey,
-    value?: StorageData
+    value?: Storage[StorageKey]
 ) {
     if (typeof keyOrItems === 'object') {
         const [sync, local] = splitStorage(keyOrItems);
