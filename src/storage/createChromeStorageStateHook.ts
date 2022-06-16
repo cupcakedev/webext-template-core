@@ -1,11 +1,11 @@
 import { useCallback, useEffect } from 'react';
-import useChromeStorage, { StorageHookReturn } from '../hooks/useChromeStorage';
-import { StorageData, StorageKey } from './storage';
+import useChromeStorage from '../hooks/useChromeStorage';
+import { Storage, StorageKey } from './storage';
 
-export default function createChromeStorageStateHook<
-    Key extends StorageKey,
-    Data extends StorageData<Key>
->(key: Key, defaultValue?: Data) {
+export default function createChromeStorageStateHook<Key extends StorageKey>(
+    key: Key,
+    defaultValue?: NonNullable<Storage[Key]>
+) {
     const consumers: any = [];
 
     return function useCreateChromeStorageHook() {
@@ -27,9 +27,6 @@ export default function createChromeStorageStateHook<
             };
         }, [setValue]);
 
-        return [value, setValueAll, isPersistent, error] as StorageHookReturn<
-            Key,
-            Data
-        >;
+        return [value, setValueAll, isPersistent, error] as const;
     };
 }
