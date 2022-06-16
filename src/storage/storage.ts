@@ -3,8 +3,6 @@ import type { Subtype } from '../interfaces/utils';
 import type { ILocalStorage, ISyncStorage } from './config';
 import { localStorageKeys, syncStorageKeys, STORAGE_VERSION } from './config';
 
-const SYNC_KEYS = Object.keys(syncStorageKeys);
-
 interface ISystemLocalStorage {
     storageVersion: string;
 }
@@ -49,10 +47,10 @@ export type Storage = LocalStorage & SyncStorage;
 export type StorageKey = keyof Storage;
 
 const getArea = (key: StorageKey) =>
-    SYNC_KEYS.includes(key) ? 'sync' : 'local';
+    syncStorageKeys[key as SyncStorageKey] ? 'sync' : 'local';
 
 const splitStorageKeys = (keys: StorageKey[]) =>
-    partition(keys, (key) => SYNC_KEYS.includes(key)) as [
+    partition(keys, (key) => syncStorageKeys[key as SyncStorageKey]) as [
         SyncStorageKey[],
         LocalStorageKey[]
     ];
@@ -60,7 +58,7 @@ const splitStorageKeys = (keys: StorageKey[]) =>
 const splitStorage = (storage: Partial<Storage>) =>
     Object.entries(storage).reduce(
         (arr, [key, value]) => {
-            if (SYNC_KEYS.includes(key)) {
+            if (syncStorageKeys[key as SyncStorageKey]) {
                 Object.assign(arr[0], { [key]: value });
                 return arr;
             }
