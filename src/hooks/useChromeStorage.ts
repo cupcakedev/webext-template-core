@@ -1,28 +1,19 @@
 import { useCallback, useEffect, useState } from 'react';
 import { syncStorageKeys } from 'src/storage/config';
-import storage, { StorageData, StorageKey } from '../storage/storage';
-
-type StorageDispatch<T> = (data: T | ((prevState: T) => T)) => void;
-type StorageTuple<T> = [T, StorageDispatch<T>, boolean, string];
-
-export type StorageHookReturn<
-    Key extends StorageKey,
-    Data extends StorageData<Key>
-> = Data extends undefined
-    ? StorageTuple<StorageData<Key>>
-    : StorageTuple<NonNullable<StorageData<Key>>>;
+import storage, { Storage, StorageKey } from '../storage/storage';
 
 function useChromeStorage<
     Key extends StorageKey,
-    Data extends StorageData<Key>
->(key: Key, defaultValue?: Data | (() => Data)) {
-    const [DEFAULT_VALUE] = useState<StorageData<Key>>(() =>
-        typeof defaultValue === 'function' ? defaultValue() : defaultValue
-    );
+    Default extends NonNullable<Storage[Key]> | undefined
+>(key: Key, defaultValue?: Default) {
+    type WithDefault<T> = Default extends undefined ? T : NonNullable<T>;
+
     const [STORAGE_AREA] = useState<'sync' | 'local'>(() =>
         Object.keys(syncStorageKeys).includes(key) ? 'sync' : 'local'
     );
-    const [state, setState] = useState(DEFAULT_VALUE);
+    const [state, setState] = useState(
+        defaultValue as WithDefault<Storage[Key]>
+    );
     const [isPersistent, setIsPersistent] = useState(true);
     const [error, setError] = useState('');
 
@@ -30,7 +21,11 @@ function useChromeStorage<
         storage.any
             .get(key)
             .then((res) => {
-                setState(res || DEFAULT_VALUE);
+                setState(
+                    (defaultValue ? res || defaultValue : res) as WithDefault<
+                        typeof res
+                    >
+                );
                 setIsPersistent(true);
                 setError('');
             })
@@ -38,10 +33,10 @@ function useChromeStorage<
                 setIsPersistent(false);
                 setError(error);
             });
-    }, [key, DEFAULT_VALUE]);
+    }, [key, defaultValue]);
 
-    const updateValue = useCallback(
-        (newValue: any) => {
+    const updateValue: typeof setState = useCallback(
+        (newValue) => {
             const toStore =
                 typeof newValue === 'function' ? newValue(state) : newValue;
             setState(toStore);
@@ -72,7 +67,7 @@ function useChromeStorage<
         };
     }, [key, STORAGE_AREA]);
 
-    return [state, updateValue, isPersistent, error] as StorageHookReturn<Key, Data>; // prettier-ignore
+    return [state, updateValue, isPersistent, error] as const;
 }
 
 export default useChromeStorage;
