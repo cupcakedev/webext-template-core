@@ -18,7 +18,7 @@ const useTokensUpdating = createChromeStorageStateHook('tokensUpdating', true);
 const Demo: React.FC<{ variant?: string }> = ({ variant }) => {
     const [counter, setCounter] = useChromeStorage('counter', 0);
 
-    const [JWSToken, setJWSToken, _, error] = useChromeStorage('JWSToken');
+    const [JWSToken, setJWSToken, error] = useChromeStorage('JWSToken');
 
     const [tokensUpdating, setTokensUpdating] = useTokensUpdating();
 

@@ -14,7 +14,6 @@ function useChromeStorage<
     const [state, setState] = useState(
         defaultValue as WithDefault<Storage[Key]>
     );
-    const [isPersistent, setIsPersistent] = useState(true);
     const [error, setError] = useState('');
 
     useEffect(() => {
@@ -26,11 +25,9 @@ function useChromeStorage<
                         typeof res
                     >
                 );
-                setIsPersistent(true);
                 setError('');
             })
             .catch((error) => {
-                setIsPersistent(false);
                 setError(error);
             });
     }, [key, defaultValue]);
@@ -42,10 +39,8 @@ function useChromeStorage<
             setState(toStore);
             storage.any.set(key, toStore).then((result) => {
                 if (result) {
-                    setIsPersistent(true);
                     setError('');
                 } else {
-                    setIsPersistent(false);
                     setError(error);
                 }
             });
@@ -57,7 +52,6 @@ function useChromeStorage<
         const onChange = (changes: any, areaName: string) => {
             if (areaName === STORAGE_AREA && key in changes) {
                 setState(changes[key].newValue);
-                setIsPersistent(true);
                 setError('');
             }
         };
@@ -67,7 +61,7 @@ function useChromeStorage<
         };
     }, [key, STORAGE_AREA]);
 
-    return [state, updateValue, isPersistent, error] as const;
+    return [state, updateValue, error] as const;
 }
 
 export default useChromeStorage;

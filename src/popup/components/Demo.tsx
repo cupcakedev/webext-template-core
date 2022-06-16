@@ -7,7 +7,7 @@ const getExtensionID = getBgCaller('getExtensionID');
 const Demo = () => {
     const [extID, setExtID] = useState<string | undefined>();
 
-    const [value, setValue, _, errorMessage] = useChromeStorage('counter', 0);
+    const [value, setValue, errorMessage] = useChromeStorage('counter', 0);
 
     if (errorMessage) {
         return <p>{`An error has occurred: ${errorMessage}`}</p>;
