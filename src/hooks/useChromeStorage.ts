@@ -1,6 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
 import { SyncStorageKeys } from 'src/storage/config';
-import storage, { Storage, StorageKey, SyncStorage } from '../storage/storage';
+import storage, {
+    Storage,
+    StorageKey,
+    StorageUpdate,
+    SyncStorage,
+} from '../storage/storage';
 
 function useChromeStorage<
     Key extends StorageKey,
@@ -34,10 +39,10 @@ function useChromeStorage<
 
     const updateValue: typeof setState = useCallback(
         (newValue) => {
-            const toStore =
+            const value =
                 typeof newValue === 'function' ? newValue(state) : newValue;
-            setState(toStore);
-            storage.any.set(key, toStore).then((result) => {
+            setState(value);
+            storage.any.set(key, value).then((result) => {
                 if (result) {
                     setError('');
                 } else {
@@ -49,9 +54,17 @@ function useChromeStorage<
     );
 
     useEffect(() => {
-        const onChange = (changes: any, areaName: string) => {
+        const onChange = (
+            changes: Partial<StorageUpdate>,
+            areaName: string
+        ) => {
             if (areaName === STORAGE_AREA && key in changes) {
-                setState(changes[key].newValue);
+                const val = changes[key]?.newValue;
+                setState(
+                    (defaultValue ? val || defaultValue : val) as WithDefault<
+                        typeof val
+                    >
+                );
                 setError('');
             }
         };
@@ -59,7 +72,7 @@ function useChromeStorage<
         return () => {
             chrome.storage.onChanged.removeListener(onChange);
         };
-    }, [key, STORAGE_AREA]);
+    }, [key, STORAGE_AREA, defaultValue]);
 
     return [state, updateValue, error] as const;
 }

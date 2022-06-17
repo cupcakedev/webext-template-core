@@ -29,6 +29,13 @@ export type Storage = LocalStorage & SyncStorage;
 
 export type StorageKey = keyof Storage;
 
+export type StorageUpdate = {
+    [Key in StorageKey]: {
+        newValue: Storage[Key];
+        oldValue: Storage[Key];
+    };
+};
+
 const getArea = (key: StorageKey) =>
     SyncStorageKeys[key as keyof SyncStorage] ? 'sync' : 'local';
 
