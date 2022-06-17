@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { listenBgMessage } from '../rpc/tabs';
+import { listenBgMessage } from 'src/bridge/tabsEvents';
 import { findRoute } from '../common/utils';
 import { routes } from './Routes';
 

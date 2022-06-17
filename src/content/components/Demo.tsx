@@ -3,16 +3,16 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 import Users from './Users';
-import { getBgCaller } from '../../rpc/bg';
 import { IUser } from '../../interfaces';
 import useChromeStorage from '../../hooks/useChromeStorage';
 import { LocalStorageKeys, SyncStorageKeys } from 'src/storage/config';
 import 'src/storage/storage.test';
 import Modal from './Modal';
+import { createBgMessageSender } from 'src/bridge/bgEvents';
 
-const getTabID = getBgCaller('getTabID');
-const getUsers = getBgCaller('getUsers');
-const getToken = getBgCaller('getToken');
+const getTabID = createBgMessageSender('getTabID');
+const getUsers = createBgMessageSender('getUsers');
+const getToken = createBgMessageSender('getToken');
 
 const Demo: React.FC<{ variant?: string }> = ({ variant }) => {
     const [counter, setCounter] = useChromeStorage(LocalStorageKeys.counter, 0);

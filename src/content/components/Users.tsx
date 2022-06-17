@@ -1,11 +1,11 @@
 /* eslint-disable react/button-has-type */
 import React, { useState } from 'react';
-import { getBgCaller } from '../../rpc/bg';
+import { createBgMessageSender } from 'src/bridge/bgEvents';
 import { IUser } from '../../interfaces';
 
-const addUser = getBgCaller('addUser');
-const updateUser = getBgCaller('updateUser');
-const deleteUser = getBgCaller('deleteUser');
+const addUser = createBgMessageSender('addUser');
+const updateUser = createBgMessageSender('updateUser');
+const deleteUser = createBgMessageSender('deleteUser');
 
 const User: React.FC<{
     user: IUser;

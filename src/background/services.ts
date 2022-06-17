@@ -2,7 +2,7 @@ import axiosOriginal from 'axios';
 // @ts-ignore
 import adapter from 'axios/lib/adapters/xhr';
 import { getCurrentTab } from '../common/utils';
-import { IBgServices } from '../rpc/bg';
+import { IBgServices } from '../bridge/types/bgEvents';
 
 const axios = axiosOriginal.create({ adapter });
 

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { getBgCaller } from '../../rpc/bg';
 import useChromeStorage from '../../hooks/useChromeStorage';
 import { LocalStorageKeys } from 'src/storage/config';
+import { createBgMessageSender } from 'src/bridge/bgEvents';
 
-const getExtensionID = getBgCaller('getExtensionID');
+const getExtensionID = createBgMessageSender('getExtensionID');
 
 const Demo = () => {
     const [extID, setExtID] = useState<string | undefined>();
