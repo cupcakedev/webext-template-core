@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { syncStorageKeys } from 'src/storage/config';
+import { SyncStorageKeys } from 'src/storage/config';
 import storage, { Storage, StorageKey, SyncStorage } from '../storage/storage';
 
 function useChromeStorage<
@@ -9,7 +9,7 @@ function useChromeStorage<
     type WithDefault<T> = Default extends undefined ? T : NonNullable<T>;
 
     const [STORAGE_AREA] = useState<'sync' | 'local'>(() =>
-        syncStorageKeys[key as keyof SyncStorage] ? 'sync' : 'local'
+        SyncStorageKeys[key as keyof SyncStorage] ? 'sync' : 'local'
     );
     const [state, setState] = useState(
         defaultValue as WithDefault<Storage[Key]>

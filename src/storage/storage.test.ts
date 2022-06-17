@@ -1,4 +1,5 @@
 import { IUser } from 'src/interfaces';
+import { LocalStorageKeys, SyncStorageKeys } from './config';
 import storage, { Storage } from './storage';
 
 const user: IUser = {
@@ -8,29 +9,37 @@ const user: IUser = {
 };
 
 // test 'local' and 'sync' storage linting (+ test intellisense = add keys to array)
-storage.local.get(['tokensUpdating']).then((res) => res.tokensUpdating);
-storage.sync.get(['JWSToken']).then((res) => res.JWSToken);
+storage.local
+    .get([LocalStorageKeys.tokensUpdating])
+    .then((res) => res.tokensUpdating);
+storage.sync.get([SyncStorageKeys.JWSToken]).then((res) => res.JWSToken);
 
 // test 'storage.any' linting
-storage.any.get('counter').then((bool) => bool); // 'local' key
-storage.any.get('user').then((user) => user?.id); // 'sync' key
-storage.any.get(['user', 'JWSToken']).then((res) => res.user); // multiple 'sync' keys
+storage.any.get(LocalStorageKeys.counter).then((bool) => bool); // 'local' key
+storage.any.get(SyncStorageKeys.user).then((user) => user?.id); // 'sync' key
 storage.any
-    .get(['JWSToken', 'refreshJWSToken', 'tokensUpdating'])
+    .get([SyncStorageKeys.user, SyncStorageKeys.JWSToken])
+    .then((res) => res.user); // multiple 'sync' keys
+storage.any
+    .get([
+        SyncStorageKeys.JWSToken,
+        SyncStorageKeys.refreshJWSToken,
+        LocalStorageKeys.tokensUpdating,
+    ])
     .then((res) => res); // 'sync' and 'local' keys
 
 // test 'storage.sync' roundabout
-storage.sync.get('user').then((initial) => {
+storage.sync.get(SyncStorageKeys.user).then((initial) => {
     storage.sync
-        .set('user', user)
-        .then((success) => storage.sync.get('user'))
+        .set(SyncStorageKeys.user, user)
+        .then((success) => storage.sync.get(SyncStorageKeys.user))
         .then((updated) => {
             console.log(
                 `storage test 1 ${updated?.id === user.id ? 'success' : 'fail'}`
             );
-            return storage.sync.set('user', initial);
+            return storage.sync.set(SyncStorageKeys.user, initial);
         })
-        .then((success) => storage.any.get('user'))
+        .then((success) => storage.any.get(SyncStorageKeys.user))
         .then((final) => {
             console.log(
                 `storage test 2 ${
@@ -41,17 +50,17 @@ storage.sync.get('user').then((initial) => {
 });
 
 // test 'storage.any' roundabout
-storage.any.get('counter').then((initial) =>
+storage.any.get(LocalStorageKeys.counter).then((initial) =>
     storage.any
-        .set('counter', (initial || 0) + 100500)
-        .then((success) => storage.any.get('counter'))
+        .set(LocalStorageKeys.counter, 100500)
+        .then((success) => storage.any.get(LocalStorageKeys.counter))
         .then((updated) => {
             console.log(
                 `storage test 3 ${updated !== initial ? 'success' : 'fail'}`
             );
-            return storage.any.set('counter', (updated || 0) - 100500);
+            return storage.any.set(LocalStorageKeys.counter, initial);
         })
-        .then((success) => storage.any.get('counter'))
+        .then((success) => storage.any.get(LocalStorageKeys.counter))
         .then((final) =>
             console.log(
                 `storage test 4 ${final === initial ? 'success' : 'fail'}`
@@ -59,17 +68,28 @@ storage.any.get('counter').then((initial) =>
         )
 );
 
-const testStorage: Partial<Storage> = {
+const emptyStorage: Partial<Storage> = {
+    JWSToken: undefined,
+    refreshJWSToken: undefined,
+    tokensUpdating: undefined,
+};
+
+const testStorage: typeof emptyStorage = {
     JWSToken: 'token',
     refreshJWSToken: 'refresh',
     tokensUpdating: true,
 };
 
 const getAny = () =>
-    storage.any.get(['JWSToken', 'refreshJWSToken', 'tokensUpdating']);
+    storage.any.get([
+        SyncStorageKeys.JWSToken,
+        SyncStorageKeys.refreshJWSToken,
+        LocalStorageKeys.tokensUpdating,
+    ]);
 
 // test 'storage.any' roundabout
-getAny().then((initial) =>
+getAny().then((initial) => {
+    initial = { ...emptyStorage, ...initial };
     storage.any
         .set(testStorage)
         .then((success) => getAny())
@@ -96,5 +116,6 @@ getAny().then((initial) =>
                         : 'fail'
                 }`
             );
-        })
-);
+            console.log(final, initial);
+        });
+});

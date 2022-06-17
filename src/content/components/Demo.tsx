@@ -1,11 +1,13 @@
+/* eslint-disable camelcase */
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 import Users from './Users';
-import useChromeStorage from '../../hooks/useChromeStorage';
 import { getBgCaller } from '../../rpc/bg';
 import { IUser } from '../../interfaces';
+import useChromeStorage from '../../hooks/useChromeStorage';
 import createChromeStorageStateHook from 'src/storage/createChromeStorageStateHook';
+import { LocalStorageKeys, SyncStorageKeys } from 'src/storage/config';
 import 'src/storage/storage.test';
 import Modal from './Modal';
 
@@ -13,12 +15,17 @@ const getTabID = getBgCaller('getTabID');
 const getUsers = getBgCaller('getUsers');
 const getToken = getBgCaller('getToken');
 
-const useTokensUpdating = createChromeStorageStateHook('tokensUpdating', true);
+const useTokensUpdating = createChromeStorageStateHook(
+    LocalStorageKeys.tokensUpdating,
+    true
+);
 
 const Demo: React.FC<{ variant?: string }> = ({ variant }) => {
-    const [counter, setCounter] = useChromeStorage('counter', 0);
+    const [counter, setCounter] = useChromeStorage(LocalStorageKeys.counter, 0);
 
-    const [JWSToken, setJWSToken, error] = useChromeStorage('JWSToken');
+    const [JWSToken, setJWSToken, error] = useChromeStorage(
+        SyncStorageKeys.JWSToken
+    );
 
     const [tokensUpdating, setTokensUpdating] = useTokensUpdating();
 

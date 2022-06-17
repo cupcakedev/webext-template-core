@@ -1,45 +1,28 @@
 import { partition } from 'lodash';
 import type { Subtype } from '../interfaces/utils';
 import type { ILocalStorage, ISyncStorage } from './config';
-import { localStorageKeys, syncStorageKeys, STORAGE_VERSION } from './config';
-
-interface ISystemLocalStorage {
-    storageVersion: string;
-}
-
-const sameKeyValue = <T extends string>(t: {
-    [v in T]: v;
-}) => t;
-
-sameKeyValue(localStorageKeys);
-sameKeyValue(syncStorageKeys);
-
-type LocalStorageKey =
-    | keyof typeof localStorageKeys
-    | keyof ISystemLocalStorage;
+import { LocalStorageKeys, SyncStorageKeys, STORAGE_VERSION } from './config';
 
 type LocalStorageDataTemplate<T = unknown> = {
-    [key in LocalStorageKey]: T;
+    [key in LocalStorageKeys]: T;
 };
 
 type LocalStorageData = LocalStorageDataTemplate &
-    Subtype<LocalStorageDataTemplate, ILocalStorage & ISystemLocalStorage>;
+    Subtype<LocalStorageDataTemplate, ILocalStorage>;
 
-type SyncStorageKey = keyof typeof syncStorageKeys;
+export type LocalStorage = {
+    [key in LocalStorageKeys]: LocalStorageData[key] | undefined;
+};
 
 type SyncStorageDataTemplate<T = unknown> = {
-    [key in SyncStorageKey]: T;
+    [key in SyncStorageKeys]: T;
 };
 
 type SyncStorageData = SyncStorageDataTemplate &
     Subtype<SyncStorageDataTemplate, ISyncStorage>;
 
-export type LocalStorage = {
-    [key in LocalStorageKey]: LocalStorageData[key] | undefined;
-};
-
 export type SyncStorage = {
-    [key in SyncStorageKey]: SyncStorageData[key] | undefined;
+    [key in SyncStorageKeys]: SyncStorageData[key] | undefined;
 };
 
 export type Storage = LocalStorage & SyncStorage;
@@ -47,18 +30,18 @@ export type Storage = LocalStorage & SyncStorage;
 export type StorageKey = keyof Storage;
 
 const getArea = (key: StorageKey) =>
-    syncStorageKeys[key as SyncStorageKey] ? 'sync' : 'local';
+    SyncStorageKeys[key as keyof SyncStorage] ? 'sync' : 'local';
 
 const splitStorageKeys = (keys: StorageKey[]) =>
-    partition(keys, (key) => syncStorageKeys[key as SyncStorageKey]) as [
-        SyncStorageKey[],
-        LocalStorageKey[]
+    partition(keys, (key) => SyncStorageKeys[key as keyof SyncStorage]) as [
+        SyncStorageKeys[],
+        LocalStorageKeys[]
     ];
 
 const splitStorage = (storage: Partial<Storage>) =>
     Object.entries(storage).reduce(
         (arr, [key, value]) => {
-            if (syncStorageKeys[key as SyncStorageKey]) {
+            if (SyncStorageKeys[key as keyof SyncStorage]) {
                 Object.assign(arr[0], { [key]: value });
                 return arr;
             }
@@ -72,11 +55,11 @@ const splitStorage = (storage: Partial<Storage>) =>
 const EMPTY_VALUE = '' as const;
 
 type StorageRaw = Record<
-    typeof localStorageKeys[keyof typeof localStorageKeys],
+    typeof LocalStorageKeys[keyof typeof LocalStorageKeys],
     Storage[StorageKey] | typeof EMPTY_VALUE
 > &
     Record<
-        typeof syncStorageKeys[keyof typeof syncStorageKeys],
+        typeof SyncStorageKeys[keyof typeof SyncStorageKeys],
         Storage[StorageKey] | typeof EMPTY_VALUE
     >;
 
@@ -107,8 +90,8 @@ const restoreNormalizedStorage = (
         return acc;
     }, data as Partial<Storage>);
 
-async function getItems<Keys extends LocalStorageKey[]>(keys: Keys): Promise<Pick<LocalStorage, Keys[number]>>; // prettier-ignore
-async function getItems<Key extends LocalStorageKey>(key: Key): Promise<LocalStorage[Key]>; // prettier-ignore
+async function getItems<Keys extends LocalStorageKeys[]>(keys: Keys): Promise<Pick<LocalStorage, Keys[number]>>; // prettier-ignore
+async function getItems<Key extends LocalStorageKeys>(key: Key): Promise<LocalStorage[Key]>; // prettier-ignore
 
 async function getItems(
     keys: StorageKey | StorageKey[],
@@ -129,7 +112,7 @@ async function getItems(
 }
 
 async function setItems(items: Partial<LocalStorage>): Promise<boolean>; // prettier-ignore
-async function setItems<Key extends LocalStorageKey>(key: Key, value: LocalStorage[Key] | undefined): Promise<boolean>; // prettier-ignore
+async function setItems<Key extends LocalStorageKeys>(key: Key, value: LocalStorage[Key] | undefined): Promise<boolean>; // prettier-ignore
 
 async function setItems(
     keyOrItems: Partial<Storage> | StorageKey,
@@ -153,7 +136,7 @@ async function setItems(
     });
 }
 
-async function removeItems(keys: LocalStorageKey | LocalStorageKey[]): Promise<boolean>; // prettier-ignore
+async function removeItems(keys: LocalStorageKeys | LocalStorageKeys[]): Promise<boolean>; // prettier-ignore
 
 async function removeItems(
     keys: StorageKey | StorageKey[],
@@ -177,7 +160,7 @@ const clearStorage = () =>
     Promise.all([chrome.storage.local.clear(), chrome.storage.sync.clear()]);
 
 async function setSyncItems(items: Partial<SyncStorage>): Promise<boolean>; // prettier-ignore
-async function setSyncItems<Key extends SyncStorageKey>(key: Key, value: SyncStorage[Key] | undefined): Promise<boolean>; // prettier-ignore
+async function setSyncItems<Key extends SyncStorageKeys>(key: Key, value: SyncStorage[Key] | undefined): Promise<boolean>; // prettier-ignore
 
 async function setSyncItems(
     keyOrItems: Partial<Storage> | StorageKey,
@@ -187,15 +170,15 @@ async function setSyncItems(
     return setItems(keyOrItems, value, 'sync');
 }
 
-async function getSyncItems<Keys extends SyncStorageKey[]>(keys: Keys): Promise<Pick<SyncStorage, Keys[number]>>; // prettier-ignore
-async function getSyncItems<Key extends SyncStorageKey>(key: Key): Promise<SyncStorage[Key]>; // prettier-ignore
+async function getSyncItems<Keys extends SyncStorageKeys[]>(keys: Keys): Promise<Pick<SyncStorage, Keys[number]>>; // prettier-ignore
+async function getSyncItems<Key extends SyncStorageKeys>(key: Key): Promise<SyncStorage[Key]>; // prettier-ignore
 
 async function getSyncItems(keys: StorageKey | StorageKey[]) {
     // @ts-ignore
     return getItems(keys, 'sync');
 }
 
-async function removeSyncItems(keys: SyncStorageKey | SyncStorageKey[]) {
+async function removeSyncItems(keys: SyncStorageKeys | SyncStorageKeys[]) {
     // @ts-ignore
     return removeItems(keys, 'sync');
 }
@@ -239,8 +222,24 @@ async function setAnyItems(
     return setItems(keyOrItems, value, getArea(keyOrItems));
 }
 
+const STORAGE_VERSION_KEY = 'storageVersion';
+
+const getStorageVersion = () =>
+    new Promise<string>((resolve) => {
+        chrome.storage.local.get(STORAGE_VERSION_KEY, (data) =>
+            resolve(data[STORAGE_VERSION_KEY])
+        );
+    });
+
+const setStorageVersion = (version: string) =>
+    new Promise<boolean>((resolve) => {
+        chrome.storage.local.set({ [STORAGE_VERSION_KEY]: version }, () => {
+            chrome.runtime.lastError ? resolve(false) : resolve(true);
+        });
+    });
+
 export const initStorage = async () => {
-    const lastStorageVersion = await getItems('storageVersion');
+    const lastStorageVersion = await getStorageVersion();
     if (process.env.NODE_ENV === 'development') {
         console.log('storage version:', STORAGE_VERSION);
         console.log('last storage version:', lastStorageVersion);
@@ -249,7 +248,7 @@ export const initStorage = async () => {
         if (process.env.NODE_ENV === 'development')
             console.log('storage version changed, clear storage');
         await clearStorage();
-        await setItems('storageVersion', STORAGE_VERSION);
+        await setStorageVersion(STORAGE_VERSION);
     }
 };
 

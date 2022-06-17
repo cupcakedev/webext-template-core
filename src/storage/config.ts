@@ -10,36 +10,26 @@ import { IUser } from '../interfaces';
  */
 export const STORAGE_VERSION = '1.0.0';
 
-const dataStorageKeys = {
-    users: 'users',
-    counter: 'counter',
-} as const;
+export enum LocalStorageKeys {
+    users = 'users',
+    counter = 'counter',
+    tokensUpdating = 'tokensUpdating',
+}
 
-const authStorageKeys = {
-    user: 'user',
-    JWSToken: 'JWSToken',
-    refreshJWSToken: 'refreshJWSToken',
-} as const;
-
-const stateStorageKeys = {
-    tokensUpdating: 'tokensUpdating',
-} as const;
-
-export const localStorageKeys = {
-    ...stateStorageKeys,
-    ...dataStorageKeys,
-} as const;
-
-export const syncStorageKeys = authStorageKeys;
+export enum SyncStorageKeys {
+    user = 'user',
+    JWSToken = 'JWSToken',
+    refreshJWSToken = 'refreshJWSToken',
+}
 
 export interface ILocalStorage {
-    users: IUser[];
-    counter: number;
-    tokensUpdating: boolean;
+    [LocalStorageKeys.users]: IUser[];
+    [LocalStorageKeys.counter]: number;
+    [LocalStorageKeys.tokensUpdating]: boolean;
 }
 
 export interface ISyncStorage {
-    JWSToken: string;
-    refreshJWSToken: string;
-    user: IUser;
+    [SyncStorageKeys.JWSToken]: string;
+    [SyncStorageKeys.refreshJWSToken]: string;
+    [SyncStorageKeys.user]: IUser;
 }

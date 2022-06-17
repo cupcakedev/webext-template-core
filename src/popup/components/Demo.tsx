@@ -1,13 +1,17 @@
 import React, { useState } from 'react';
 import { getBgCaller } from '../../rpc/bg';
 import useChromeStorage from '../../hooks/useChromeStorage';
+import { LocalStorageKeys } from 'src/storage/config';
 
 const getExtensionID = getBgCaller('getExtensionID');
 
 const Demo = () => {
     const [extID, setExtID] = useState<string | undefined>();
 
-    const [value, setValue, errorMessage] = useChromeStorage('counter', 0);
+    const [value, setValue, errorMessage] = useChromeStorage(
+        LocalStorageKeys.counter,
+        0
+    );
 
     if (errorMessage) {
         return <p>{`An error has occurred: ${errorMessage}`}</p>;
