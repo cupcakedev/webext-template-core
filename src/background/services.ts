@@ -1,18 +1,14 @@
-import axiosOriginal from 'axios';
-// @ts-ignore
-import adapter from 'axios/lib/adapters/xhr';
 import { getCurrentTab } from '@common/utils';
 import { IBgServices } from '../bridge/types/bgEvents';
-
-const axios = axiosOriginal.create({ adapter });
 
 const URL_JSON_SERVER = 'http://localhost:3004';
 
 export const Services: IBgServices = {
     getToken: async (_, args) => {
         try {
-            const res = await axios(`${URL_JSON_SERVER}/tokens/${args}`);
-            return res.data;
+            return await (
+                await fetch(`${URL_JSON_SERVER}/tokens/${args}`)
+            ).json();
         } catch (e) {
             return undefined;
         }
