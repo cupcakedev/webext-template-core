@@ -1,8 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import { ShadowView } from './../shadow';
-
 import App from './App';
 
 const injection = document.createElement('div');
@@ -11,12 +9,7 @@ injection.id = 'injection';
 document.body.appendChild(injection);
 
 export async function injectEntryPoint() {
-    ReactDOM.render(
-        <ShadowView styleContent="th, td {border:1px solid black}">
-            <App />
-        </ShadowView>,
-        injection
-    );
+    ReactDOM.render(<App />, injection);
 }
 
 injectEntryPoint()
