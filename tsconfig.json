@@ -13,7 +13,12 @@
     "jsx": "react",
     "downlevelIteration": true,
     "strict": true,
-    "types": ["chrome", "node", "webpack-env"]
+    "types": ["chrome", "node", "webpack-env"],
+    "paths": {
+      "@assets/*": ["src/assets/*"],
+      "@common/*": ["src/common/*"],
+      "src/*": ["src/*"]
+    }
   },
   "include": ["src/**/*", "custom.d.ts"],
   "exclude": ["./node_modules", "./dist"]

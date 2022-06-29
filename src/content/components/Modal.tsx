@@ -2,7 +2,7 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 import root from 'react-shadow/styled-components';
 import { Injection } from './Injection';
-import { defaultFontMixin } from 'src/common/styles';
+import { defaultFontMixin } from '@common/styles';
 
 const selectTargetElement = () => document.querySelector('#injection');
 

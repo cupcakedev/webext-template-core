@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import root from 'react-shadow/styled-components';
 
-import { defaultFontMixin } from 'src/common/styles';
+import { defaultFontMixin } from '@common/styles';
 import Demo from './Demo';
 import { Injection } from './Injection';
 

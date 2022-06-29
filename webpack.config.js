@@ -39,14 +39,18 @@ module.exports = (env) => ({
                 use: ['style-loader', 'css-loader'],
             },
             {
-                test: /\.ttf$/,
-                use: ['file-loader'],
+                test: /\.(woff(2)?|ttf|eo)$/,
+                loader: 'url-loader',
             },
         ],
     },
     resolve: {
-        extensions: ['.tsx', '.ts', '.js'],
-        plugins: [new TsconfigPathsPlugin({})],
+        extensions: ['.ts', '.tsx', '.js', '.jsx'],
+        plugins: [
+            new TsconfigPathsPlugin({
+                extensions: ['.ts', '.tsx', '.js', '.jsx'],
+            }),
+        ],
     },
     plugins: [
         new EnvironmentPlugin(['EXTENSION_NAME_PREFIX']),

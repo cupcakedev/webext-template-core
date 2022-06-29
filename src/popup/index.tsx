@@ -1,9 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { createGlobalStyle } from 'styled-components';
-import { defaultFontMixin } from 'src/common/styles';
-import { fontFacesMixin } from 'src/assets/fonts';
 import Demo from '../content/components/Demo';
+
+import { fontFacesMixin } from '@assets/fonts';
+import { defaultFontMixin } from '@common/styles';
 
 const injection = document.createElement('div');
 injection.classList.add('injection');
