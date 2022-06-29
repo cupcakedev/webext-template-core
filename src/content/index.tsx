@@ -1,5 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { fontFacesMixin } from 'src/assets/fonts';
+import { createGlobalStyle } from 'styled-components';
 
 import App from './App';
 
@@ -8,8 +10,17 @@ injection.classList.add('injection');
 injection.id = 'injection';
 document.body.appendChild(injection);
 
+const GlobalStyles = createGlobalStyle`
+    ${fontFacesMixin}
+`;
+
 export async function injectEntryPoint() {
-    ReactDOM.createRoot(injection).render(<App />);
+    ReactDOM.createRoot(injection).render(
+        <>
+            <GlobalStyles />
+            <App />
+        </>
+    );
 }
 
 injectEntryPoint()

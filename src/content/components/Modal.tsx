@@ -2,6 +2,7 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 import root from 'react-shadow/styled-components';
 import { Injection } from './Injection';
+import { defaultFontMixin } from 'src/common/styles';
 
 const selectTargetElement = () => document.querySelector('#injection');
 
@@ -33,6 +34,8 @@ const Root = styled.div<{ padding: string }>`
     bottom: 0;
     height: 100%;
     width: 100%;
+    ${defaultFontMixin};
+
     ${(props) =>
         props.padding &&
         css`

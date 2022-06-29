@@ -136,7 +136,6 @@ const Root = styled.div`
     border: 1px solid black;
     background: rgb(221, 221, 221);
     font-size: 14px;
-    font-family: 'sans-serif';
     padding: 24px;
 `;
 
