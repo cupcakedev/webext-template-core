@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import ReactDOM from 'react-dom/client';
 
 import App from './App';
 
@@ -9,7 +9,7 @@ injection.id = 'injection';
 document.body.appendChild(injection);
 
 export async function injectEntryPoint() {
-    ReactDOM.render(<App />, injection);
+    ReactDOM.createRoot(injection).render(<App />);
 }
 
 injectEntryPoint()
