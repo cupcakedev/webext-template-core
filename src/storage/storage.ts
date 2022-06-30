@@ -12,8 +12,11 @@ import {
     splitStorageKeys,
 } from './utils';
 
-async function getItems<Keys extends LocalStorageKeys[]>(keys: Keys): Promise<Pick<LocalStorage, Keys[number]>>; // prettier-ignore
-async function getItems<Key extends LocalStorageKeys>(key: Key): Promise<LocalStorage[Key]>; // prettier-ignore
+async function getLocalItems<Keys extends LocalStorageKeys[]>(keys: Keys): Promise<Pick<LocalStorage, Keys[number]>>; // prettier-ignore
+async function getLocalItems<Key extends LocalStorageKeys>(key: Key): Promise<LocalStorage[Key]>; // prettier-ignore
+async function getLocalItems(keys: StorageKey | StorageKey[]) {
+    return getItems(keys);
+}
 
 async function getItems(
     keys: StorageKey | StorageKey[],
@@ -33,8 +36,14 @@ async function getItems(
     });
 }
 
-async function setItems(items: Partial<LocalStorage>): Promise<boolean>; // prettier-ignore
-async function setItems<Key extends LocalStorageKeys>(key: Key, value: LocalStorage[Key] | undefined): Promise<boolean>; // prettier-ignore
+async function setLocalItems(items: Partial<LocalStorage>): Promise<boolean>; // prettier-ignore
+async function setLocalItems<Key extends LocalStorageKeys>(key: Key, value: LocalStorage[Key] | undefined): Promise<boolean>; // prettier-ignore
+async function setLocalItems(
+    keyOrItems: Partial<Storage> | StorageKey,
+    value?: Storage[StorageKey]
+) {
+    return setItems(keyOrItems, value);
+}
 
 async function setItems(
     keyOrItems: Partial<Storage> | StorageKey,
@@ -58,7 +67,9 @@ async function setItems(
     });
 }
 
-async function removeItems(keys: LocalStorageKeys | LocalStorageKeys[]): Promise<boolean>; // prettier-ignore
+async function removeLocalItems(keys: LocalStorageKeys | LocalStorageKeys[]) {
+    return removeItems(keys);
+}
 
 async function removeItems(
     keys: StorageKey | StorageKey[],
@@ -83,43 +94,36 @@ const clearStorage = () =>
 
 async function setSyncItems(items: Partial<SyncStorage>): Promise<boolean>; // prettier-ignore
 async function setSyncItems<Key extends SyncStorageKeys>(key: Key, value: SyncStorage[Key] | undefined): Promise<boolean>; // prettier-ignore
-
 async function setSyncItems(
     keyOrItems: Partial<Storage> | StorageKey,
     value?: Storage[StorageKey]
 ) {
-    // @ts-ignore
     return setItems(keyOrItems, value, 'sync');
 }
 
 async function getSyncItems<Keys extends SyncStorageKeys[]>(keys: Keys): Promise<Pick<SyncStorage, Keys[number]>>; // prettier-ignore
 async function getSyncItems<Key extends SyncStorageKeys>(key: Key): Promise<SyncStorage[Key]>; // prettier-ignore
-
 async function getSyncItems(keys: StorageKey | StorageKey[]) {
-    // @ts-ignore
     return getItems(keys, 'sync');
 }
 
 async function removeSyncItems(keys: SyncStorageKeys | SyncStorageKeys[]) {
-    // @ts-ignore
     return removeItems(keys, 'sync');
 }
 
 async function getAnyItems<Keys extends StorageKey[]>(keys: Keys): Promise<Pick<Storage, Keys[number]>>; // prettier-ignore
 async function getAnyItems<Key extends StorageKey>(key: Key): Promise<Storage[Key]>; // prettier-ignore
-
 async function getAnyItems(keys: StorageKey | StorageKey[]) {
     if (Array.isArray(keys)) {
         const [syncKeys, localKeys] = splitStorageKeys(keys);
 
         const [localStorage, syncStorage] = await Promise.all([
-            getItems(localKeys),
-            // @ts-ignore
-            getItems(syncKeys, 'sync'),
+            getItems(localKeys) as Promise<Partial<Storage>>,
+            getItems(syncKeys, 'sync') as Promise<Partial<Storage>>,
         ]);
         return { ...localStorage, ...syncStorage };
     }
-    // @ts-ignore
+
     return getItems(keys, getArea(keys));
 }
 
@@ -129,12 +133,11 @@ async function removeAnyItems(keys: StorageKey | StorageKey[]) {
 
         const [localSuccess, syncSuccess] = await Promise.all([
             removeItems(localKeys),
-            // @ts-ignore
             removeItems(syncKeys, 'sync'),
         ]);
         return localSuccess && syncSuccess;
     }
-    // @ts-ignore
+
     return removeItems(keys, getArea(keys));
 }
 
@@ -149,14 +152,12 @@ async function setAnyItems(
         const [sync, local] = splitStorage(keyOrItems);
 
         const [localSuccess, syncSuccess] = await Promise.all([
-            // @ts-ignore
-            setItems(local, value, 'local'),
-            // @ts-ignore
+            setItems(local, value),
             setItems(sync, value, 'sync'),
         ]);
         return localSuccess && syncSuccess;
     }
-    // @ts-ignore
+
     return setItems(keyOrItems, value, getArea(keyOrItems));
 }
 
@@ -176,9 +177,9 @@ export const initStorage = async () => {
 
 export default {
     local: {
-        get: getItems,
-        set: setItems,
-        remove: removeItems,
+        get: getLocalItems,
+        set: setLocalItems,
+        remove: removeLocalItems,
         clear: () => chrome.storage.local.clear(),
     },
     sync: {
