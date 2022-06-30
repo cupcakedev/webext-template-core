@@ -4,6 +4,17 @@ module.exports = {
     rules: {
         'prettier/prettier': 2,
         'no-restricted-syntax': [2, 'ForStatement'],
+        'no-restricted-imports': [
+            'error',
+            {
+                paths: [
+                    {
+                        name: 'lodash',
+                        message: 'Import [module] from lodash/[module] instead',
+                    },
+                ],
+            },
+        ],
         'import/no-extraneous-dependencies': 0,
         'no-param-reassign': 0,
         'no-underscore-dangle': 0,

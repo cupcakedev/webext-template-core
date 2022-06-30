@@ -4,9 +4,11 @@ const ExtReloader = require('webpack-ext-reloader');
 const TerserPlugin = require('terser-webpack-plugin');
 const { EnvironmentPlugin } = require('webpack');
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+const { merge } = require('webpack-merge');
 
-module.exports = (env) => ({
-    mode: env.mode ?? 'production',
+const productionConfig = {
+    mode: 'production',
     entry: {
         background: `${__dirname}/src/pages/background/index.ts`,
         content: `${__dirname}/src/pages/content/index.tsx`,
@@ -24,11 +26,7 @@ module.exports = (env) => ({
         rules: [
             {
                 test: /\.tsx?$/,
-                use: [
-                    {
-                        loader: 'ts-loader',
-                    },
-                ],
+                use: 'ts-loader',
                 exclude: /node_modules/,
             },
             {
@@ -90,4 +88,16 @@ module.exports = (env) => ({
             }),
         ],
     },
-});
+};
+
+const devConfig = {
+    mode: 'development',
+    plugins: [new BundleAnalyzerPlugin()],
+};
+
+module.exports = (env) => {
+    if (env.development) {
+        return merge(productionConfig, devConfig);
+    }
+    return productionConfig;
+};

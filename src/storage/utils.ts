@@ -1,4 +1,4 @@
-import { partition } from 'lodash';
+import partition from 'lodash/partition';
 import { LocalStorageKeys, SyncStorageKeys } from './config';
 import { LocalStorage, Storage, StorageKey, SyncStorage } from './types';
 
