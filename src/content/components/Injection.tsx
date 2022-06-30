@@ -1,5 +1,4 @@
-import * as React from 'react';
-import { ReactNode, useLayoutEffect, useState } from 'react';
+import React, { ReactNode, useLayoutEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 
 export interface InjectionProps {
