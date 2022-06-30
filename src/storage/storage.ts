@@ -198,8 +198,7 @@ async function getAnyItems(keys: StorageKey | StorageKey[]) {
         const [syncKeys, localKeys] = splitStorageKeys(keys);
 
         const [localStorage, syncStorage] = await Promise.all([
-            // @ts-ignore
-            getItems(localKeys, 'local'),
+            getItems(localKeys),
             // @ts-ignore
             getItems(syncKeys, 'sync'),
         ]);
@@ -207,6 +206,21 @@ async function getAnyItems(keys: StorageKey | StorageKey[]) {
     }
     // @ts-ignore
     return getItems(keys, getArea(keys));
+}
+
+async function removeAnyItems(keys: StorageKey | StorageKey[]) {
+    if (Array.isArray(keys)) {
+        const [syncKeys, localKeys] = splitStorageKeys(keys);
+
+        const [localSuccess, syncSuccess] = await Promise.all([
+            removeItems(localKeys),
+            // @ts-ignore
+            removeItems(syncKeys, 'sync'),
+        ]);
+        return localSuccess && syncSuccess;
+    }
+    // @ts-ignore
+    return removeItems(keys, getArea(keys));
 }
 
 async function setAnyItems<Key extends StorageKey>(key: Key, value: Storage[Key]): Promise<boolean> // prettier-ignore
@@ -218,12 +232,14 @@ async function setAnyItems(
 ) {
     if (typeof keyOrItems === 'object') {
         const [sync, local] = splitStorage(keyOrItems);
-        return Promise.all([
+
+        const [localSuccess, syncSuccess] = await Promise.all([
             // @ts-ignore
             setItems(local, value, 'local'),
             // @ts-ignore
             setItems(sync, value, 'sync'),
-        ]).then(([localSuccess, syncSuccess]) => localSuccess && syncSuccess);
+        ]);
+        return localSuccess && syncSuccess;
     }
     // @ts-ignore
     return setItems(keyOrItems, value, getArea(keyOrItems));
@@ -275,6 +291,7 @@ export default {
     any: {
         get: getAnyItems,
         set: setAnyItems,
+        remove: removeAnyItems,
         clear: clearStorage,
     },
 };
