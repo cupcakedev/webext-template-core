@@ -1,5 +1,5 @@
 /* When editing this file, follow the STORAGE_VERSION instructions: */
-import { IUser } from '../interfaces';
+import { IUser } from '../types';
 
 /**
  * Storage version must be set equal to extension version when in this version:

@@ -1,4 +1,4 @@
-import { IUser } from 'src/interfaces';
+import { IUser } from 'src/types';
 import { LocalStorageKeys, SyncStorageKeys } from './config';
 import storage from './storage';
 import { Storage } from './types';

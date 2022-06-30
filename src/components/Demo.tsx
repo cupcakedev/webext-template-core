@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 import Users from './Users';
-import { IUser } from '../interfaces';
+import { IUser } from '../types';
 import useChromeStorage from '../hooks/useChromeStorage';
 import { LocalStorageKeys, SyncStorageKeys } from 'src/storage/config';
 import 'src/storage/storage.test';

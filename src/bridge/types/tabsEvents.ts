@@ -1,4 +1,4 @@
-import { Promisable } from 'src/interfaces/utils';
+import { Promisable } from 'src/types/utils';
 
 export interface ITabsServiceModel {
     updateUrl: {

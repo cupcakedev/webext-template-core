@@ -1,7 +1,7 @@
 /* eslint-disable react/button-has-type */
 import React, { useState } from 'react';
 import { createBgMessageSender } from 'src/bridge/bgEvents';
-import { IUser } from '../interfaces';
+import { IUser } from '../types';
 
 const addUser = createBgMessageSender('addUser');
 const updateUser = createBgMessageSender('updateUser');

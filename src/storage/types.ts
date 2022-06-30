@@ -1,4 +1,4 @@
-import type { Subtype } from '../interfaces/utils';
+import type { Subtype } from '../types/utils';
 import type {
     ILocalStorage,
     ISyncStorage,
