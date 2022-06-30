@@ -20,6 +20,7 @@ export enum SyncStorageKeys {
     user = 'user',
     JWSToken = 'JWSToken',
     refreshJWSToken = 'refreshJWSToken',
+    excludeDomains = 'excludeDomains',
 }
 
 export interface ILocalStorage {
@@ -32,4 +33,5 @@ export interface ISyncStorage {
     [SyncStorageKeys.JWSToken]: string;
     [SyncStorageKeys.refreshJWSToken]: string;
     [SyncStorageKeys.user]: IUser;
+    [SyncStorageKeys.excludeDomains]: string;
 }
