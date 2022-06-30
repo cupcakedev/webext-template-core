@@ -1,8 +1,4 @@
-// @ts-ignore
-import { matchPattern } from 'url-matcher';
-// @ts-ignore
 import * as _ from 'lodash';
-import { parse } from 'query-string';
 import { RouteInterface } from '../interfaces';
 
 export const getCurrentTab = () =>
@@ -22,25 +18,17 @@ export const openTab = async (url: string) =>
 export const findRoute = (routes: RouteInterface[], pathname: string) => {
     for (const route of routes) {
         if (typeof route.pattern === 'string') {
-            const match = matchPattern(route.pattern, pathname);
+            const match = new RegExp(route.pattern).test(pathname);
             if (match) {
                 const Component = route.component;
-                const params = _.zipObject(match.paramNames, match.paramValues);
-                const searchParams = parse(window.location.search);
-                // omit ref because react throw error
-                const props = _.omit({ ...params, ...searchParams }, 'ref');
-                return { Component, props };
+                return { Component };
             }
         }
         if (typeof route.pattern === 'function') {
             const match = route.pattern(pathname);
             if (match) {
                 const Component = route.component;
-                const params = match;
-                const searchParams = parse(window.location.search);
-                // omit ref because react throw error
-                const props = _.omit({ ...params, ...searchParams }, 'ref');
-                return { Component, props };
+                return { Component, props: match };
             }
         }
     }
