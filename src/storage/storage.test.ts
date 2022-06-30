@@ -1,6 +1,7 @@
 import { IUser } from 'src/interfaces';
 import { LocalStorageKeys, SyncStorageKeys } from './config';
-import storage, { Storage } from './storage';
+import storage from './storage';
+import { Storage } from './types';
 
 const user: IUser = {
     id: 129321312,

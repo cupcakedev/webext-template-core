@@ -1,101 +1,16 @@
-import { partition } from 'lodash';
-import type { Subtype } from '../interfaces/utils';
-import type { ILocalStorage, ISyncStorage } from './config';
 import { LocalStorageKeys, SyncStorageKeys, STORAGE_VERSION } from './config';
-
-type LocalStorageDataTemplate<T = unknown> = {
-    [key in LocalStorageKeys]: T;
-};
-
-type LocalStorageData = LocalStorageDataTemplate &
-    Subtype<LocalStorageDataTemplate, ILocalStorage>;
-
-export type LocalStorage = {
-    [key in LocalStorageKeys]: LocalStorageData[key] | undefined;
-};
-
-type SyncStorageDataTemplate<T = unknown> = {
-    [key in SyncStorageKeys]: T;
-};
-
-type SyncStorageData = SyncStorageDataTemplate &
-    Subtype<SyncStorageDataTemplate, ISyncStorage>;
-
-export type SyncStorage = {
-    [key in SyncStorageKeys]: SyncStorageData[key] | undefined;
-};
-
-export type Storage = LocalStorage & SyncStorage;
-
-export type StorageKey = keyof Storage;
-
-export type StorageUpdate = {
-    [Key in StorageKey]: {
-        newValue: Storage[Key];
-        oldValue: Storage[Key];
-    };
-};
-
-const getArea = (key: StorageKey) =>
-    SyncStorageKeys[key as keyof SyncStorage] ? 'sync' : 'local';
-
-const splitStorageKeys = (keys: StorageKey[]) =>
-    partition(keys, (key) => SyncStorageKeys[key as keyof SyncStorage]) as [
-        SyncStorageKeys[],
-        LocalStorageKeys[]
-    ];
-
-const splitStorage = (storage: Partial<Storage>) =>
-    Object.entries(storage).reduce(
-        (arr, [key, value]) => {
-            if (SyncStorageKeys[key as keyof SyncStorage]) {
-                Object.assign(arr[0], { [key]: value });
-                return arr;
-            }
-            Object.assign(arr[1], { [key]: value });
-            return arr;
-        },
-        [{}, {}] as [Partial<SyncStorage>, Partial<LocalStorage>]
-    );
-
-// Safari skips writes with 'undefined' and 'null', write '' instead
-const EMPTY_VALUE = '' as const;
-
-type StorageRaw = Record<
-    typeof LocalStorageKeys[keyof typeof LocalStorageKeys],
-    Storage[StorageKey] | typeof EMPTY_VALUE
-> &
-    Record<
-        typeof SyncStorageKeys[keyof typeof SyncStorageKeys],
-        Storage[StorageKey] | typeof EMPTY_VALUE
-    >;
-
-const shouldNormalize = (value: Storage[StorageKey]) =>
-    value === undefined || value === null;
-
-const normalizeStorageValue = (value: Storage[StorageKey]) =>
-    shouldNormalize(value) ? EMPTY_VALUE : value;
-
-const normalizeStorage = (items: Partial<Storage>): Partial<StorageRaw> =>
-    Object.entries(items).reduce((acc, [key, value]) => {
-        if (shouldNormalize(value)) {
-            Object.assign(acc, { [key]: EMPTY_VALUE });
-        }
-        return acc;
-    }, items);
-
-const restoreNormalizedValue = (value: Storage[StorageKey]) =>
-    value === EMPTY_VALUE ? undefined : value;
-
-const restoreNormalizedStorage = (
-    data: Partial<StorageRaw>
-): Partial<Storage> =>
-    Object.entries(data).reduce((acc, [key, value]) => {
-        if (value === EMPTY_VALUE) {
-            Object.assign(acc, { [key]: undefined });
-        }
-        return acc;
-    }, data as Partial<Storage>);
+import { Storage, StorageKey, LocalStorage, SyncStorage } from './types';
+import {
+    getArea,
+    getStorageVersion,
+    normalizeStorage,
+    normalizeStorageValue,
+    restoreNormalizedStorage,
+    restoreNormalizedValue,
+    setStorageVersion,
+    splitStorage,
+    splitStorageKeys,
+} from './utils';
 
 async function getItems<Keys extends LocalStorageKeys[]>(keys: Keys): Promise<Pick<LocalStorage, Keys[number]>>; // prettier-ignore
 async function getItems<Key extends LocalStorageKeys>(key: Key): Promise<LocalStorage[Key]>; // prettier-ignore
@@ -244,22 +159,6 @@ async function setAnyItems(
     // @ts-ignore
     return setItems(keyOrItems, value, getArea(keyOrItems));
 }
-
-const STORAGE_VERSION_KEY = 'storageVersion';
-
-const getStorageVersion = () =>
-    new Promise<string>((resolve) => {
-        chrome.storage.local.get(STORAGE_VERSION_KEY, (data) =>
-            resolve(data[STORAGE_VERSION_KEY])
-        );
-    });
-
-const setStorageVersion = (version: string) =>
-    new Promise<boolean>((resolve) => {
-        chrome.storage.local.set({ [STORAGE_VERSION_KEY]: version }, () => {
-            chrome.runtime.lastError ? resolve(false) : resolve(true);
-        });
-    });
 
 export const initStorage = async () => {
     const lastStorageVersion = await getStorageVersion();

@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
 import { SyncStorageKeys } from 'src/storage/config';
-import storage, {
+import storage from '../storage/storage';
+import {
     Storage,
     StorageKey,
     StorageUpdate,
     SyncStorage,
-} from '../storage/storage';
+} from '../storage/types';
 
 function useChromeStorage<
     Key extends StorageKey,
