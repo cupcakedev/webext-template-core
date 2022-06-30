@@ -8,10 +8,10 @@ const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 module.exports = (env) => ({
     mode: env.mode ?? 'production',
     entry: {
-        background: `${__dirname}/src/background/index.ts`,
-        content: `${__dirname}/src/content/index.tsx`,
-        popup: `${__dirname}/src/popup/index.tsx`,
-        options: `${__dirname}/src/options/index.tsx`,
+        background: `${__dirname}/src/pages/background/index.ts`,
+        content: `${__dirname}/src/pages/content/index.tsx`,
+        popup: `${__dirname}/src/pages/popup/index.tsx`,
+        options: `${__dirname}/src/pages/options/index.tsx`,
     },
     output: {
         publicPath: '',
@@ -68,11 +68,11 @@ module.exports = (env) => ({
                     force: true,
                 },
                 {
-                    from: './src/popup/popup.html',
+                    from: './src/pages/popup/popup.html',
                     force: true,
                 },
                 {
-                    from: './src/options/options.html',
+                    from: './src/pages/options/options.html',
                     force: true,
                 },
             ],

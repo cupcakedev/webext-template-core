@@ -1,6 +1,6 @@
 import React, { useLayoutEffect, useState } from 'react';
 import root from 'react-shadow/styled-components';
-import { Injection } from 'src/content/components/Injection';
+import { Injection } from 'src/pages/content/components/Injection';
 import SerpItem from './SerpItem';
 
 const CONTAINER_CLASSNAME = 'template-serp';

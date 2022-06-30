@@ -1,7 +1,7 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 import root from 'react-shadow/styled-components';
-import { Injection } from '../content/components/Injection';
+import { Injection } from '../pages/content/components/Injection';
 import { defaultFontMixin } from 'src/styles/font';
 import { MODAL_ROOT_ID } from 'src/utils/modalUtils';
 

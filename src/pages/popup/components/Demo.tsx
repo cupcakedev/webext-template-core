@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import useChromeStorage from '../../hooks/useChromeStorage';
+import useChromeStorage from '../../../hooks/useChromeStorage';
 import { LocalStorageKeys } from 'src/storage/config';
 import { createBgMessageSender } from 'src/bridge/bgEvents';
 
