@@ -1,4 +1,4 @@
-import { getCurrentTab } from '@common/utils';
+import { getCurrentTab } from 'src/utils/tabUtils';
 import { IBgServices } from '../bridge/types/bgEvents';
 
 const URL_JSON_SERVER = 'http://localhost:3004';

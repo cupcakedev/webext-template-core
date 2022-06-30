@@ -1,4 +1,4 @@
-import { createModalRoot } from '@common/utils';
+import { createModalRoot } from 'src/utils/modalUtils';
 import React, { useState } from 'react';
 import Modal from './Modal';
 

@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { createGlobalStyle } from 'styled-components';
 
 import { fontFacesMixin } from '@assets/fonts';
-import { defaultFontMixin } from '@common/styles';
+import { defaultFontMixin } from 'src/styles/font';
 import Demo from 'src/components/Demo';
 
 const root = document.createElement('div');
