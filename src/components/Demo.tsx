@@ -3,12 +3,12 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 import Users from './Users';
-import { IUser } from '../../interfaces';
-import useChromeStorage from '../../hooks/useChromeStorage';
+import { IUser } from '../interfaces';
+import useChromeStorage from '../hooks/useChromeStorage';
 import { LocalStorageKeys, SyncStorageKeys } from 'src/storage/config';
 import 'src/storage/storage.test';
-import Modal from './Modal';
 import { createBgMessageSender } from 'src/bridge/bgEvents';
+import ModalDemo from './ModalDemo';
 
 const getTabID = createBgMessageSender('getTabID');
 const getUsers = createBgMessageSender('getUsers');
@@ -36,53 +36,10 @@ const Demo: React.FC<{ variant?: string }> = ({ variant }) => {
         setTabID(id);
     };
 
-    const [showModal, setShowModal] = useState(false);
-    const [showSecondModal, setShowSecondModal] = useState(false);
-    const [showThirdModal, setShowThirdModal] = useState(false);
-
-    useEffect(() => {
-        console.log('show modal', showModal);
-    }, [showModal]);
-
     return (
         <Root>
             <div>
-                <div
-                    style={{
-                        display: 'flex',
-                        gap: '11px',
-                        height: '25px',
-                        alignItems: 'center',
-                    }}
-                >
-                    <button onClick={() => setShowModal((prev) => !prev)}>
-                        Открыть модальное окно
-                    </button>
-                    {showModal && (
-                        <Modal
-                            onClose={() => setShowModal(false)}
-                            onAccept={() => setShowSecondModal(true)}
-                        />
-                    )}
-                    {showSecondModal && (
-                        <Modal
-                            padding="20px 20px 0 0"
-                            onClose={() => setShowSecondModal(false)}
-                            onAccept={() => setShowThirdModal(true)}
-                        />
-                    )}
-                    {showThirdModal && (
-                        <Modal
-                            padding="40px 40px 0 0"
-                            onClose={() => setShowThirdModal(false)}
-                            onAccept={() => {
-                                setShowModal(false);
-                                setShowSecondModal(false);
-                                setShowThirdModal(false);
-                            }}
-                        />
-                    )}
-                </div>
+                <ModalDemo />
                 <div
                     style={{
                         display: 'flex',

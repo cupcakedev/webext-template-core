@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import root from 'react-shadow/styled-components';
 
 import { defaultFontMixin } from '@common/styles';
-import Demo from './Demo';
+import Demo from 'src/components/Demo';
 import { Injection } from './Injection';
 
 const selectTargetEl = () => document.querySelector('#injection');

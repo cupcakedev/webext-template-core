@@ -1,14 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { createGlobalStyle } from 'styled-components';
-import Demo from '../content/components/Demo';
 
 import { fontFacesMixin } from '@assets/fonts';
 import { defaultFontMixin } from '@common/styles';
+import Demo from 'src/components/Demo';
 
-const injection = document.createElement('div');
-injection.classList.add('injection');
-document.body.appendChild(injection);
+const root = document.createElement('div');
+root.id = 'root';
+document.body.appendChild(root);
 
 const GlobalStyles = createGlobalStyle`
   body {
@@ -24,7 +24,7 @@ const GlobalStyles = createGlobalStyle`
   }
 `;
 
-ReactDOM.createRoot(injection).render(
+ReactDOM.createRoot(root).render(
     <>
         <GlobalStyles />
         <Demo />

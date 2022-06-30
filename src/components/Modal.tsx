@@ -1,14 +1,23 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 import root from 'react-shadow/styled-components';
-import { Injection } from './Injection';
+import { Injection } from '../content/components/Injection';
 import { defaultFontMixin } from '@common/styles';
+import { MODAL_ROOT_ID } from '@common/utils';
 
-const selectTargetElement = () => document.querySelector('#injection');
+const selectTargetElement = (id?: string) =>
+    document.querySelector(`#${id || MODAL_ROOT_ID}`);
 
-const Modal = (props: any) => (
+interface Props {
+    onAccept: () => void;
+    onClose: () => void;
+    padding?: string;
+    rootId?: string;
+}
+
+const Modal = (props: Props) => (
     <Injection
-        selectTargetElement={selectTargetElement}
+        selectTargetElement={() => selectTargetElement(props.rootId)}
         position="beforeend"
         containerClassName="modal_test__container"
     >
@@ -27,7 +36,7 @@ const Modal = (props: any) => (
     </Injection>
 );
 
-const Root = styled.div<{ padding: string }>`
+const Root = styled.div<{ padding?: string }>`
     z-index: 2147483647;
     position: fixed;
     top: 0;
