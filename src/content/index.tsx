@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { createGlobalStyle } from 'styled-components';
 
 import { fontFacesMixin } from '@assets/fonts';
-import App from './App';
+import Router from './router';
 
 const injection = document.createElement('div');
 injection.classList.add('injection');
@@ -14,11 +14,11 @@ const GlobalStyles = createGlobalStyle`
     ${fontFacesMixin};
 `;
 
-export async function injectEntryPoint() {
+async function injectEntryPoint() {
     ReactDOM.createRoot(injection).render(
         <>
             <GlobalStyles />
-            <App />
+            <Router />
         </>
     );
 }

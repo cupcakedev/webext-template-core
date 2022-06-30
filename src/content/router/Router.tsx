@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { listenBgMessage } from 'src/bridge/tabsEvents';
-import { findRoute } from '@common/utils';
-import { routes } from './Routes';
+import routes from './routes';
+import { findRoute } from './utils';
 
-const App = () => {
+const Router = () => {
     const [url, setUrl] = useState<string>(window.location.href);
     const [search, setSearch] = useState<string>(window.location.search);
     const Route = findRoute(routes, url);
@@ -32,4 +32,4 @@ const App = () => {
     return <Route.Component {...Route.props} />;
 };
 
-export default App;
+export default Router;
