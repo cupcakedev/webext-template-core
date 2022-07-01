@@ -1,7 +1,7 @@
 import React, { useLayoutEffect, useState } from 'react';
 import root from 'react-shadow/styled-components';
 import { Injection } from 'src/pages/content/components/Injection';
-import SerpItem from './SerpItem';
+import { SerpItem } from './SerpItem';
 
 const CONTAINER_CLASSNAME = 'template-serp';
 const ITEM_TEXT = "I'm a SERP injection";
@@ -16,7 +16,7 @@ interface SerpProps {
     serpLinksSelector: string;
 }
 
-export const Serp: React.FC<SerpProps> = ({ serpLinksSelector }) => {
+const Serp: React.FC<SerpProps> = ({ serpLinksSelector }) => {
     const [containers, setContainers] = useState<PortalData[]>([]);
 
     const serpContainers = (links: NodeListOf<any>) => {
@@ -60,3 +60,5 @@ export const Serp: React.FC<SerpProps> = ({ serpLinksSelector }) => {
         </>
     );
 };
+
+export { Serp };

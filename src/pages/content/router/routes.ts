@@ -1,4 +1,4 @@
-import DemoInjection from '../components/DemoInjection';
+import { DemoInjection } from '../components/DemoInjection';
 import { isSearchPage } from '../searchPage/utils';
 import { SearchPage } from '../searchPage/SearchPage';
 import { RouteInterface } from './utils';
@@ -16,4 +16,4 @@ const routes: RouteInterface[] = [
     },
 ];
 
-export default routes;
+export { routes };

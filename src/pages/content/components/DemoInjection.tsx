@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import root from 'react-shadow/styled-components';
 
 import { defaultFontMixin } from 'src/styles/font';
-import Demo from 'src/components/Demo';
+import { Demo } from 'src/components/Demo';
 import { Injection } from './Injection';
 
 const selectTargetEl = () => document.querySelector('#injection');
@@ -33,4 +33,4 @@ const Container = styled.div`
     }
 `;
 
-export default DemoInjection;
+export { DemoInjection };

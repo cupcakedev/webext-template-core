@@ -21,4 +21,4 @@ const Root = styled.div`
     }
 `;
 
-export default SerpItem;
+export { SerpItem };

@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { createGlobalStyle } from 'styled-components';
 
 import { fontFacesMixin } from '@assets/fonts';
-import Router from './router';
+import { Router } from './router';
 
 const injection = document.createElement('div');
 injection.classList.add('injection');

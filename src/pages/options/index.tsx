@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom/client';
 import styled, { createGlobalStyle } from 'styled-components';
 
-import storage from 'src/storage/storage';
+import { storage } from 'src/storage/storage';
 import { fontFacesMixin } from '@assets/fonts';
 import { defaultFontMixin } from 'src/styles/font';
 import { SyncStorageKeys } from 'src/storage/config';

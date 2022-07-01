@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { listenBgMessage } from 'src/bridge/tabsEvents';
-import routes from './routes';
+import { routes } from './routes';
 import { findRoute } from './utils';
 
 const Router = () => {
@@ -32,4 +32,4 @@ const Router = () => {
     return <Route.Component {...Route.props} />;
 };
 
-export default Router;
+export { Router };

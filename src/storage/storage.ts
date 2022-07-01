@@ -182,7 +182,7 @@ export const initStorage = async () => {
     }
 };
 
-const storage = {
+export const storage = {
     local: {
         get: getLocalItems,
         set: setLocalItems,
@@ -202,5 +202,3 @@ const storage = {
         clear: clearStorage,
     },
 };
-
-export default storage;

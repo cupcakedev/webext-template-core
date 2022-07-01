@@ -1,14 +1,13 @@
-/* eslint-disable camelcase */
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
-import Users from './Users';
+import { Users } from './Users';
 import { IUser } from '../types';
-import useChromeStorage from '../hooks/useChromeStorage';
+import { useChromeStorage } from '../hooks/useChromeStorage';
 import { LocalStorageKeys, SyncStorageKeys } from 'src/storage/config';
-import 'src/storage/storage.test';
 import { createBgMessageSender } from 'src/bridge/bgEvents';
-import ModalDemo from './ModalDemo';
+import { ModalDemo } from './ModalDemo';
+import 'src/storage/storage.test';
 
 const getTabID = createBgMessageSender('getTabID');
 const getUsers = createBgMessageSender('getUsers');
@@ -96,4 +95,4 @@ const Root = styled.div`
     padding: 24px;
 `;
 
-export default Demo;
+export { Demo };

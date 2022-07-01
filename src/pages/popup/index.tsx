@@ -4,7 +4,7 @@ import { createGlobalStyle } from 'styled-components';
 
 import { fontFacesMixin } from '@assets/fonts';
 import { defaultFontMixin } from 'src/styles/font';
-import Demo from 'src/components/Demo';
+import { Demo } from 'src/components/Demo';
 
 const root = document.createElement('div');
 root.id = 'root';

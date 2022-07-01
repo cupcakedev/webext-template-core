@@ -106,4 +106,4 @@ const CloseButton = styled(Button)`
     color: red;
 `;
 
-export default Modal;
+export { Modal };

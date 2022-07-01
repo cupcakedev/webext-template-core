@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { SyncStorageKeys } from 'src/storage/config';
-import storage from '../storage/storage';
+import { storage } from '../storage/storage';
 import {
     Storage,
     StorageKey,
@@ -78,4 +78,4 @@ function useChromeStorage<
     return [state, updateValue, error] as const;
 }
 
-export default useChromeStorage;
+export { useChromeStorage };

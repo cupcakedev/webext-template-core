@@ -5,7 +5,7 @@ import NunitoSansSemiBold from './NunitoSans-SemiBold.ttf';
 import NunitoSansBold from './NunitoSans-Bold.ttf';
 import NunitoSansExtraBold from './NunitoSans-ExtraBold.ttf';
 
-export const fontFacesMixin = css`
+const fontFacesMixin = css`
     @font-face {
         font-family: 'Nunito Sans';
         font-style: normal;
@@ -37,4 +37,4 @@ export const fontFacesMixin = css`
         src: url(${NunitoSansExtraBold}) format('truetype');
     }
 `;
-export default fontFacesMixin;
+export { fontFacesMixin };

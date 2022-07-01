@@ -172,4 +172,4 @@ const Users: React.FC<{ users: Array<IUser> | undefined }> = (props) => {
     );
 };
 
-export default Users;
+export { Users };

@@ -1,6 +1,6 @@
-import { createModalRoot } from 'src/utils/modalUtils';
 import React, { useState } from 'react';
-import Modal from './Modal';
+import { Modal } from './Modal';
+import { createModalRoot } from 'src/utils/modalUtils';
 
 createModalRoot();
 
@@ -49,4 +49,4 @@ const ModalDemo = () => {
     );
 };
 
-export default ModalDemo;
+export { ModalDemo };
