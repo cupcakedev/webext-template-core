@@ -13,7 +13,7 @@
     "jsx": "react",
     "downlevelIteration": true,
     "strict": true,
-    "types": ["chrome", "node", "webpack-env"],
+    "types": ["chrome", "node", "webpack-env", "jest"],
     "paths": {
       "@assets/*": ["src/assets/*"],
       "@common/*": ["src/common/*"],

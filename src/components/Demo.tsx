@@ -7,7 +7,6 @@ import { useChromeStorage } from '../hooks/useChromeStorage';
 import { LocalStorageKeys, SyncStorageKeys } from 'src/storage/config';
 import { createBgMessageSender } from 'src/bridge/bgEvents';
 import { ModalDemo } from './ModalDemo';
-import 'src/storage/storage.test';
 
 const getTabID = createBgMessageSender('getTabID');
 const getUsers = createBgMessageSender('getUsers');
