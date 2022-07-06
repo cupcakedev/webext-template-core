@@ -1,6 +1,8 @@
 import { listenContentMessages } from 'src/bridge/bgEvents';
 import { sendMessageTab } from 'src/bridge/tabsEvents';
 import { Services } from './services';
+import { storage } from '../../storage/storage';
+import { LocalStorageKeys, SyncStorageKeys } from 'src/storage/config';
 
 listenContentMessages(Services);
 
@@ -38,8 +40,3 @@ function urlListener(
 }
 
 chrome.tabs.onUpdated.addListener(urlListener);
-
-// chrome.runtime.connect().onDisconnect.addListener(function() {
-//     chrome.tabs.onUpdated.removeListener(urlListener)
-//     console.log("disconnected")
-// })

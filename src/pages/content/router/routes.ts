@@ -3,7 +3,7 @@ import { isSearchPage } from '../searchPage/utils';
 import { SearchPage } from '../searchPage/SearchPage';
 import { RouteInterface } from './utils';
 
-const isDemoPage = () => true; // (pathname: string) => pathname.includes('/demo');
+const isDemoPage = () => true;
 
 const routes: RouteInterface[] = [
     {
