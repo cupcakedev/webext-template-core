@@ -40,3 +40,25 @@ function urlListener(
 }
 
 chrome.tabs.onUpdated.addListener(urlListener);
+
+// STORAGE USAGE EXAMPLES (+ intellisense)
+
+// 'storage.local' and 'storage.sync'
+storage.local
+    .get([LocalStorageKeys.tokensUpdating])
+    .then((res) => res.tokensUpdating);
+storage.sync.get([SyncStorageKeys.JWSToken]).then((res) => res.JWSToken);
+
+// 'storage.any'
+storage.any.get(LocalStorageKeys.counter).then((bool) => bool); // 'local' key
+storage.any.get(SyncStorageKeys.user).then((user) => user?.id); // 'sync' key
+storage.any
+    .get([SyncStorageKeys.user, SyncStorageKeys.JWSToken])
+    .then((res) => res.user); // multiple 'sync' keys
+storage.any
+    .get([
+        SyncStorageKeys.JWSToken,
+        SyncStorageKeys.refreshJWSToken,
+        LocalStorageKeys.tokensUpdating,
+    ])
+    .then((res) => res); // 'sync' and 'local' keys
