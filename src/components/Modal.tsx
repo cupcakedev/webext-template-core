@@ -1,47 +1,31 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 import root from 'react-shadow/styled-components';
-import { Injection } from '../pages/content/components/Injection';
 import { defaultFontMixin } from 'src/styles/font';
-
-export const MODAL_ROOT_ID = 'modal-root';
-
-const selectTargetElement = (id?: string) => {
-    let el = document.querySelector(`#${id || MODAL_ROOT_ID}`);
-    if (!el) {
-        el = document.createElement('div');
-        el.id = id || MODAL_ROOT_ID;
-        document.body.appendChild(el);
-    }
-    return el;
-};
+import { InjectModal } from './InjectModal';
 
 interface Props {
+    rootId?: string;
+    padding?: string;
     onAccept: () => void;
     onClose: () => void;
-    padding?: string;
-    rootId?: string;
 }
 
-const Modal = (props: Props) => (
-    <Injection
-        selectTargetElement={() => selectTargetElement(props.rootId)}
-        position="beforeend"
-        containerClassName="modal_test__container"
-    >
+const Modal = ({ rootId, padding, onAccept, onClose }: Props) => (
+    <InjectModal id={rootId}>
         <root.div>
-            <Root padding={props.padding}>
+            <Root padding={padding}>
                 <Content>
                     <Title>Hello, world of modals!</Title>
                     <Text>React is cool</Text>
                     <ButtonsContainer>
-                        <OkButton onClick={props.onAccept}>OK</OkButton>
-                        <CloseButton onClick={props.onClose}>Close</CloseButton>
+                        <OkButton onClick={onAccept}>OK</OkButton>
+                        <CloseButton onClick={onClose}>Close</CloseButton>
                     </ButtonsContainer>
                 </Content>
             </Root>
         </root.div>
-    </Injection>
+    </InjectModal>
 );
 
 const Root = styled.div<{ padding?: string }>`
