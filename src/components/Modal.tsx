@@ -3,10 +3,18 @@ import styled, { css } from 'styled-components';
 import root from 'react-shadow/styled-components';
 import { Injection } from '../pages/content/components/Injection';
 import { defaultFontMixin } from 'src/styles/font';
-import { MODAL_ROOT_ID } from 'src/utils/modalUtils';
 
-const selectTargetElement = (id?: string) =>
-    document.querySelector(`#${id || MODAL_ROOT_ID}`);
+export const MODAL_ROOT_ID = 'modal-root';
+
+const selectTargetElement = (id?: string) => {
+    let el = document.querySelector(`#${id || MODAL_ROOT_ID}`);
+    if (!el) {
+        el = document.createElement('div');
+        el.id = id || MODAL_ROOT_ID;
+        document.body.appendChild(el);
+    }
+    return el;
+};
 
 interface Props {
     onAccept: () => void;

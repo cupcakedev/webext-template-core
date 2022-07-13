@@ -1,8 +1,5 @@
 import React, { useState } from 'react';
 import { Modal } from './Modal';
-import { createModalRoot } from 'src/utils/modalUtils';
-
-createModalRoot();
 
 const ModalDemo = () => {
     const [showModal, setShowModal] = useState(false);
