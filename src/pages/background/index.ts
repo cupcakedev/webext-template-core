@@ -3,6 +3,7 @@ import { sendMessageTab } from 'src/bridge/tabsEvents';
 import { Services } from './services';
 import { storage } from '../../storage/storage';
 import { LocalStorageKeys, SyncStorageKeys } from 'src/storage/config';
+import '../../logger';
 
 listenContentMessages(Services);
 

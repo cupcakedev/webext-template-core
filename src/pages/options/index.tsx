@@ -6,6 +6,7 @@ import { storage } from 'src/storage/storage';
 import { fontFacesMixin } from '@assets/fonts';
 import { defaultFontMixin } from 'src/styles/font';
 import { SyncStorageKeys } from 'src/storage/config';
+import '../../logger';
 
 const Options = () => {
     const textareaRef = useRef<HTMLTextAreaElement>(null);

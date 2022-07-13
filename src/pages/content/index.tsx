@@ -4,6 +4,7 @@ import { createGlobalStyle } from 'styled-components';
 
 import { fontFacesMixin } from '@assets/fonts';
 import { Router } from './router';
+import '../../logger';
 
 const injection = document.createElement('div');
 injection.classList.add('injection');

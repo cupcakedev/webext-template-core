@@ -170,13 +170,12 @@ async function removeAnyItems(keys: StorageKey | StorageKey[]) {
 
 export const initStorage = async () => {
     const lastStorageVersion = await getStorageVersion();
-    if (process.env.NODE_ENV === 'development') {
-        console.log('storage version:', STORAGE_VERSION);
-        console.log('last storage version:', lastStorageVersion);
-    }
+
+    console.log('storage version:', STORAGE_VERSION);
+    console.log('last storage version:', lastStorageVersion);
+
     if (STORAGE_VERSION !== lastStorageVersion) {
-        if (process.env.NODE_ENV === 'development')
-            console.log('storage version changed, clear storage');
+        console.log('storage version changed, clear storage');
         await clearStorage();
         await setStorageVersion(STORAGE_VERSION);
     }
