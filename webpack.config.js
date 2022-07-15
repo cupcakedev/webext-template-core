@@ -1,6 +1,4 @@
 const path = require('path');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
-const ExtReloader = require('webpack-ext-reloader');
 const TerserPlugin = require('terser-webpack-plugin');
 const { EnvironmentPlugin } = require('webpack');
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
@@ -10,18 +8,21 @@ const { merge } = require('webpack-merge');
 const productionConfig = {
     mode: 'production',
     entry: {
-        background: `${__dirname}/src/pages/background/index.ts`,
-        content: `${__dirname}/src/pages/content/index.tsx`,
-        popup: `${__dirname}/src/pages/popup/index.tsx`,
-        options: `${__dirname}/src/pages/options/index.tsx`,
+        index: `${__dirname}/src/index.ts`,
+        'storage/storage': `${__dirname}/src/storage/storage.ts`,
+        'storage/config': `${__dirname}/src/storage/config.ts`,
+        'bridge/bgEvents': `${__dirname}/src/bridge/bgEvents.ts`,
+        'bridge/tabsEvents': `${__dirname}/src/bridge/tabsEvents.ts`,
     },
     output: {
-        publicPath: '',
-        path: path.resolve(__dirname, 'dist'),
+        path: path.resolve(__dirname, 'build'),
         filename: '[name].js',
+        libraryTarget: 'umd',
+        library: 'Core',
+        umdNamedDefine: true,
         clean: true,
     },
-    devtool: 'cheap-module-source-map',
+    devtool: 'inline-source-map',
     module: {
         rules: [
             {
@@ -51,42 +52,9 @@ const productionConfig = {
             }),
         ],
     },
-    plugins: [
-        new EnvironmentPlugin(['EXTENSION_NAME_PREFIX']),
-        new CopyWebpackPlugin({
-            patterns: [
-                {
-                    from: './src/manifest.json',
-                    force: true,
-                },
-                {
-                    context: './src/assets/icon',
-                    from: '*.png',
-                    to: 'icon',
-                    force: true,
-                },
-                {
-                    from: './src/pages/popup/popup.html',
-                    force: true,
-                },
-                {
-                    from: './src/pages/options/options.html',
-                    force: true,
-                },
-            ],
-        }),
-    ],
+    plugins: [new EnvironmentPlugin(['EXTENSION_NAME_PREFIX'])],
     optimization: {
-        minimizer: [
-            new TerserPlugin({
-                terserOptions: {
-                    format: {
-                        comments: false,
-                    },
-                },
-                extractComments: false,
-            }),
-        ],
+        minimize: false,
     },
 };
 

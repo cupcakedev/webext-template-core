@@ -1,16 +1,21 @@
 {
-  "name": "CupcakeDevExtensionTemplate",
+  "name": "webext-template-core",
   "version": "0.0.1",
-  "description": "CupcakeDev Extension Template",
+  "description": "CupcakeDev Extension Template Core",
+  "license": "MIT",
   "scripts": {
     "dev": "dotenv -- webpack --env development --watch",
     "build": "dotenv -- webpack --env production",
+    "init": "mkdir export",
+    "pack": "yarn pack --filename export/ext-template-core.tgz",
     "lint": "eslint --ext js,ts,tsx .",
     "test": "jest",
     "start-json-server": "json-server --watch db.json --port 3004"
   },
-  "private": true,
-  "main": "export/index",
+  "main": "./build/index.js",
+  "files": [
+    "build"
+  ],
   "dependencies": {
     "@types/lodash": "^4.14.178",
     "lodash": "^4.17.21",
