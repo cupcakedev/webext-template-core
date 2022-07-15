@@ -1,8 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { createGlobalStyle } from 'styled-components';
 
-import { fontFacesMixin } from '@assets/fonts';
 import { Router } from './router';
 import '../../logger';
 
@@ -11,17 +9,8 @@ injection.classList.add('injection');
 injection.id = 'injection';
 document.body.appendChild(injection);
 
-const GlobalStyles = createGlobalStyle`
-    ${fontFacesMixin};
-`;
-
 async function injectEntryPoint() {
-    ReactDOM.createRoot(injection).render(
-        <>
-            <GlobalStyles />
-            <Router />
-        </>
-    );
+    ReactDOM.createRoot(injection).render(<Router />);
 }
 
 injectEntryPoint()
