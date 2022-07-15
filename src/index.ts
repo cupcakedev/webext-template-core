@@ -9,3 +9,4 @@ export {
     sendMessageTab,
     getTabCaller,
 } from './bridge/tabsEvents';
+export { RouteInterface, Router } from './pages/content/router';

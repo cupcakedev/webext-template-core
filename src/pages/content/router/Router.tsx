@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { listenBgMessage } from 'src/bridge/tabsEvents';
-import { routes } from './routes';
-import { findRoute } from './utils';
+import { findRoute, RouteInterface } from './utils';
 
-const Router = () => {
+const Router = ({ routes }: { routes: RouteInterface[] }) => {
     const [url, setUrl] = useState<string>(window.location.href);
     const [search, setSearch] = useState<string>(window.location.search);
     const Route = findRoute(routes, url);
