@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
-import { SyncStorageKeys } from 'src/storage/config';
-import { storage } from '../storage/storage';
 import {
+    storage,
     Storage,
     StorageKey,
-    StorageUpdate,
-    SyncStorage,
-} from '../storage/types';
+    ISyncStorage,
+    SyncStorageKeys,
+} from 'src/storage/config';
+import { StorageUpdate } from 'src/storage/types';
 
 function useChromeStorage<
     Key extends StorageKey,
@@ -15,7 +15,7 @@ function useChromeStorage<
     type WithDefault<T> = Default extends undefined ? T : NonNullable<T>;
 
     const [STORAGE_AREA] = useState<'sync' | 'local'>(() =>
-        SyncStorageKeys[key as keyof SyncStorage] ? 'sync' : 'local'
+        SyncStorageKeys[key as keyof ISyncStorage] ? 'sync' : 'local'
     );
     const [state, setState] = useState(
         defaultValue as WithDefault<Storage[Key]>
@@ -27,9 +27,9 @@ function useChromeStorage<
             .get(key)
             .then((res) => {
                 setState(
-                    (defaultValue ? res || defaultValue : res) as WithDefault<
-                        typeof res
-                    >
+                    (defaultValue !== undefined
+                        ? res || defaultValue
+                        : res) as WithDefault<Storage[Key]>
                 );
                 setError('');
             })
@@ -43,7 +43,7 @@ function useChromeStorage<
             const value =
                 typeof newValue === 'function' ? newValue(state) : newValue;
             setState(value);
-            storage.any.set(key, value).then((result) => {
+            storage.any.set({ [key]: value }).then((result) => {
                 if (result) {
                     setError('');
                 } else {
@@ -56,15 +56,15 @@ function useChromeStorage<
 
     useEffect(() => {
         const onChange = (
-            changes: Partial<StorageUpdate>,
+            changes: StorageUpdate<Storage>,
             areaName: string
         ) => {
             if (areaName === STORAGE_AREA && key in changes) {
-                const val = changes[key]?.newValue;
+                const val = changes[key]?.newValue || undefined;
                 setState(
-                    (defaultValue ? val || defaultValue : val) as WithDefault<
-                        typeof val
-                    >
+                    (defaultValue !== undefined
+                        ? val || defaultValue
+                        : val) as WithDefault<typeof val>
                 );
                 setError('');
             }

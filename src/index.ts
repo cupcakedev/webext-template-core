@@ -1,4 +1,4 @@
-export { storage, initStorage } from './storage/storage';
+export { createStorage, migrageStorage } from './storage/storage';
 export {
     listenContentMessages,
     sendMessageBg,

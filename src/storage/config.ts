@@ -1,5 +1,6 @@
 /* When editing this file, follow the STORAGE_VERSION instructions: */
 import { IUser } from '../types';
+import { createStorage } from './storage';
 
 /**
  * Storage version must be set equal to extension version when in this version:
@@ -35,3 +36,11 @@ export interface ISyncStorage {
     [SyncStorageKeys.user]: IUser;
     [SyncStorageKeys.excludeDomains]: string;
 }
+
+export type Storage = Partial<ILocalStorage & ISyncStorage>;
+export type StorageKey = LocalStorageKeys | SyncStorageKeys;
+
+export const storage = createStorage<ILocalStorage, ISyncStorage>(
+    LocalStorageKeys,
+    SyncStorageKeys
+);
