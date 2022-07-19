@@ -1,5 +1,12 @@
-import { LocalStorageKeys, SyncStorageKeys, STORAGE_VERSION } from './config';
-import { Storage, StorageKey, LocalStorage, SyncStorage } from './types';
+import {
+    StorageArea,
+    StorageDataType,
+    StringEnumType,
+    Getter,
+    Setter,
+    Remover,
+    Storage,
+} from './types';
 import {
     getArea,
     getStorageVersion,
@@ -12,18 +19,15 @@ import {
     splitStorageKeys,
 } from './utils';
 
-async function getItems(
-    keys: StorageKey | StorageKey[],
-    area: 'local' | 'sync' = 'local'
-) {
+async function getItems(keys: string | string[], area: StorageArea = 'local') {
     if (Array.isArray(keys)) {
-        return new Promise<Partial<Storage>>((resolve) => {
+        return new Promise<Partial<StorageDataType>>((resolve) => {
             chrome.storage[area].get(keys, (data) =>
                 resolve(restoreNormalizedStorage(data))
             );
         });
     }
-    return new Promise<Storage[StorageKey]>((resolve) => {
+    return new Promise<any>((resolve) => {
         chrome.storage[area].get(keys, (data) =>
             resolve(restoreNormalizedValue(data[keys]))
         );
@@ -31,9 +35,9 @@ async function getItems(
 }
 
 async function setItems(
-    keyOrItems: Partial<Storage> | StorageKey,
-    value?: Storage[StorageKey],
-    area: 'local' | 'sync' = 'local'
+    keyOrItems: Partial<StorageDataType> | string,
+    value?: any,
+    area: StorageArea = 'local'
 ) {
     if (typeof keyOrItems === 'object') {
         return new Promise<boolean>((resolve) => {
@@ -53,8 +57,8 @@ async function setItems(
 }
 
 async function removeItems(
-    keys: StorageKey | StorageKey[],
-    area: 'local' | 'sync' = 'local'
+    keys: string | string[],
+    area: StorageArea = 'local'
 ) {
     if (Array.isArray(keys)) {
         return new Promise<boolean>((resolve) => {
@@ -70,77 +74,51 @@ async function removeItems(
     });
 }
 
-const clearStorage = () =>
-    Promise.all([chrome.storage.local.clear(), chrome.storage.sync.clear()]);
+// storage.local, storage.sync
 
-// local storage
+const createGetter: <S extends StorageDataType>(
+    area: StorageArea
+) => Getter<S> = (area) => (keys) =>
+    /* @ts-ignore */
+    getItems(keys, area);
 
-async function getLocalItems<Keys extends LocalStorageKeys[]>(keys: Keys): Promise<Pick<LocalStorage, Keys[number]>>; // prettier-ignore
-async function getLocalItems<Key extends LocalStorageKeys>(key: Key): Promise<LocalStorage[Key]>; // prettier-ignore
-async function getLocalItems(keys: StorageKey | StorageKey[]) {
-    return getItems(keys);
-}
+const createSetter: <S extends StorageDataType>(
+    area: StorageArea
+) => Setter<S> =
+    (area) =>
+    (keyOrItems, value = undefined) =>
+        setItems(keyOrItems, value, area);
 
-async function setLocalItems(items: Partial<LocalStorage>): Promise<boolean>; // prettier-ignore
-async function setLocalItems<Key extends LocalStorageKeys>(key: Key, value: LocalStorage[Key] | undefined): Promise<boolean>; // prettier-ignore
-async function setLocalItems(
-    keyOrItems: Partial<Storage> | StorageKey,
-    value?: Storage[StorageKey]
+const createRemover: <S extends StorageDataType>(
+    area: StorageArea
+) => Remover<S> = (area) => (keys) => removeItems(keys, area);
+
+// storage.any (mixed)
+
+async function getAnyItems(
+    allSyncKeys: StringEnumType,
+    keys: string | string[]
 ) {
-    return setItems(keyOrItems, value);
-}
-
-async function removeLocalItems(keys: LocalStorageKeys | LocalStorageKeys[]) {
-    return removeItems(keys);
-}
-
-// sync storage
-
-async function getSyncItems<Keys extends SyncStorageKeys[]>(keys: Keys): Promise<Pick<SyncStorage, Keys[number]>>; // prettier-ignore
-async function getSyncItems<Key extends SyncStorageKeys>(key: Key): Promise<SyncStorage[Key]>; // prettier-ignore
-async function getSyncItems(keys: StorageKey | StorageKey[]) {
-    return getItems(keys, 'sync');
-}
-
-async function setSyncItems(items: Partial<SyncStorage>): Promise<boolean>; // prettier-ignore
-async function setSyncItems<Key extends SyncStorageKeys>(key: Key, value: SyncStorage[Key] | undefined): Promise<boolean>; // prettier-ignore
-async function setSyncItems(
-    keyOrItems: Partial<Storage> | StorageKey,
-    value?: Storage[StorageKey]
-) {
-    return setItems(keyOrItems, value, 'sync');
-}
-
-async function removeSyncItems(keys: SyncStorageKeys | SyncStorageKeys[]) {
-    return removeItems(keys, 'sync');
-}
-
-// mixed storage
-
-async function getAnyItems<Keys extends StorageKey[]>(keys: Keys): Promise<Pick<Storage, Keys[number]>>; // prettier-ignore
-async function getAnyItems<Key extends StorageKey>(key: Key): Promise<Storage[Key]>; // prettier-ignore
-async function getAnyItems(keys: StorageKey | StorageKey[]) {
     if (Array.isArray(keys)) {
-        const [syncKeys, localKeys] = splitStorageKeys(keys);
+        const [syncKeys, localKeys] = splitStorageKeys(allSyncKeys, keys);
 
         const [localStorage, syncStorage] = await Promise.all([
-            getItems(localKeys) as Promise<Partial<Storage>>,
-            getItems(syncKeys, 'sync') as Promise<Partial<Storage>>,
+            getItems(localKeys),
+            getItems(syncKeys, 'sync'),
         ]);
         return { ...localStorage, ...syncStorage };
     }
 
-    return getItems(keys, getArea(keys));
+    return getItems(keys, getArea(allSyncKeys, keys));
 }
 
-async function setAnyItems<Key extends StorageKey>(key: Key, value: Storage[Key]): Promise<boolean> // prettier-ignore
-async function setAnyItems(items: Partial<Storage>): Promise<boolean> // prettier-ignore
 async function setAnyItems(
-    keyOrItems: Partial<Storage> | StorageKey,
-    value?: Storage[StorageKey]
+    allSyncKeys: StringEnumType,
+    keyOrItems: Partial<StorageDataType> | string,
+    value?: any
 ) {
     if (typeof keyOrItems === 'object') {
-        const [sync, local] = splitStorage(keyOrItems);
+        const [sync, local] = splitStorage(allSyncKeys, keyOrItems);
 
         const [localSuccess, syncSuccess] = await Promise.all([
             setItems(local, value),
@@ -149,12 +127,15 @@ async function setAnyItems(
         return localSuccess && syncSuccess;
     }
 
-    return setItems(keyOrItems, value, getArea(keyOrItems));
+    return setItems(keyOrItems, value, getArea(allSyncKeys, keyOrItems));
 }
 
-async function removeAnyItems(keys: StorageKey | StorageKey[]) {
+async function removeAnyItems(
+    allSyncKeys: StringEnumType,
+    keys: keyof StorageDataType | (keyof StorageDataType)[]
+) {
     if (Array.isArray(keys)) {
-        const [syncKeys, localKeys] = splitStorageKeys(keys);
+        const [syncKeys, localKeys] = splitStorageKeys(allSyncKeys, keys);
 
         const [localSuccess, syncSuccess] = await Promise.all([
             removeItems(localKeys),
@@ -163,41 +144,60 @@ async function removeAnyItems(keys: StorageKey | StorageKey[]) {
         return localSuccess && syncSuccess;
     }
 
-    return removeItems(keys, getArea(keys));
+    return removeItems(keys, getArea(allSyncKeys, keys));
 }
 
-// init
+const createAnyGetter: <S extends StorageDataType>(
+    allSyncKeys: StringEnumType
+) => Getter<S> = (allSyncKeys) => (keys) =>
+    /* @ts-ignore */
+    getAnyItems(allSyncKeys, keys);
 
-export const initStorage = async () => {
+const createAnySetter: <S extends StorageDataType>(
+    allSyncKeys: StringEnumType
+) => Setter<S> =
+    (allSyncKeys) =>
+    (keyOrItems, value = undefined) =>
+        setAnyItems(allSyncKeys, keyOrItems, value);
+
+const createAnyRemover: <S extends StorageDataType>(
+    allSyncKeys: StringEnumType
+) => Remover<S> = (allSyncKeys) => async (keys) =>
+    removeAnyItems(allSyncKeys, keys);
+
+const clearAllStorage = () =>
+    Promise.all([chrome.storage.local.clear(), chrome.storage.sync.clear()]);
+
+const createStorageArea = <T extends StorageDataType>(area: StorageArea) => ({
+    get: createGetter<T>(area),
+    set: createSetter<T>(area),
+    remove: createRemover<T>(area),
+    clear: () => chrome.storage[area].clear(),
+});
+
+export const createStorage = <Local, Sync>(
+    localKeys: StringEnumType,
+    syncKeys: StringEnumType
+): Storage<Local, Sync> => ({
+    local: createStorageArea<Local>('local'),
+    sync: createStorageArea<Sync>('sync'),
+    any: {
+        get: createAnyGetter<Local & Sync>(syncKeys),
+        set: createAnySetter<Local & Sync>(syncKeys),
+        remove: createAnyRemover<Local & Sync>(syncKeys),
+        clear: clearAllStorage,
+    },
+});
+
+export const migrageStorage = async (version: string) => {
     const lastStorageVersion = await getStorageVersion();
 
-    console.log('storage version:', STORAGE_VERSION);
+    console.log('storage version:', version);
     console.log('last storage version:', lastStorageVersion);
 
-    if (STORAGE_VERSION !== lastStorageVersion) {
+    if (version !== lastStorageVersion) {
         console.log('storage version changed, clear storage');
-        await clearStorage();
-        await setStorageVersion(STORAGE_VERSION);
+        await clearAllStorage();
+        await setStorageVersion(version);
     }
-};
-
-export const storage = {
-    local: {
-        get: getLocalItems,
-        set: setLocalItems,
-        remove: removeLocalItems,
-        clear: () => chrome.storage.local.clear(),
-    },
-    sync: {
-        get: getSyncItems,
-        set: setSyncItems,
-        remove: removeSyncItems,
-        clear: () => chrome.storage.sync.clear(),
-    },
-    any: {
-        get: getAnyItems,
-        set: setAnyItems,
-        remove: removeAnyItems,
-        clear: clearStorage,
-    },
 };

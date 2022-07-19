@@ -1,4 +1,4 @@
-export { storage, initStorage } from './storage/storage';
+export { createStorage, migrageStorage } from './storage/storage';
 export {
     listenContentMessages,
     sendMessageBg,
@@ -10,3 +10,4 @@ export {
     getTabCaller,
 } from './bridge/tabsEvents';
 export { RouteInterface, Router } from './pages/content/router';
+export { createHookUseChromeStorage } from './hooks/useChromeStorage';

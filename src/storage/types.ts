@@ -1,40 +1,43 @@
-import type { Subtype } from '../types/utils';
-import type {
-    ILocalStorage,
-    ISyncStorage,
-    LocalStorageKeys,
-    SyncStorageKeys,
-} from './config';
-
-type LocalStorageDataTemplate<T = unknown> = {
-    [key in LocalStorageKeys]: T;
-};
-
-type LocalStorageData = LocalStorageDataTemplate &
-    Subtype<LocalStorageDataTemplate, ILocalStorage>;
-
-export type LocalStorage = {
-    [key in LocalStorageKeys]: LocalStorageData[key] | undefined;
-};
-
-type SyncStorageDataTemplate<T = unknown> = {
-    [key in SyncStorageKeys]: T;
-};
-
-type SyncStorageData = SyncStorageDataTemplate &
-    Subtype<SyncStorageDataTemplate, ISyncStorage>;
-
-export type SyncStorage = {
-    [key in SyncStorageKeys]: SyncStorageData[key] | undefined;
-};
-
-export type Storage = LocalStorage & SyncStorage;
-
-export type StorageKey = keyof Storage;
-
-export type StorageUpdate = {
-    [Key in StorageKey]: {
-        newValue: Storage[Key];
-        oldValue: Storage[Key];
+export type StringEnumType = Record<string | number | symbol, string>;
+export type StorageDataType = Record<string, any>;
+export type StorageKeyType<S extends StorageDataType> = string & keyof S;
+export type StorageArea = 'local' | 'sync';
+export type StorageUpdate<S extends StorageDataType> = {
+    [Key in keyof S]?: {
+        newValue: S[Key] | '';
+        oldValue: S[Key] | '';
     };
+};
+
+export type Getter<S extends StorageDataType> = <
+    Key extends StorageKeyType<S> | StorageKeyType<S>[]
+>(
+    keys: Key
+) => Key extends StorageKeyType<S>
+    ? Promise<S[Key]>
+    : Promise<Pick<S, Key[number]>>;
+
+export type Setter<S extends StorageDataType> = <
+    KeyOrItems extends StorageKeyType<S> | Partial<S>
+>(
+    ...args: KeyOrItems extends StorageKeyType<S>
+        ? [key: KeyOrItems, value: S[KeyOrItems] | undefined]
+        : [items: KeyOrItems]
+) => Promise<boolean>;
+
+export type Remover<S extends StorageDataType> = (
+    keys: StorageKeyType<S> | StorageKeyType<S>[]
+) => Promise<boolean>;
+
+export type StorageAreaApi<S extends StorageDataType> = {
+    get: Getter<S>;
+    set: Setter<S>;
+    remove: Remover<S>;
+    clear: () => Promise<unknown>;
+};
+
+export type Storage<LocalStorageData, SyncStorageData> = {
+    local: StorageAreaApi<LocalStorageData>;
+    sync: StorageAreaApi<SyncStorageData>;
+    any: StorageAreaApi<LocalStorageData & SyncStorageData>;
 };
