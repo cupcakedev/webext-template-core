@@ -20,8 +20,6 @@
     "baseUrl": ".",
     "types": ["chrome", "node", "webpack-env", "jest"],
     "paths": {
-      "@assets/*": ["src/assets/*"],
-      "@common/*": ["src/common/*"],
       "src/*": ["src/*"]
     }
   },

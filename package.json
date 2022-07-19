@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "dotenv -- webpack --env development --watch",
-    "build": "dotenv -- webpack --env production",
+    "build": "dotenv -- webpack --env production && tsc-alias",
     "init": "mkdir export",
     "pack": "yarn pack --filename export/ext-template-core.tgz",
     "lint": "eslint --ext js,ts,tsx .",
@@ -50,6 +50,7 @@
     "style-loader": "^3.3.1",
     "ts-jest": "^27.0.0",
     "ts-loader": "^9.3.0",
+    "tsc-alias": "^1.7.0",
     "tsconfig-paths-webpack-plugin": "^3.5.2",
     "url-loader": "^4.1.1",
     "webpack": "^5.73.0",

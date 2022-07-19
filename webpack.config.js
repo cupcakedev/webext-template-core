@@ -1,12 +1,11 @@
 const path = require('path');
 const TerserPlugin = require('terser-webpack-plugin');
-const { EnvironmentPlugin } = require('webpack');
+const { EnvironmentPlugin, WatchIgnorePlugin } = require('webpack');
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const { merge } = require('webpack-merge');
 
-const productionConfig = {
-    mode: 'production',
+const commonConfig = {
     entry: {
         index: `${__dirname}/src/index.ts`,
         'storage/storage': `${__dirname}/src/storage/storage.ts`,
@@ -25,11 +24,6 @@ const productionConfig = {
     devtool: 'inline-source-map',
     module: {
         rules: [
-            {
-                test: /\.tsx?$/,
-                use: 'ts-loader',
-                exclude: /node_modules/,
-            },
             {
                 test: /\.(?:ico|gif|png|svg|jpg|jpeg)$/i,
                 loader: 'url-loader',
@@ -52,20 +46,54 @@ const productionConfig = {
             }),
         ],
     },
-    plugins: [new EnvironmentPlugin(['EXTENSION_NAME_PREFIX'])],
+    plugins: [
+        new EnvironmentPlugin(['EXTENSION_NAME_PREFIX']),
+        new WatchIgnorePlugin({
+            paths: [/\.js$/, /\.d\.ts$/],
+        }),
+    ],
     optimization: {
         minimize: false,
+    },
+};
+
+const prodConfig = {
+    mode: 'production',
+    module: {
+        rules: [
+            {
+                test: /\.tsx?$/,
+                use: 'ts-loader',
+                exclude: /node_modules/,
+            },
+        ],
     },
 };
 
 const devConfig = {
     mode: 'development',
     plugins: [new BundleAnalyzerPlugin()],
+    module: {
+        rules: [
+            {
+                test: /\.tsx?$/,
+                use: {
+                    loader: 'ts-loader',
+                    options: {
+                        compilerOptions: {
+                            declaration: false,
+                        },
+                    },
+                },
+                exclude: /node_modules/,
+            },
+        ],
+    },
 };
 
 module.exports = (env) => {
     if (env.development) {
-        return merge(productionConfig, devConfig);
+        return merge(commonConfig, devConfig);
     }
-    return productionConfig;
+    return merge(commonConfig, prodConfig);
 };
