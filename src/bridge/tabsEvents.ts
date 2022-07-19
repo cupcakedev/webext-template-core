@@ -1,17 +1,23 @@
 import {
-    ITabRequest,
-    TabMessageSender,
-    TabMessageSenderCreator,
-    TabMessageListener,
-} from './types/tabsEvents';
+    IRequest,
+    ServicesModelType,
+    TMessageListener,
+    TMessageSender,
+    TMessageSenderCreator,
+} from './types';
 
-export const listenBgMessage: TabMessageListener = (type, callback) => {
+type ITabRequest = IRequest<'tabs_command'>;
+
+export const listenBgMessage: TMessageListener<ServicesModelType> = (
+    method,
+    callback
+) => {
     chrome.runtime.onMessage.addListener(
         async (request: ITabRequest, sender, sendResponse) => {
-            if (request.type === type) {
+            if (request.type === 'tabs_command' && request.method === method) {
                 console.log('receive from bg', request);
                 const response = await callback(sender, request.params);
-                console.log('send response', type, response);
+                console.log('send response', method, response);
                 sendResponse(response);
             }
             return true;
@@ -19,19 +25,22 @@ export const listenBgMessage: TabMessageListener = (type, callback) => {
     );
 };
 
-export const sendMessageTab: TabMessageSender = (...args) =>
-    new Promise((resolve) => {
-        const request: ITabRequest = {
-            key: 'tabs_command',
-            type: args[1],
-            params: args[2],
-        };
-        chrome.tabs.sendMessage(args[0], request, (response) =>
-            resolve(response)
-        );
-    });
+export const sendMessageTab =
+    (tabId: number): TMessageSender<ServicesModelType> =>
+    (...args) =>
+        new Promise((resolve) => {
+            const request: ITabRequest = {
+                type: 'tabs_command',
+                method: args[0],
+                params: args[1],
+            };
+            chrome.tabs.sendMessage(tabId, request, (response) =>
+                resolve(response)
+            );
+        });
 
-export const getTabCaller: TabMessageSenderCreator =
+export const getTabCaller =
+    (tabId: number): TMessageSenderCreator<ServicesModelType> =>
     (method) =>
     (...args) =>
-        sendMessageTab(args[0], method, args[1]);
+        sendMessageTab(tabId)(method, args[0]);

@@ -1,7 +1,12 @@
-import { Promisable } from 'src/types/utils';
+import {
+    IServices,
+    ServicesModelType,
+    TMessageListener,
+    TMessageSender,
+} from '../../types';
 import { IUser } from '../../../types';
 
-export interface IBgServicesModel {
+export interface IBgServicesModel extends ServicesModelType {
     getToken: {
         Params: undefined;
         Response: string;
@@ -35,42 +40,8 @@ export interface IBgServicesModel {
     };
 }
 
-export type IBgServices = {
-    [Key in keyof IBgServicesModel]: Partial<
-        IBgServicesModel[Key]['Params']
-    > extends IBgServicesModel[Key]['Params']
-        ? (
-              sender: chrome.runtime.MessageSender,
-              args?: IBgServicesModel[Key]['Params']
-          ) => Promisable<IBgServicesModel[Key]['Response']>
-        : (
-              sender: chrome.runtime.MessageSender,
-              args: IBgServicesModel[Key]['Params']
-          ) => Promisable<IBgServicesModel[Key]['Response']>;
-};
+export type IBgServices = IServices<IBgServicesModel>;
 
-export interface IBgRequest<
-    Key extends keyof IBgServicesModel = keyof IBgServicesModel
-> {
-    type: 'command';
-    method: Key;
-    params: IBgServicesModel[Key]['Params'];
-}
+export type TBgMessegeSender = TMessageSender<IBgServicesModel>;
 
-export type BgMessageSender = <T extends keyof IBgServicesModel>(
-    ...args: Partial<
-        IBgServicesModel[T]['Params']
-    > extends IBgServicesModel[T]['Params']
-        ? [method: T, params?: IBgServicesModel[T]['Params']]
-        : [method: T, params: IBgServicesModel[T]['Params']]
-) => Promise<IBgServicesModel[T]['Response']>;
-
-export type BgMessageSenderCreator = <T extends keyof IBgServicesModel>(
-    method: T
-) => (
-    ...args: Partial<
-        IBgServicesModel[T]['Params']
-    > extends IBgServicesModel[T]['Params']
-        ? [params?: IBgServicesModel[T]['Params']]
-        : [params: IBgServicesModel[T]['Params']]
-) => Promise<IBgServicesModel[T]['Response']>;
+export type TBgMessageListener = TMessageListener<IBgServicesModel>;

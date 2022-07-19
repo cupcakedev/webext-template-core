@@ -1,13 +1,16 @@
 import {
-    IBgRequest,
-    IBgServices,
-    BgMessageSender,
-    BgMessageSenderCreator,
-} from './types/bgEvents';
+    IRequest,
+    IServices,
+    ServicesModelType,
+    TMessageSender,
+    TMessageSenderCreator,
+} from './types';
+
+type IBgRequest = IRequest<'command'>;
 
 const isPromise = (value: any) => !!value && typeof value.then === 'function';
 
-export const listenContentMessages = (Services: IBgServices) =>
+export const listenContentMessages = (Services: IServices<ServicesModelType>) =>
     chrome.runtime.onMessage.addListener(
         (request: IBgRequest, sender, sendResponse) => {
             if (chrome.runtime.lastError) {
@@ -45,7 +48,7 @@ export const listenContentMessages = (Services: IBgServices) =>
         }
     );
 
-export const sendMessageBg: BgMessageSender = (...args) =>
+export const sendMessageBg: TMessageSender<ServicesModelType> = (...args) =>
     new Promise((resolve) => {
         const request: IBgRequest = {
             type: 'command',
@@ -55,7 +58,7 @@ export const sendMessageBg: BgMessageSender = (...args) =>
         chrome.runtime.sendMessage(request, (response) => resolve(response));
     });
 
-export const createBgMessageSender: BgMessageSenderCreator =
+export const createBgMessageSender: TMessageSenderCreator<ServicesModelType> =
     (method) =>
     (...args) =>
         sendMessageBg(method, args[0]);
