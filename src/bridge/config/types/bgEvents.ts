@@ -1,5 +1,5 @@
 import { Promisable } from 'src/types/utils';
-import { IUser } from '../../types';
+import { IUser } from '../../../types';
 
 export interface IBgServicesModel {
     getToken: {
