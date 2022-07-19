@@ -25,16 +25,16 @@ export enum SyncStorageKeys {
 }
 
 export interface ILocalStorage {
-    [LocalStorageKeys.users]: IUser[];
-    [LocalStorageKeys.counter]: number;
-    [LocalStorageKeys.tokensUpdating]: boolean;
+    [LocalStorageKeys.users]?: IUser[];
+    [LocalStorageKeys.counter]?: number;
+    [LocalStorageKeys.tokensUpdating]?: boolean;
 }
 
 export interface ISyncStorage {
-    [SyncStorageKeys.JWSToken]: string;
-    [SyncStorageKeys.refreshJWSToken]: string;
-    [SyncStorageKeys.user]: IUser;
-    [SyncStorageKeys.excludeDomains]: string;
+    [SyncStorageKeys.JWSToken]?: string;
+    [SyncStorageKeys.refreshJWSToken]?: string;
+    [SyncStorageKeys.user]?: IUser;
+    [SyncStorageKeys.excludeDomains]?: string;
 }
 
 export type Storage = Partial<ILocalStorage & ISyncStorage>;

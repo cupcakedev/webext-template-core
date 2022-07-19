@@ -1,8 +1,11 @@
 import {
     StorageArea,
-    StorageKeyType,
-    StorageType,
+    StorageDataType,
     StringEnumType,
+    Getter,
+    Setter,
+    Remover,
+    Storage,
 } from './types';
 import {
     getArea,
@@ -18,7 +21,7 @@ import {
 
 async function getItems(keys: string | string[], area: StorageArea = 'local') {
     if (Array.isArray(keys)) {
-        return new Promise<Partial<StorageType>>((resolve) => {
+        return new Promise<Partial<StorageDataType>>((resolve) => {
             chrome.storage[area].get(keys, (data) =>
                 resolve(restoreNormalizedStorage(data))
             );
@@ -32,7 +35,7 @@ async function getItems(keys: string | string[], area: StorageArea = 'local') {
 }
 
 async function setItems(
-    keyOrItems: Partial<StorageType> | string,
+    keyOrItems: Partial<StorageDataType> | string,
     value?: any,
     area: StorageArea = 'local'
 ) {
@@ -73,39 +76,22 @@ async function removeItems(
 
 // storage.local, storage.sync
 
-type Getter<S extends StorageType> = <
-    Key extends StorageKeyType<S> | StorageKeyType<S>[]
->(
-    keys: Key
-) => Key extends StorageKeyType<S>
-    ? Promise<S[Key]>
-    : Promise<Pick<S, Key[number]>>;
+const createGetter: <S extends StorageDataType>(
+    area: StorageArea
+) => Getter<S> = (area) => (keys) =>
+    /* @ts-ignore */
+    getItems(keys, area);
 
-type Setter<S extends StorageType> = <
-    KeyOrItems extends StorageKeyType<S> | Partial<S>
->(
-    ...args: KeyOrItems extends keyof S
-        ? [key: KeyOrItems, value: S[KeyOrItems] | undefined]
-        : [items: KeyOrItems]
-) => Promise<boolean>;
-
-type Remover<S extends StorageType> = (
-    keys: StorageKeyType<S> | StorageKeyType<S>[]
-) => Promise<boolean>;
-
-const createGetter: <S extends StorageType>(area: StorageArea) => Getter<S> =
-    (area) => (keys) =>
-        /* @ts-ignore */
-        getItems(keys, area);
-
-const createSetter: <S extends StorageType>(area: StorageArea) => Setter<S> =
+const createSetter: <S extends StorageDataType>(
+    area: StorageArea
+) => Setter<S> =
     (area) =>
     (keyOrItems, value = undefined) =>
         setItems(keyOrItems, value, area);
 
-const createRemover: <S extends StorageType>(area: StorageArea) => Remover<S> =
-    (area) => (keys) =>
-        removeItems(keys, area);
+const createRemover: <S extends StorageDataType>(
+    area: StorageArea
+) => Remover<S> = (area) => (keys) => removeItems(keys, area);
 
 // storage.any (mixed)
 
@@ -128,7 +114,7 @@ async function getAnyItems(
 
 async function setAnyItems(
     allSyncKeys: StringEnumType,
-    keyOrItems: Partial<StorageType> | string,
+    keyOrItems: Partial<StorageDataType> | string,
     value?: any
 ) {
     if (typeof keyOrItems === 'object') {
@@ -146,7 +132,7 @@ async function setAnyItems(
 
 async function removeAnyItems(
     allSyncKeys: StringEnumType,
-    keys: keyof StorageType | (keyof StorageType)[]
+    keys: keyof StorageDataType | (keyof StorageDataType)[]
 ) {
     if (Array.isArray(keys)) {
         const [syncKeys, localKeys] = splitStorageKeys(allSyncKeys, keys);
@@ -161,20 +147,20 @@ async function removeAnyItems(
     return removeItems(keys, getArea(allSyncKeys, keys));
 }
 
-const createAnyGetter: <S extends StorageType>(
+const createAnyGetter: <S extends StorageDataType>(
     allSyncKeys: StringEnumType
 ) => Getter<S> = (allSyncKeys) => (keys) =>
     /* @ts-ignore */
     getAnyItems(allSyncKeys, keys);
 
-const createAnySetter: <S extends StorageType>(
+const createAnySetter: <S extends StorageDataType>(
     allSyncKeys: StringEnumType
 ) => Setter<S> =
     (allSyncKeys) =>
     (keyOrItems, value = undefined) =>
         setAnyItems(allSyncKeys, keyOrItems, value);
 
-const createAnyRemover: <S extends StorageType>(
+const createAnyRemover: <S extends StorageDataType>(
     allSyncKeys: StringEnumType
 ) => Remover<S> = (allSyncKeys) => async (keys) =>
     removeAnyItems(allSyncKeys, keys);
@@ -182,7 +168,7 @@ const createAnyRemover: <S extends StorageType>(
 const clearAllStorage = () =>
     Promise.all([chrome.storage.local.clear(), chrome.storage.sync.clear()]);
 
-const createStorageArea = <T extends StorageType>(area: StorageArea) => ({
+const createStorageArea = <T extends StorageDataType>(area: StorageArea) => ({
     get: createGetter<T>(area),
     set: createSetter<T>(area),
     remove: createRemover<T>(area),
@@ -192,7 +178,7 @@ const createStorageArea = <T extends StorageType>(area: StorageArea) => ({
 export const createStorage = <Local, Sync>(
     localKeys: StringEnumType,
     syncKeys: StringEnumType
-) => ({
+): Storage<Local, Sync> => ({
     local: createStorageArea<Local>('local'),
     sync: createStorageArea<Sync>('sync'),
     any: {

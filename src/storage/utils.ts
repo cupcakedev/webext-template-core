@@ -1,17 +1,17 @@
 import partition from 'lodash/partition';
-import { StorageType, StringEnumType } from './types';
+import { StorageDataType, StringEnumType } from './types';
 
 export const getArea = (allSyncKeys: StringEnumType, key: string) =>
     allSyncKeys[key] ? 'sync' : 'local';
 
 export const splitStorageKeys = (
     allSyncKeys: StringEnumType,
-    keys: (keyof StorageType)[]
+    keys: (keyof StorageDataType)[]
 ) => partition(keys, (key) => allSyncKeys[key]);
 
 export const splitStorage = (
     allSyncKeys: StringEnumType,
-    storage: StorageType
+    storage: StorageDataType
 ) =>
     Object.entries(storage).reduce(
         (arr, [key, value]) => {
@@ -22,7 +22,7 @@ export const splitStorage = (
             Object.assign(arr[1], { [key]: value });
             return arr;
         },
-        [{}, {}] as [StorageType, StorageType]
+        [{}, {}] as [StorageDataType, StorageDataType]
     );
 
 // Safari skips writes with 'undefined' and 'null', write '' instead
@@ -33,7 +33,9 @@ const shouldNormalize = (value: any) => value === undefined || value === null;
 export const normalizeStorageValue = (value: any) =>
     shouldNormalize(value) ? EMPTY_VALUE : value;
 
-export const normalizeStorage = (items: StorageType): Partial<StorageType> =>
+export const normalizeStorage = (
+    items: StorageDataType
+): Partial<StorageDataType> =>
     Object.entries(items).reduce((acc, [key, value]) => {
         if (shouldNormalize(value)) {
             Object.assign(acc, { [key]: EMPTY_VALUE });
@@ -45,14 +47,14 @@ export const restoreNormalizedValue = (value: any) =>
     value === EMPTY_VALUE ? undefined : value;
 
 export const restoreNormalizedStorage = (
-    data: StorageType
-): Partial<StorageType> =>
+    data: StorageDataType
+): Partial<StorageDataType> =>
     Object.entries(data).reduce((acc, [key, value]) => {
         if (value === EMPTY_VALUE) {
             Object.assign(acc, { [key]: undefined });
         }
         return acc;
-    }, data as Partial<StorageType>);
+    }, data as Partial<StorageDataType>);
 
 const STORAGE_VERSION_KEY = 'storageVersion';
 
