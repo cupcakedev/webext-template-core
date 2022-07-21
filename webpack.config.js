@@ -5,7 +5,8 @@ const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const { merge } = require('webpack-merge');
 
-const commonConfig = {
+const prodConfig = {
+    mode: 'production',
     entry: {
         index: `${__dirname}/src/index.ts`,
         'storage/storage': `${__dirname}/src/storage/storage.ts`,
@@ -24,6 +25,16 @@ const commonConfig = {
     devtool: 'inline-source-map',
     module: {
         rules: [
+            {
+                test: /\.tsx?$/,
+                use: {
+                    loader: 'ts-loader',
+                    options: {
+                        compiler: 'ttypescript',
+                    },
+                },
+                exclude: /node_modules/,
+            },
             {
                 test: /\.(?:ico|gif|png|svg|jpg|jpeg)$/i,
                 loader: 'url-loader',
@@ -57,43 +68,14 @@ const commonConfig = {
     },
 };
 
-const prodConfig = {
-    mode: 'production',
-    module: {
-        rules: [
-            {
-                test: /\.tsx?$/,
-                use: 'ts-loader',
-                exclude: /node_modules/,
-            },
-        ],
-    },
-};
-
 const devConfig = {
     mode: 'development',
     plugins: [new BundleAnalyzerPlugin()],
-    module: {
-        rules: [
-            {
-                test: /\.tsx?$/,
-                use: {
-                    loader: 'ts-loader',
-                    options: {
-                        compilerOptions: {
-                            declaration: false,
-                        },
-                    },
-                },
-                exclude: /node_modules/,
-            },
-        ],
-    },
 };
 
 module.exports = (env) => {
     if (env.development) {
-        return merge(commonConfig, devConfig);
+        return merge(prodConfig, devConfig);
     }
-    return merge(commonConfig, prodConfig);
+    return prodConfig;
 };

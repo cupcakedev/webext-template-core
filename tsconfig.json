@@ -21,7 +21,11 @@
     "types": ["chrome", "node", "webpack-env", "jest"],
     "paths": {
       "src/*": ["src/*"]
-    }
+    },
+    "plugins": [
+      { "transform": "typescript-transform-paths" },
+      { "transform": "typescript-transform-paths", "afterDeclarations": true }
+    ]
   },
   "include": ["src/**/*", "custom.d.ts"],
   "exclude": ["./node_modules", "./build", "src/**/*.test.*"]
