@@ -22,6 +22,11 @@ const prodConfig = {
         umdNamedDefine: true,
         clean: true,
     },
+    externals: {
+        react: 'react',
+        reactDOM: 'react-dom',
+        reactIs: 'react-is',
+    },
     devtool: 'inline-source-map',
     module: {
         rules: [
