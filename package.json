@@ -16,6 +16,10 @@
   "files": [
     "build"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cupcakedev/webext-template-core"
+  },
   "peerDependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
