@@ -9,5 +9,7 @@ export {
     sendMessageTab,
     getTabCaller,
 } from './bridge/tabsEvents';
+export { InjectModal } from './components/InjectModal';
 export { RouteInterface, Router } from './pages/content/router';
+export { Injection } from './pages/content/components/Injection';
 export { createHookUseChromeStorage } from './hooks/createHookUseChromeStorage';
