@@ -2,7 +2,10 @@
   "name": "webext-template-core",
   "version": "0.0.1",
   "description": "CupcakeDev Extension Template Core",
-  "license": "MIT",
+  "private": true,
+  "author": "cupcakedev",
+  "license": "ISC",
+  "main": "./build/index.js",
   "scripts": {
     "dev": "dotenv -- webpack --env development --watch",
     "build": "dotenv -- webpack --env production",
@@ -10,10 +13,6 @@
     "test": "jest",
     "start-json-server": "json-server --watch db.json --port 3004"
   },
-  "main": "./build/index.js",
-  "files": [
-    "build"
-  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/cupcakedev/webext-template-core"
