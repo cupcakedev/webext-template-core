@@ -1,3 +1,4 @@
+import { logger } from 'src/logger';
 import {
     IRequest,
     ServicesModelType,
@@ -15,9 +16,9 @@ export const listenBgMessage: TMessageListener<ServicesModelType> = (
     chrome.runtime.onMessage.addListener(
         async (request: ITabRequest, sender, sendResponse) => {
             if (request.type === 'tabs_command' && request.method === method) {
-                console.log('receive from bg', request);
+                logger('receive from bg', request);
                 const response = await callback(sender, request.params);
-                console.log('send response', method, response);
+                logger('send response', method, response);
                 sendResponse(response);
             }
             return true;

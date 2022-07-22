@@ -1,3 +1,4 @@
+import { logger } from 'src/logger';
 import {
     StorageArea,
     StorageDataType,
@@ -192,11 +193,11 @@ export const createStorage = <Local, Sync>(
 export const migrageStorage = async (version: string) => {
     const lastStorageVersion = await getStorageVersion();
 
-    console.log('storage version:', version);
-    console.log('last storage version:', lastStorageVersion);
+    logger('storage version:', version);
+    logger('last storage version:', lastStorageVersion);
 
     if (version !== lastStorageVersion) {
-        console.log('storage version changed, clear storage');
+        logger('storage version changed, clear storage');
         await clearAllStorage();
         await setStorageVersion(version);
     }

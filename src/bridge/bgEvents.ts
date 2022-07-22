@@ -1,3 +1,4 @@
+import { logger } from 'src/logger';
 import {
     IRequest,
     IServices,
@@ -20,7 +21,7 @@ export const listenContentMessages = (Services: IServices<ServicesModelType>) =>
             if (request.type !== 'command') {
                 return true;
             }
-            console.log('request', request.method, ' => send');
+            logger('request', request.method, ' => send');
             const { method, params } = request;
 
             if (!Object.keys(Services).includes(method)) {
@@ -32,15 +33,15 @@ export const listenContentMessages = (Services: IServices<ServicesModelType>) =>
             if (isPromise(result)) {
                 (result as Promise<any>)
                     .then((promisedResult) => {
-                        console.log(promisedResult);
+                        logger(promisedResult);
                         sendResponse(promisedResult);
                     })
                     .catch((e: any) => {
-                        console.log({ error: e.message });
+                        logger({ error: e.message });
                         sendResponse({ error: e.message });
                     });
             } else {
-                console.log(result);
+                logger(result);
                 sendResponse(result);
             }
 
