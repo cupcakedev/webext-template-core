@@ -15,14 +15,15 @@ const selectTargetElement = (id?: string) => {
 
 interface Props {
     id?: string;
-    children?: JSX.Element;
+    containerClassName?: string;
+    children: JSX.Element;
 }
 
-const InjectModal: React.FC<Props> = ({ id, children }) => (
+const InjectModal: React.FC<Props> = ({ id, children, containerClassName }) => (
     <Injection
         selectTargetElement={() => selectTargetElement(id)}
         position="beforeend"
-        containerClassName="modal_test__container"
+        containerClassName={containerClassName || 'modal__container'}
     >
         {children}
     </Injection>
