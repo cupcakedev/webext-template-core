@@ -1,5 +1,6 @@
 const path = require('path');
 const { EnvironmentPlugin } = require('webpack');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const { merge } = require('webpack-merge');
 
@@ -14,7 +15,6 @@ const prodConfig = {
         libraryTarget: 'umd',
         library: 'Core',
         umdNamedDefine: true,
-        clean: true,
     },
     externals: {
         react: 'react',
@@ -58,8 +58,8 @@ const prodConfig = {
     },
     plugins: [
         new EnvironmentPlugin(['EXTENSION_NAME_PREFIX']),
-        new WatchIgnorePlugin({
-            paths: [/\.js$/, /\.d\.ts$/],
+        new CleanWebpackPlugin({
+            cleanStaleWebpackAssets: false,
         }),
     ],
     optimization: {
