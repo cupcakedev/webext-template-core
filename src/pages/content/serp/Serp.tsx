@@ -1,22 +1,31 @@
 import React, { useLayoutEffect, useState } from 'react';
 import root from 'react-shadow/styled-components';
 import { Injection } from 'src/pages/content/components/Injection';
-import { SerpItem } from './SerpItem';
 
-const CONTAINER_CLASSNAME = 'template-serp';
-const ITEM_TEXT = "I'm a SERP injection";
+export type SearchConfig = {
+    pattern: RegExp;
+    linksSelector: string;
+    searchInput: string;
+};
+
+const CONTAINER_CLASSNAME = 'serp-item';
 
 interface PortalData {
     href: string;
     container: Element;
-    text: string;
 }
 
 interface SerpProps {
     serpLinksSelector: string;
+    itemContainerClassName?: string;
+    render: (props: { href: string }) => JSX.Element;
 }
 
-const Serp: React.FC<SerpProps> = ({ serpLinksSelector }) => {
+const Serp: React.FC<SerpProps> = ({
+    serpLinksSelector,
+    itemContainerClassName,
+    render,
+}) => {
     const [containers, setContainers] = useState<PortalData[]>([]);
 
     const serpContainers = (links: NodeListOf<any>) => {
@@ -29,7 +38,6 @@ const Serp: React.FC<SerpProps> = ({ serpLinksSelector }) => {
             containers.push({
                 href,
                 container: link,
-                text: ITEM_TEXT,
             });
         });
         return containers;
@@ -50,11 +58,11 @@ const Serp: React.FC<SerpProps> = ({ serpLinksSelector }) => {
                     key={container.href}
                     selectTargetElement={() => container.container}
                     position="beforebegin"
-                    containerClassName={CONTAINER_CLASSNAME}
+                    containerClassName={
+                        itemContainerClassName || CONTAINER_CLASSNAME
+                    }
                 >
-                    <root.div>
-                        <SerpItem text={container.text} />
-                    </root.div>
+                    <root.div>{render({ href: container.href })}</root.div>
                 </Injection>
             ))}
         </>
