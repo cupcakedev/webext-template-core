@@ -9,6 +9,7 @@
   "scripts": {
     "dev": "dotenv -- webpack --env development --watch",
     "build": "dotenv -- webpack --env production",
+    "prepare": "dotenv -- webpack --env production",
     "lint": "eslint --ext js,ts,tsx .",
     "test": "jest",
     "start-json-server": "json-server --watch db.json --port 3004"
