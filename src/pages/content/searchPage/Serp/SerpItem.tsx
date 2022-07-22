@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import logo from 'src/assets/icon/32.png';
+import logo from '../assets/icon/32.png';
 
 const SerpItem = ({ text }: { text: string }) => (
     <Root>

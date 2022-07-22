@@ -9,10 +9,6 @@ const prodConfig = {
     mode: 'production',
     entry: {
         index: `${__dirname}/src/index.ts`,
-        'storage/storage': `${__dirname}/src/storage/storage.ts`,
-        'storage/config': `${__dirname}/src/storage/config.ts`,
-        'bridge/bgEvents': `${__dirname}/src/bridge/bgEvents.ts`,
-        'bridge/tabsEvents': `${__dirname}/src/bridge/tabsEvents.ts`,
     },
     output: {
         path: path.resolve(__dirname, 'build'),
