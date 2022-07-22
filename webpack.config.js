@@ -1,8 +1,6 @@
 const path = require('path');
-const TerserPlugin = require('terser-webpack-plugin');
-const { EnvironmentPlugin, WatchIgnorePlugin } = require('webpack');
+const { EnvironmentPlugin } = require('webpack');
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
-const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const { merge } = require('webpack-merge');
 
 const prodConfig = {
@@ -71,7 +69,6 @@ const prodConfig = {
 
 const devConfig = {
     mode: 'development',
-    plugins: [new BundleAnalyzerPlugin()],
 };
 
 module.exports = (env) => {
