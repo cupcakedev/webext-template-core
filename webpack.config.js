@@ -3,6 +3,7 @@ const { EnvironmentPlugin } = require('webpack');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const { merge } = require('webpack-merge');
+const CopyPlugin = require('copy-webpack-plugin');
 
 const prodConfig = {
     mode: 'production',
@@ -60,6 +61,18 @@ const prodConfig = {
         new EnvironmentPlugin(['EXTENSION_NAME_PREFIX']),
         new CleanWebpackPlugin({
             cleanStaleWebpackAssets: false,
+        }),
+        new CopyPlugin({
+            patterns: [
+                {
+                    from: `${__dirname}/package.json`,
+                    to: `${__dirname}/build/`,
+                },
+                {
+                    from: `${__dirname}/LICENSE`,
+                    to: `${__dirname}/build/`,
+                },
+            ],
         }),
     ],
     optimization: {
