@@ -65,11 +65,15 @@ const prodConfig = {
         new CopyPlugin({
             patterns: [
                 {
-                    from: `${__dirname}/package.json`,
+                    from: `${__dirname}/src/package.json`,
                     to: `${__dirname}/build/`,
                 },
                 {
                     from: `${__dirname}/LICENSE`,
+                    to: `${__dirname}/build/`,
+                },
+                {
+                    from: `${__dirname}/README.md`,
                     to: `${__dirname}/build/`,
                 },
             ],
