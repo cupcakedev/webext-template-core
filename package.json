@@ -2,7 +2,6 @@
   "name": "webext-template-core",
   "version": "1.0.0",
   "description": "CupcakeDev Extension Template Core",
-  "private": true,
   "author": "cupcakedev",
   "license": "ISC",
   "main": "./build/index.js",
