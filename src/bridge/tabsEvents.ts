@@ -35,9 +35,11 @@ export const sendMessageTab =
                 method: args[0],
                 params: args[1],
             };
-            chrome.tabs.sendMessage(tabId, request, (response) =>
-                resolve(response)
-            );
+            chrome.tabs.sendMessage(tabId, request, (response) => {
+                if (!chrome.runtime.lastError) {
+                    resolve(response);
+                }
+            });
         });
 
 export const getTabCaller =
