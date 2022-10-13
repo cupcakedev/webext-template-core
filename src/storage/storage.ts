@@ -176,7 +176,10 @@ const createStorageArea = <T extends StorageDataType>(area: StorageArea) => ({
     clear: () => chrome.storage[area].clear(),
 });
 
-export const createStorage = <Local, Sync>(
+export const createStorage = <
+    Local extends StorageDataType,
+    Sync extends StorageDataType
+>(
     localKeys: StringEnumType,
     syncKeys: StringEnumType
 ): Storage<Local, Sync> => ({
