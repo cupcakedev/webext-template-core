@@ -28,11 +28,11 @@ export const listenContentMessages = (Services: IServices<ServicesModelType>) =>
                 return Promise.reject();
             }
 
-            const result = Services[method](sender, params as never);
+            const result = Services[method](sender, params);
 
             if (isPromise(result)) {
-                (result as Promise<any>)
-                    .then((promisedResult) => {
+                result
+                    .then((promisedResult: any) => {
                         logger(promisedResult);
                         sendResponse(promisedResult);
                     })

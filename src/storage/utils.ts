@@ -13,7 +13,7 @@ export const splitStorage = (
     allSyncKeys: StringEnumType,
     storage: StorageDataType
 ) =>
-    Object.entries(storage).reduce(
+    Object.entries(storage).reduce<[StorageDataType, StorageDataType]>(
         (arr, [key, value]) => {
             if (allSyncKeys[key]) {
                 Object.assign(arr[0], { [key]: value });
@@ -22,7 +22,7 @@ export const splitStorage = (
             Object.assign(arr[1], { [key]: value });
             return arr;
         },
-        [{}, {}] as [StorageDataType, StorageDataType]
+        [{}, {}]
     );
 
 // Safari skips writes with 'undefined' and 'null', write '' instead
@@ -49,12 +49,15 @@ export const restoreNormalizedValue = (value: any) =>
 export const restoreNormalizedStorage = (
     data: StorageDataType
 ): Partial<StorageDataType> =>
-    Object.entries(data).reduce((acc, [key, value]) => {
-        if (value === EMPTY_VALUE) {
-            Object.assign(acc, { [key]: undefined });
-        }
-        return acc;
-    }, data as Partial<StorageDataType>);
+    Object.entries(data).reduce<Partial<StorageDataType>>(
+        (acc, [key, value]) => {
+            if (value === EMPTY_VALUE) {
+                Object.assign(acc, { [key]: undefined });
+            }
+            return acc;
+        },
+        data
+    );
 
 const STORAGE_VERSION_KEY = 'storageVersion';
 
