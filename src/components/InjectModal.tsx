@@ -1,5 +1,5 @@
 import React from 'react';
-import { Injection } from '../pages/content/components/Injection';
+import { Injection } from './Injection';
 
 export const MODAL_ROOT_ID = 'modal-root';
 
