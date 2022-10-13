@@ -56,14 +56,15 @@ const createHookUseChromeStorage = <
                         ? (newValue as Function)(state)
                         : newValue;
                 setState(value);
-                // @ts-ignore
-                storage.any.set({ [key]: value }).then((result) => {
-                    if (result) {
-                        setError('');
-                    } else {
-                        setError(error);
-                    }
-                });
+                (storage as Storage<any, any>).any
+                    .set({ [key]: value })
+                    .then((result) => {
+                        if (result) {
+                            setError('');
+                        } else {
+                            setError(error);
+                        }
+                    });
             },
             [key, state, error]
         );

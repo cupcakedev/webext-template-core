@@ -36,7 +36,10 @@ export type StorageAreaApi<S extends StorageDataType> = {
     clear: () => Promise<unknown>;
 };
 
-export type Storage<LocalStorageData, SyncStorageData> = {
+export type Storage<
+    LocalStorageData extends StorageDataType,
+    SyncStorageData extends StorageDataType
+> = {
     local: StorageAreaApi<LocalStorageData>;
     sync: StorageAreaApi<SyncStorageData>;
     any: StorageAreaApi<LocalStorageData & SyncStorageData>;
