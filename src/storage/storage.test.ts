@@ -1,5 +1,10 @@
 import { createStorage } from './storage';
-import { IUser } from '../types';
+
+interface IUser {
+    id: number;
+    name: string;
+    login: string;
+}
 
 enum LocalStorageKeys {
     users = 'users',
