@@ -21,3 +21,5 @@ npm install webext-template-core
 ```bash
 yarn add webext-template-core
 ```
+
+[Documentation for development](docs/Development.md)
