@@ -1,0 +1,9 @@
+{
+  "name": "webext-template-core",
+  "version": "1.0.2",
+  "description": "CupcakeDev Extension Template Core",
+  "main": "./index",
+  "types": "./index",
+  "author": "cupcakedev",
+  "license": "ISC"
+}
