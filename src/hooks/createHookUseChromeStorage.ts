@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import {
     StorageKeyType,
@@ -30,6 +30,8 @@ const createHookUseChromeStorage = <
             allSyncKeys[key] ? 'sync' : 'local'
         );
 
+        const defaultValueRef = useRef(defaultValue as WithDefault<S[Key]>);
+
         const [state, setState] = useState(defaultValue as WithDefault<S[Key]>);
         const [error, setError] = useState('');
 
@@ -38,8 +40,8 @@ const createHookUseChromeStorage = <
                 .get(key)
                 .then((res) => {
                     setState(
-                        (defaultValue !== undefined
-                            ? res || defaultValue
+                        (defaultValueRef.current !== undefined
+                            ? res || defaultValueRef.current
                             : res) as WithDefault<S[Key]>
                     );
                     setError('');
@@ -47,7 +49,7 @@ const createHookUseChromeStorage = <
                 .catch((error) => {
                     setError(error);
                 });
-        }, [key, defaultValue]);
+        }, [key, defaultValueRef.current]);
 
         const updateValue: typeof setState = useCallback(
             (newValue) => {
@@ -77,7 +79,9 @@ const createHookUseChromeStorage = <
                 if (areaName === STORAGE_AREA && key in changes) {
                     const val = changes[key]?.newValue || undefined;
                     setState(
-                        defaultValue !== undefined ? val || defaultValue : val
+                        defaultValueRef.current !== undefined
+                            ? val || defaultValueRef.current
+                            : val
                     );
                     setError('');
                 }
@@ -86,7 +90,7 @@ const createHookUseChromeStorage = <
             return () => {
                 chrome.storage.onChanged.removeListener(onChange);
             };
-        }, [key, STORAGE_AREA, defaultValue]);
+        }, [key, STORAGE_AREA, defaultValueRef.current]);
 
         return [state, updateValue, error] as const;
     };
