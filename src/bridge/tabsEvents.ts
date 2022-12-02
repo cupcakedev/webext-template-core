@@ -20,6 +20,9 @@ export const listenBgMessage: TMessageListener<ServicesModelType> = (
                 const response = await callback(sender, request.params);
                 logger('send response', method, response);
                 sendResponse(response);
+                // in Firefox listener has to return the response value, as 'sendResponse' doesn't seem to work
+                // returning response doesn't affect Chrome or Safari
+                return response;
             }
             return true;
         }
