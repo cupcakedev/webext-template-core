@@ -1,6 +1,6 @@
 {
   "name": "webext-template-core",
-  "version": "1.0.2",
+  "version": "1.0.4",
   "description": "CupcakeDev Extension Template Core",
   "main": "./index",
   "types": "./index",
