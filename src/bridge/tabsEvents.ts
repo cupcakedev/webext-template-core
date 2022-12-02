@@ -36,9 +36,11 @@ export const sendMessageTab =
                 params: args[1],
             };
             chrome.tabs.sendMessage(tabId, request, (response) => {
-                if (!chrome.runtime.lastError) {
-                    resolve(response);
+                if (chrome.runtime.lastError) {
+                    console.error(chrome.runtime.lastError.message);
+                    resolve(undefined);
                 }
+                resolve(response);
             });
         });
 
