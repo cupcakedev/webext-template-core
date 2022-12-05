@@ -20,6 +20,12 @@ jobs:
           node-version: 16.13.2
           registry-url: https://registry.npmjs.org/
 
+      - name: install
+        run: yarn install
+
+      - name: build
+        run: yarn build
+
       - name: set name author
         run: |
           git config user.email "action@github.com"
