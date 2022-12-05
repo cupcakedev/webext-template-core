@@ -4,17 +4,16 @@ on:
   push:
     branches:
       - npm
-  pull_request:
-    branches:
-      - npm
 
 jobs:
   publish:
     runs-on: ubuntu-latest
 
     steps:
-      - name: checkout repository
+      - name: checkout npm
         uses: actions/checkout@v2
+        with:
+          ref: npm
 
       - uses: actions/setup-node@v2
         with:
@@ -28,6 +27,21 @@ jobs:
 
       - name: patch version
         run: npm version patch --git-tag-version
+
+      - name: checkout master
+        run: |
+          git fetch
+          git checkout master
+
+      - name: pushing
+        run: |
+          git merge -X theirs npm --allow-unrelated-histories
+          git push --follow-tags
+
+      - name: checkout npm
+        run: |
+          git fetch
+          git checkout npm
 
       - name: publish package to npm
         run: npm publish
