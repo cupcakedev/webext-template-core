@@ -1,4 +1,3 @@
-import partition from 'lodash/partition';
 import { StorageDataType, StringEnumType } from './types';
 
 export const getArea = (allSyncKeys: StringEnumType, key: string) =>
@@ -7,7 +6,18 @@ export const getArea = (allSyncKeys: StringEnumType, key: string) =>
 export const splitStorageKeys = (
     allSyncKeys: StringEnumType,
     keys: (keyof StorageDataType)[]
-) => partition(keys, (key) => allSyncKeys[key]);
+) =>
+    keys.reduce<[(keyof StorageDataType)[], (keyof StorageDataType)[]]>(
+        (arr, key) => {
+            if (allSyncKeys[key]) {
+                arr[0].push(key);
+                return arr;
+            }
+            arr[1].push(key);
+            return arr;
+        },
+        [[], []]
+    );
 
 export const splitStorage = (
     allSyncKeys: StringEnumType,
