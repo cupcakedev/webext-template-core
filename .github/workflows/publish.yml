@@ -1,32 +1,39 @@
-name: MANUAL PUBLISH NPM
+name: Publish to NPM
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - npm
+  pull_request:
+    branches:
+      - npm
 
 jobs:
   publish:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/setup-node@v2
-        with:
-          node-version: 14.x
-          registry-url: https://registry.npmjs.org/
-
       - name: checkout repository
         uses: actions/checkout@v2
+
+      - uses: actions/setup-node@v2
         with:
-          fetch-depth: 0
+          node-version: 16.13.2
+          registry-url: https://registry.npmjs.org/
 
-      - name: install
-        run: yarn install
+      - name: set name author
+        run: |
+          git config user.email "action@github.com"
+          git config user.name "GitHub Action"
 
-      - name: build
-        run: yarn build
+      - name: patch version
+        run: npm version patch --git-tag-version
 
       - name: publish package to npm
-        working-directory: build
         run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: pushing
+        run: git push --follow-tags
 
