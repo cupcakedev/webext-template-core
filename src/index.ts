@@ -1,5 +1,5 @@
 export { createStorage, migrageStorage } from './storage/storage';
-export { StorageUpdate } from './storage/types';
+export { StorageUpdate, StorageDataType } from './storage/types';
 export {
     listenContentMessages,
     sendMessageBg,
