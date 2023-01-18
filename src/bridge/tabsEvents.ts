@@ -14,15 +14,15 @@ export const listenBgMessage: TMessageListener<ServicesModelType> = (
     callback
 ) => {
     chrome.runtime.onMessage.addListener(
-        async (request: ITabRequest, sender, sendResponse) => {
+        (request: ITabRequest, sender, sendResponse) => {
             if (request.type === 'tabs_command' && request.method === method) {
                 logger('receive from bg', request);
-                const response = await callback(sender, request.params);
-                logger('send response', method, response);
-                sendResponse(response);
-                // in Firefox listener has to return the response value, as 'sendResponse' doesn't seem to work
-                // returning response doesn't affect Chrome or Safari
-                return response;
+                Promise.resolve(callback(sender, request.params)).then(
+                    (response) => {
+                        logger('send response', method, response);
+                        sendResponse(response);
+                    }
+                );
             }
             return true;
         }
