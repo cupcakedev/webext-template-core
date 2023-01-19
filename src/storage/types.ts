@@ -4,8 +4,8 @@ export type StorageKeyType<S extends StorageDataType> = string & keyof S;
 export type StorageArea = 'local' | 'sync';
 export type StorageUpdate<S extends StorageDataType> = {
     [Key in keyof S]?: {
-        newValue: S[Key] | '';
-        oldValue: S[Key] | '';
+        newValue?: S[Key] | '';
+        oldValue?: S[Key] | '';
     };
 };
 
