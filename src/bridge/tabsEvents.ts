@@ -32,7 +32,7 @@ export const listenBgMessage: TMessageListener<ServicesModelType> = (
 export const sendMessageTab =
     (tabId: number): TMessageSender<ServicesModelType> =>
     (...args) =>
-        new Promise((resolve) => {
+        new Promise((resolve, reject) => {
             const request: ITabRequest = {
                 type: 'tabs_command',
                 method: args[0],
@@ -40,8 +40,7 @@ export const sendMessageTab =
             };
             chrome.tabs.sendMessage(tabId, request, (response) => {
                 if (chrome.runtime.lastError) {
-                    console.error(chrome.runtime.lastError.message);
-                    resolve(undefined);
+                    reject(chrome.runtime.lastError.message);
                 }
                 resolve(response);
             });
